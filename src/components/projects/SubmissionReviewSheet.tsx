@@ -137,13 +137,13 @@ export function SubmissionReviewSheet({
         </div>
 
         <div className="grid grid-cols-2 gap-2 border-t border-border bg-muted/40 p-4 sm:grid-cols-4">
-          <Button onClick={() => decide("اعتماد")} className="bg-success text-success-foreground hover:bg-success/90">
+          <Button onClick={() => decide("اعتماد", "approved")} className="bg-success text-success-foreground hover:bg-success/90">
             <CheckCircle2 className="h-4 w-4" /> اعتماد
           </Button>
-          <Button onClick={() => decide("طلب مستندات إضافية")} className="bg-warning text-warning-foreground hover:bg-warning/90">
+          <Button onClick={() => decide("طلب مستندات إضافية", "additional_docs")} className="bg-warning text-warning-foreground hover:bg-warning/90">
             <AlertTriangle className="h-4 w-4" /> مستندات إضافية
           </Button>
-          <Button onClick={() => decide("رفض")} variant="destructive">
+          <Button onClick={() => decide("رفض", "rejected")} variant="destructive">
             <XCircle className="h-4 w-4" /> رفض
           </Button>
           <Button onClick={() => decide("إعادة تعيين")} variant="secondary">
