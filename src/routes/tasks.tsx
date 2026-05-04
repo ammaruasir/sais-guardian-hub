@@ -7,7 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Plus } from "lucide-react";
 import { TaskBoard } from "@/components/tasks/TaskBoard";
 import { NewTaskDialog } from "@/components/tasks/NewTaskDialog";
-import { tasks, currentUserId } from "@/data/tasks";
+import { currentUserId } from "@/data/tasks";
+import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/tasks")({
