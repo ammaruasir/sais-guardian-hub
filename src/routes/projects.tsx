@@ -3,9 +3,12 @@ import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useRole } from "@/context/RoleContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { KanbanBoard } from "@/components/projects/KanbanBoard";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import { ProjectsFilters, applyFilters, defaultFilters, type ProjectFilters } from "@/components/projects/ProjectsFilters";
+import { ProjectFormDialog } from "@/components/projects/ProjectFormDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -23,6 +26,7 @@ function ProjectsPage() {
   const projects = useAppStore((s) => s.projects);
   const [filters, setFilters] = useState<ProjectFilters>(defaultFilters);
   const [view, setView] = useState<"kanban" | "table">("kanban");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const filtered = useMemo(() => applyFilters(projects, filters), [filters, projects]);
 
   return (
@@ -33,12 +37,15 @@ function ProjectsPage() {
             <h1 className="text-2xl font-bold tracking-tight">المشاريع</h1>
             <p className="text-sm text-muted-foreground">إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع</p>
           </div>
-          <Tabs value={view} onValueChange={(v) => setView(v as any)}>
-            <TabsList>
-              <TabsTrigger value="kanban">كانبان</TabsTrigger>
-              <TabsTrigger value="table">جدول</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={() => setDialogOpen(true)}><Plus className="ml-1 h-4 w-4" />إضافة مشروع</Button>
+            <Tabs value={view} onValueChange={(v) => setView(v as any)}>
+              <TabsList>
+                <TabsTrigger value="kanban">كانبان</TabsTrigger>
+                <TabsTrigger value="table">جدول</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
 
         <ProjectsFilters value={filters} onChange={setFilters} />
@@ -50,6 +57,7 @@ function ProjectsPage() {
 
         {view === "kanban" ? <KanbanBoard projects={filtered} /> : <ProjectsTable projects={filtered} />}
       </div>
+      <ProjectFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <Toaster position="top-center" />
     </AppShell>
   );
