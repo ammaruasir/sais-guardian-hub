@@ -68,7 +68,7 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">الحالة</label>
-              <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
+              <Select value={status} onValueChange={(v) => { const ns = v as TaskStatus; setStatus(ns); if (task) { updateTaskStatus(task.id, ns); toast.success("تم تحديث الحالة"); } }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {(Object.keys(taskStatusLabel) as TaskStatus[]).map((s) => (
