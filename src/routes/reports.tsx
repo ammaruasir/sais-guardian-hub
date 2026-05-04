@@ -96,7 +96,11 @@ function ChartCard({ title, en, children }: { title: string; en: string; childre
 
 function ReportsContent() {
   const [range, setRange] = useState("6m");
-  const maxReviewer = Math.max(...reviewers.map((r) => r.count));
+  const factor = range === "30d" ? 0.85 : range === "3m" ? 0.92 : range === "1y" ? 1.15 : 1;
+  const monthlyR = monthly.map((d) => ({ ...d, v: Math.max(1, Math.round(d.v * factor)) }));
+  const stagesR = stages.map((d) => ({ ...d, days: Number((d.days * factor).toFixed(1)) }));
+  const reviewersR = reviewers.map((d) => ({ ...d, count: Math.max(1, Math.round(d.count * factor)) }));
+  const maxReviewer = Math.max(...reviewersR.map((r) => r.count));
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
