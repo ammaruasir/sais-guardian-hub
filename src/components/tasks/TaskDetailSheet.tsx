@@ -43,7 +43,7 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="left" className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle className="text-right">{task.titleAr}</SheetTitle>
+          <SheetTitle className="text-end">{task.titleAr}</SheetTitle>
         </SheetHeader>
         <div className="mt-4 space-y-4">
           <div className="flex flex-wrap gap-2">

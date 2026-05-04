@@ -16,7 +16,7 @@ export function RequirementsTree() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold num">
                 {s.stage}
               </div>
-              <div className="flex-1 text-right">
+              <div className="flex-1 text-end">
                 <div className="text-base font-semibold">المرحلة {s.stage}: {s.titleAr}</div>
                 <div className="text-xs text-muted-foreground">{s.titleEn}</div>
               </div>

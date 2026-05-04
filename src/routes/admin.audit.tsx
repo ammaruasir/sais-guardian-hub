@@ -125,7 +125,7 @@ function AuditPage() {
       {/* Guide */}
       <Collapsible>
         <Card className="p-3">
-          <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-right">
+          <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 text-end">
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Info className="h-4 w-4 text-secondary" />
               دليل الأحداث الأمنية والمستويات
@@ -187,13 +187,13 @@ function AuditPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">المستخدم</TableHead>
-              <TableHead className="text-right">الحدث</TableHead>
-              <TableHead className="text-right">الوصف</TableHead>
-              <TableHead className="text-right">الصفحة</TableHead>
-              <TableHead className="text-right">المستوى</TableHead>
-              <TableHead className="text-right">الوقت</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">المستخدم</TableHead>
+              <TableHead className="text-end">الحدث</TableHead>
+              <TableHead className="text-end">الوصف</TableHead>
+              <TableHead className="text-end">الصفحة</TableHead>
+              <TableHead className="text-end">المستوى</TableHead>
+              <TableHead className="text-end">الوقت</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

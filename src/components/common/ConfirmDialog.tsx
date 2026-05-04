@@ -27,8 +27,8 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent dir="rtl" className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-right">{title}</DialogTitle>
-          <DialogDescription className="text-right">{description}</DialogDescription>
+          <DialogTitle className="text-end">{title}</DialogTitle>
+          <DialogDescription className="text-end">{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-row justify-start gap-2 sm:justify-start">
           <Button

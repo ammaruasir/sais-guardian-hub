@@ -40,7 +40,7 @@ export function ProjectsTable({ projects }: { projects: Project[] }) {
 
   function header(key: SortKey, label: string) {
     return (
-      <TableHead className="text-right">
+      <TableHead className="text-end">
         <button
           className="inline-flex items-center gap-1 hover:text-foreground"
           onClick={() => {
@@ -67,7 +67,7 @@ export function ProjectsTable({ projects }: { projects: Project[] }) {
             {header("status", "الحالة")}
             {header("reviewer", "المراجع")}
             {header("submittedAt", "تاريخ التقديم")}
-            <TableHead className="text-right">الإجراء</TableHead>
+            <TableHead className="text-end">الإجراء</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -56,23 +56,23 @@ export function RoleFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent dir="rtl" className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-right">{editing ? "تعديل الدور" : "إضافة دور جديد"}</DialogTitle>
-          <DialogDescription className="text-right">
+          <DialogTitle className="text-end">{editing ? "تعديل الدور" : "إضافة دور جديد"}</DialogTitle>
+          <DialogDescription className="text-end">
             عرّف اسم الدور ومفتاحه ووصفه ليتم استخدامه في مصفوفة الصلاحيات.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label className="text-right block mb-1.5">الاسم (عربي)</Label>
-            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className="text-right" />
+            <Label className="text-end block mb-1.5">الاسم (عربي)</Label>
+            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className="text-end" />
           </div>
           <div>
-            <Label className="text-right block mb-1.5">المفتاح (إنجليزي)</Label>
+            <Label className="text-end block mb-1.5">المفتاح (إنجليزي)</Label>
             <Input value={key} onChange={(e) => setKey(e.target.value)} disabled={editing} placeholder="role_key" />
           </div>
           <div>
-            <Label className="text-right block mb-1.5">الوصف</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="text-right" />
+            <Label className="text-end block mb-1.5">الوصف</Label>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} className="text-end" />
           </div>
         </div>
         <DialogFooter className="flex-row justify-start gap-2 sm:justify-start">

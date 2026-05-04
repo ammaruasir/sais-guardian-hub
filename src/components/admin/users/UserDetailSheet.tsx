@@ -24,8 +24,8 @@ export function UserDetailSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-full sm:max-w-md" dir="rtl">
         <SheetHeader>
-          <SheetTitle className="text-right">تفاصيل المستخدم</SheetTitle>
-          <SheetDescription className="text-right">عرض البيانات والنشاط الأخير</SheetDescription>
+          <SheetTitle className="text-end">تفاصيل المستخدم</SheetTitle>
+          <SheetDescription className="text-end">عرض البيانات والنشاط الأخير</SheetDescription>
         </SheetHeader>
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export function UserDetailSheet({
                 {user.nameAr.replace(/^[أم]\.\s*/, "").charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <div className="text-right">
+            <div className="text-end">
               <div className="font-bold text-base">{user.nameAr}</div>
               <div className="text-xs text-muted-foreground">{user.email}</div>
               <Badge variant={user.active ? "default" : "secondary"} className="mt-1">

@@ -15,7 +15,7 @@ export function PermissionsMatrix() {
       <table className="w-full min-w-[800px] text-sm" dir="rtl">
         <thead className="bg-muted/50">
           <tr>
-            <th className="sticky end-0 bg-muted/50 px-4 py-3 text-right border-s">
+            <th className="sticky end-0 bg-muted/50 px-4 py-3 text-end border-s">
               <div className="flex items-center gap-2 font-semibold">
                 <SettingsIcon className="h-4 w-4" />
                 الوحدة / الصلاحية
@@ -39,7 +39,7 @@ export function PermissionsMatrix() {
           {permissionModules.map((mod) => (
             <PermModuleSection key={mod.name}>
               <tr className="bg-muted/30">
-                <td colSpan={1 + roles.length} className="px-4 py-2 text-right">
+                <td colSpan={1 + roles.length} className="px-4 py-2 text-end">
                   <div className="flex items-center gap-2 font-semibold text-sm">
                     <span className={cn("inline-block h-2.5 w-2.5 rounded-full", mod.color)} />
                     {mod.ar}
@@ -50,7 +50,7 @@ export function PermissionsMatrix() {
                 .filter((p) => p.module === mod.name)
                 .map((p, idx) => (
                   <tr key={p.key} className={cn(idx % 2 === 1 && "bg-muted/10")}>
-                    <td className="sticky end-0 px-4 py-2 text-right border-s bg-inherit">{p.labelAr}</td>
+                    <td className="sticky end-0 px-4 py-2 text-end border-s bg-inherit">{p.labelAr}</td>
                     {roles.map((r) => {
                       const v = perms[p.key]?.[r.key] ?? false;
                       return (

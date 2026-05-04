@@ -66,7 +66,7 @@ export function SubmissionReviewSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-xl" dir="rtl">
-        <SheetHeader className="border-b border-border p-5 text-right">
+        <SheetHeader className="border-b border-border p-5 text-end">
           <SheetTitle>مراجعة التقديم — المرحلة {submission.stage}</SheetTitle>
           <SheetDescription>
             {stageLabel[submission.stage].ar} • قُدّم في <span className="num">{submission.submittedAt}</span>
