@@ -78,6 +78,9 @@ function Breadcrumbs() {
 
 export function TopBar() {
   const { role } = useRole();
+  const unread = useAppStore((s) =>
+    s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
+  );
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur md:px-6">
       <SidebarTrigger className="shrink-0" />
@@ -87,9 +90,9 @@ export function TopBar() {
         <Button variant="ghost" size="icon" className="relative" asChild>
           <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
             <Bell className="h-5 w-5" />
-            {unreadCountForRole(role) > 0 && (
+            {unread > 0 && (
               <Badge className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
-                {unreadCountForRole(role)}
+                {unread}
               </Badge>
             )}
           </Link>
