@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, FileUp, AlertCircle, XCircle, MessageSquare } from "lucide-react";
-import { activity } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils";
 
 const iconMap = {
