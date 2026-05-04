@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle, CheckCircle2, FileSearch } from "lucide-react";
 import { kpis } from "@/data";
 import type { LucideIcon } from "lucide-react";
@@ -51,6 +53,23 @@ function Kpi({
 }
 
 export function KpiCards() {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 350);
+    return () => clearTimeout(t);
+  }, []);
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Card key={i}><CardContent className="p-5 space-y-4">
+            <Skeleton className="h-11 w-11 rounded-xl" />
+            <div className="space-y-2"><Skeleton className="h-7 w-16" /><Skeleton className="h-3 w-24" /></div>
+          </CardContent></Card>
+        ))}
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
       <Kpi icon={FileSearch} label="المشاريع النشطة" sub="Active Projects" value={String(kpis.activeProjects)} tone="primary" trend={{ dir: "up", text: "+2" }} />

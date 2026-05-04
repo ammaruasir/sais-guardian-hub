@@ -1,13 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { NotificationsList } from "@/components/notifications/NotificationsList";
+import { useRole } from "@/context/RoleContext";
 
 export const Route = createFileRoute("/portal/notifications")({
-  component: () => (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold tracking-tight">الإشعارات</h1>
-      <div className="flex h-[50vh] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card/50 text-center">
-        <div className="text-lg font-semibold">قريباً</div>
-        <p className="max-w-md text-sm text-muted-foreground">لوحة الإشعارات قادمة في المرحلة 5.</p>
-      </div>
-    </div>
-  ),
+  component: PortalNotificationsPage,
 });
+
+function PortalNotificationsPage() {
+  const { role } = useRole();
+  if (role !== "company") return <Navigate to="/notifications" />;
+  return <NotificationsList role="company" />;
+}

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useRole } from "@/context/RoleContext";
 import { cn } from "@/lib/utils";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { unreadCountForRole } from "@/data/notifications";
 
 function RoleSwitcher() {
   const { role, setRole } = useRole();
@@ -52,7 +53,11 @@ function Breadcrumbs() {
     "/portal/notifications": "الإشعارات",
     "/portal/help": "المساعدة",
   };
-  const label = map[path] ?? "";
+  let label = map[path];
+  if (!label) {
+    const seg = "/" + path.split("/").filter(Boolean)[0];
+    label = map[seg] ?? "";
+  }
   return (
     <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
       <Link to="/" className="hover:text-foreground">الرئيسية</Link>
@@ -74,11 +79,15 @@ export function TopBar() {
       <Breadcrumbs />
       <div className="ml-auto flex items-center gap-3">
         <RoleSwitcher />
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <Badge className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
-            3
-          </Badge>
+        <Button variant="ghost" size="icon" className="relative" asChild>
+          <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
+            <Bell className="h-5 w-5" />
+            {unreadCountForRole(role) > 0 && (
+              <Badge className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
+                {unreadCountForRole(role)}
+              </Badge>
+            )}
+          </Link>
         </Button>
         <div className="flex items-center gap-2">
           <Avatar className="h-9 w-9">
