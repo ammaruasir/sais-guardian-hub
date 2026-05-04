@@ -40,6 +40,7 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
   const allNotifications = useAppStore((s) => s.notifications);
   const markAsRead = useAppStore((s) => s.markAsRead);
   const markAllAsRead = useAppStore((s) => s.markAllAsRead);
+  const deleteNotification = useAppStore((s) => s.deleteNotification);
   const items = allNotifications.filter((n) => n.forRole === role || n.forRole === "both");
   const [filter, setFilter] = useState<Filter>("all");
 
