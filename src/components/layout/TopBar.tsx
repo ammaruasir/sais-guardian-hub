@@ -52,6 +52,11 @@ function Breadcrumbs() {
     "/portal/requirements": "المتطلبات",
     "/portal/notifications": "الإشعارات",
     "/portal/help": "المساعدة",
+    "/admin": "الإدارة",
+    "/admin/users": "المستخدمون",
+    "/admin/roles": "الصلاحيات والأدوار",
+    "/admin/audit": "الأحداث الأمنية",
+    "/admin/settings": "الإعدادات",
   };
   let label = map[path];
   if (!label) {

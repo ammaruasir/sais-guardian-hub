@@ -39,6 +39,13 @@ const saisNav = [
   { to: "/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
 ];
 
+const adminNav = [
+  { to: "/admin/users", icon: Users, ar: "المستخدمون", en: "Users" },
+  { to: "/admin/roles", icon: Shield, ar: "الصلاحيات والأدوار", en: "Roles & Permissions" },
+  { to: "/admin/audit", icon: ShieldAlert, ar: "الأحداث الأمنية", en: "Security Events" },
+  { to: "/admin/settings", icon: Settings, ar: "الإعدادات", en: "Settings" },
+];
+
 const companyNav = [
   { to: "/portal", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
   { to: "/portal/projects", icon: FolderKanban, ar: "مشاريعنا", en: "Our Projects" },
@@ -92,6 +99,28 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {role === "sais" && (
+          <SidebarGroup>
+            <SidebarGroupLabel>الإدارة</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminNav.map((item) => {
+                  const active = path === item.to || path.startsWith(item.to + "/");
+                  return (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>
+                        <Link to={item.to} className="flex items-center gap-3">
+                          <item.icon className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{item.ar}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-3 text-[11px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
         © 2026 SAIS — نموذج توضيحي
