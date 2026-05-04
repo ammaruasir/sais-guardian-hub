@@ -273,7 +273,7 @@ function WizardPage() {
         {step === 5 && project && stage > 0 && (
           <div className="space-y-4">
             <Info label="المشروع" value={`${project.nameAr} — ${project.facilityAr}`} />
-            <Info label="المرحلة" value={`${stage} — ${stageLabel[stage].ar}`} />
+            <Info label="المرحلة" value={`${stage} — ${stageLabel[stage as Stage].ar}`} />
             <Info label="الاستشاري" value={consultants.find((c) => c.id === consultantId)?.nameAr ?? "—"} />
             <Info label="المُوقّع" value={signatory} />
             <Info label="التاريخ" value={date} />
