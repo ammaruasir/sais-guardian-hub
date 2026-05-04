@@ -22,9 +22,10 @@ function GuardedTasks() {
 }
 
 function TasksPage() {
+  const tasks = useAppStore((s) => s.tasks);
   const [mine, setMine] = useState(false);
   const [open, setOpen] = useState(false);
-  const filtered = useMemo(() => (mine ? tasks.filter((t) => t.assigneeId === currentUserId) : tasks), [mine]);
+  const filtered = useMemo(() => (mine ? tasks.filter((t) => t.assigneeId === currentUserId) : tasks), [mine, tasks]);
 
   return (
     <AppShell>
