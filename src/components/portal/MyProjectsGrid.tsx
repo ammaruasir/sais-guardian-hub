@@ -53,7 +53,8 @@ export function MyProjectsGrid() {
               <div className="text-[11px] text-muted-foreground num">آخر تحديث: {p.submittedAt}</div>
             </div>
             <Link
-              to="/portal/projects"
+              to="/portal/projects/$id"
+              params={{ id: p.id }}
               className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-secondary hover:underline"
             >
               عرض المشروع <ArrowLeft className="h-3 w-3" />
