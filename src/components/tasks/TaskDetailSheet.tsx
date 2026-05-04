@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { useAppStore } from "@/store/appStore";
 
 export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; open: boolean; onClose: () => void }) {
+  const projects = useAppStore((s) => s.projects);
+  const updateTask = useAppStore((s) => s.updateTask);
+  const updateTaskStatus = useAppStore((s) => s.updateTaskStatus);
   const [status, setStatus] = useState<TaskStatus>("new");
   const [assignee, setAssignee] = useState<string>("");
   const [comments, setComments] = useState<TaskComment[]>([]);
