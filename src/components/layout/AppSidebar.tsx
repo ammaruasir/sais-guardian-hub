@@ -28,6 +28,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
+import logoUrl from "@/assets/logo.svg";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
@@ -64,8 +65,8 @@ export function AppSidebar() {
     <Sidebar side="left" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
-            {role === "sais" ? "SA" : <Building2 className="h-5 w-5" />}
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+            <img src={logoUrl} alt="SAIS" className="h-full w-full object-contain" />
           </div>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <div className="truncate text-sm font-bold text-sidebar-foreground">
