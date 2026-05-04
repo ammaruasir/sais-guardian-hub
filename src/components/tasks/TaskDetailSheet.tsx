@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { type Task, type TaskComment, type TaskStatus, taskPriorityLabel, taskStatusLabel, taskTypeLabel } from "@/data/tasks";
-import { projects, reviewers } from "@/data";
+import { reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; open: boolean; onClose: () => void }) {
   const [status, setStatus] = useState<TaskStatus>("new");
