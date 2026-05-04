@@ -177,6 +177,15 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <Switch checked={active} onCheckedChange={setActive} />
+            <div className="text-end">
+              <div className="text-sm font-medium">حالة الحساب</div>
+              <p className="text-xs text-muted-foreground">
+                {active ? "نشط — يمكن للمستخدم تسجيل الدخول" : "غير نشط — تم تعطيل الحساب"}
+              </p>
+            </div>
+          </div>
         </div>
         <DialogFooter className="flex-row justify-start gap-2 sm:justify-start">
           <Button onClick={submit}>حفظ المستخدم</Button>
