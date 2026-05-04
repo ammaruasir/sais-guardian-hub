@@ -52,12 +52,12 @@ export function UsersTable() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="بحث في النظام..."
-            className="pr-10 text-right"
+            className="pe-10 text-right"
           />
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">

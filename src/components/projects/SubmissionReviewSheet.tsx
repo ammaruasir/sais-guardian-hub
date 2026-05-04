@@ -124,7 +124,7 @@ export function SubmissionReviewSheet({
                 {history.map((h) => (
                   <AccordionItem key={h.id} value={h.id}>
                     <AccordionTrigger className="text-sm">
-                      المرحلة {h.stage} — {h.decision === "approved" ? "معتمد" : h.decision ?? "—"} <span className="num mr-2 text-xs text-muted-foreground">{h.reviewedAt}</span>
+                      المرحلة {h.stage} — {h.decision === "approved" ? "معتمد" : h.decision ?? "—"} <span className="num me-2 text-xs text-muted-foreground">{h.reviewedAt}</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground">
                       {h.comments ?? "لا توجد ملاحظات."}

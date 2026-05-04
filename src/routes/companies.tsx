@@ -56,7 +56,7 @@ function CompaniesPage() {
             <p className="text-sm text-muted-foreground">قائمة المنشآت المسجلة لدى الهيئة</p>
           </div>
           <Button size="sm" onClick={() => { setEditing(null); setDialogOpen(true); }}>
-            <Plus className="ml-1 h-4 w-4" />إضافة منشأة
+            <Plus className="ms-1 h-4 w-4" />إضافة منشأة
           </Button>
         </div>
 

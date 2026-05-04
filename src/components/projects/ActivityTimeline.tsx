@@ -12,12 +12,12 @@ const map: Record<ProjectActivity["type"], { Icon: any; cls: string }> = {
 
 export function ActivityTimeline({ items }: { items: ProjectActivity[] }) {
   return (
-    <ol className="relative space-y-4 border-r-2 border-border pr-6">
+    <ol className="relative space-y-4 border-e-2 border-border pe-6">
       {items.map((a) => {
         const { Icon, cls } = map[a.type];
         return (
           <li key={a.id} className="relative">
-            <span className={`absolute -right-[34px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-background ${cls}`}>
+            <span className={`absolute -end-[34px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-background ${cls}`}>
               <Icon className="h-3.5 w-3.5" />
             </span>
             <div className="rounded-lg border border-border bg-card p-3">

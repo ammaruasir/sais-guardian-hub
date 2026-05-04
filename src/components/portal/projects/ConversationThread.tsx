@@ -72,7 +72,7 @@ export function ConversationThread({ projectId }: { projectId: string }) {
           className="flex-1 resize-none"
         />
         <Button onClick={send}>
-          <Send className="ml-1 h-4 w-4" /> إرسال رسالة
+          <Send className="ms-1 h-4 w-4" /> إرسال رسالة
         </Button>
       </div>
     </div>

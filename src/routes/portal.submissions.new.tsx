@@ -308,7 +308,7 @@ function WizardPage() {
           disabled={step === 1}
           onClick={() => setStep((s) => Math.max(1, s - 1))}
         >
-          <ChevronRight className="ml-1 h-4 w-4" /> السابق
+          <ChevronRight className="ms-1 h-4 w-4" /> السابق
         </Button>
         {step < 5 ? (
           <div className="flex items-center gap-3">
@@ -322,7 +322,7 @@ function WizardPage() {
               </button>
             )}
             <Button disabled={!canNext} onClick={() => setStep((s) => s + 1)}>
-              التالي <ChevronLeft className="mr-1 h-4 w-4" />
+              التالي <ChevronLeft className="me-1 h-4 w-4" />
             </Button>
           </div>
         ) : (
@@ -358,7 +358,7 @@ function WizardPage() {
               setSubmitted(true);
             }}
           >
-            <CheckCircle2 className="ml-1 h-5 w-5" /> تقديم
+            <CheckCircle2 className="ms-1 h-5 w-5" /> تقديم
           </Button>
         )}
       </div>

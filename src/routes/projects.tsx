@@ -38,7 +38,7 @@ function ProjectsPage() {
             <p className="text-sm text-muted-foreground">إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={() => setDialogOpen(true)}><Plus className="ml-1 h-4 w-4" />إضافة مشروع</Button>
+            <Button size="sm" onClick={() => setDialogOpen(true)}><Plus className="ms-1 h-4 w-4" />إضافة مشروع</Button>
             <Tabs value={view} onValueChange={(v) => setView(v as any)}>
               <TabsList>
                 <TabsTrigger value="kanban">كانبان</TabsTrigger>

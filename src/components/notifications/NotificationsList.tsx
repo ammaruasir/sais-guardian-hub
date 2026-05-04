@@ -65,7 +65,7 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={markAll} disabled={unreadTotal === 0}>
-          <CheckCheck className="ml-1 h-4 w-4" />
+          <CheckCheck className="ms-1 h-4 w-4" />
           تحديد الكل كمقروء
         </Button>
       </div>

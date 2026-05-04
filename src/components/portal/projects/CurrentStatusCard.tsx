@@ -28,7 +28,7 @@ export function CurrentStatusCard({ project, submission }: { project: Project; s
         </div>
 
         {submission?.comments && (
-          <div className="mt-4 rounded-xl border-r-4 border-secondary bg-secondary/5 p-4">
+          <div className="mt-4 rounded-xl border-e-4 border-secondary bg-secondary/5 p-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-secondary">
               <MessageSquareQuote className="h-4 w-4" />
               تعليق المراجع — {reviewer?.nameAr}
