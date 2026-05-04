@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { KanbanBoard } from "@/components/projects/KanbanBoard";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
-import { ProjectsFilters, applyFilters, defaultFilters, type ProjectFilters } from "@/components/projects/ProjectsFilters";
+import {
+  ProjectsFilters,
+  applyFilters,
+  defaultFilters,
+  type ProjectFilters,
+} from "@/components/projects/ProjectsFilters";
 import { ProjectFormDialog } from "@/components/projects/ProjectFormDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
@@ -35,11 +40,16 @@ function ProjectsPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">المشاريع</h1>
-            <p className="text-sm text-muted-foreground">إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع</p>
+            <p className="text-sm text-muted-foreground">
+              إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={() => setDialogOpen(true)}><Plus className="ms-1 h-4 w-4" />إضافة مشروع</Button>
-            <Tabs value={view} onValueChange={(v) => setView(v as any)}>
+            <Button size="sm" onClick={() => setDialogOpen(true)}>
+              <Plus className="ms-1 h-4 w-4" />
+              إضافة مشروع
+            </Button>
+            <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")}>
               <TabsList>
                 <TabsTrigger value="kanban">كانبان</TabsTrigger>
                 <TabsTrigger value="table">جدول</TabsTrigger>
@@ -55,7 +65,11 @@ function ProjectsPage() {
           <span className="num font-semibold text-foreground"> {projects.length}</span> مشروع
         </div>
 
-        {view === "kanban" ? <KanbanBoard projects={filtered} /> : <ProjectsTable projects={filtered} />}
+        {view === "kanban" ? (
+          <KanbanBoard projects={filtered} />
+        ) : (
+          <ProjectsTable projects={filtered} />
+        )}
       </div>
       <ProjectFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <Toaster position="top-center" />

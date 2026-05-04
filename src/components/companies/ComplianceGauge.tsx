@@ -12,7 +12,14 @@ export function ComplianceGauge({ score, size = 140 }: { score: number; size?: n
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth={10} fill="none" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="var(--muted)"
+          strokeWidth={10}
+          fill="none"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -27,7 +34,9 @@ export function ComplianceGauge({ score, size = 140 }: { score: number; size?: n
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="num text-3xl font-bold" style={{ color: band.color }}>{score}%</div>
+        <div className="num text-3xl font-bold" style={{ color: band.color }}>
+          {score}%
+        </div>
         <div className="text-xs text-muted-foreground">{band.ar}</div>
       </div>
     </div>

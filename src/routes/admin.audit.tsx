@@ -5,16 +5,42 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import {
-  ShieldAlert, Shield, AlertTriangle, Eye, RefreshCw, ChevronDown, Info,
-  User, Activity, Globe, Clock, Trash2, Search,
+  ShieldAlert,
+  Shield,
+  AlertTriangle,
+  Eye,
+  RefreshCw,
+  ChevronDown,
+  Info,
+  User,
+  Activity,
+  Globe,
+  Clock,
+  Trash2,
+  Search,
 } from "lucide-react";
 import { auditCountBaseline, type AuditEvent } from "@/data/admin";
 import { toast } from "sonner";
+import { useRole } from "@/context/RoleContext";
+import { NoAccess } from "@/components/common/NoAccess";
 
 export const Route = createFileRoute("/admin/audit")({
   component: AuditPage,
@@ -34,6 +60,7 @@ function formatTs(ts: string) {
 }
 
 function AuditPage() {
+  const { hasPermission } = useRole();
   const audit = useAppStore((s) => s.audit);
   const users = useAppStore((s) => s.users);
   const deleteAudit = useAppStore((s) => s.deleteAudit);
@@ -45,12 +72,14 @@ function AuditPage() {
   const [page, setPage] = useState(1);
   const [, setBump] = useState(0);
   const [toDelete, setToDelete] = useState<AuditEvent | null>(null);
+  const allowed = hasPermission("settings.view");
 
   const types = useMemo(() => Array.from(new Set(audit.map((e) => e.type))), [audit]);
 
   const filtered = useMemo(() => {
     return audit.filter((e) => {
-      if (q && !`${e.user} ${e.description} ${e.type}`.toLowerCase().includes(q.toLowerCase())) return false;
+      if (q && !`${e.user} ${e.description} ${e.type}`.toLowerCase().includes(q.toLowerCase()))
+        return false;
       if (user !== "all" && e.user !== user) return false;
       if (type !== "all" && e.type !== type) return false;
       if (level !== "all" && e.level !== level) return false;
@@ -80,6 +109,8 @@ function AuditPage() {
     };
   }, [audit]);
 
+  if (!allowed) return <NoAccess />;
+
   return (
     <div className="space-y-6" dir="rtl">
       <header className="flex flex-wrap items-start justify-between gap-3">
@@ -89,13 +120,18 @@ function AuditPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold">الأحداث الأمنية</h1>
-            <p className="text-sm text-muted-foreground">مراقبة وتتبع الأنشطة المشبوهة المسجلة في النظام</p>
+            <p className="text-sm text-muted-foreground">
+              مراقبة وتتبع الأنشطة المشبوهة المسجلة في النظام
+            </p>
           </div>
         </div>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => { setBump((x) => x + 1); toast.success("تم تحديث السجل"); }}
+          onClick={() => {
+            setBump((x) => x + 1);
+            toast.success("تم تحديث السجل");
+          }}
         >
           <RefreshCw className="ms-1 h-4 w-4" />
           تحديث
@@ -105,10 +141,30 @@ function AuditPage() {
       {/* KPIs */}
       <div className="grid gap-3 md:grid-cols-4">
         {[
-          { icon: Shield, label: "إجمالي الأحداث", value: counts.total, cls: "bg-secondary/15 text-secondary" },
-          { icon: AlertTriangle, label: "أحداث حرجة", value: counts.critical, cls: "bg-destructive/15 text-destructive" },
-          { icon: AlertTriangle, label: "تحذيرات", value: counts.warning, cls: "bg-warning/20 text-warning-foreground" },
-          { icon: Eye, label: "معلومات", value: counts.info, cls: "bg-muted text-muted-foreground" },
+          {
+            icon: Shield,
+            label: "إجمالي الأحداث",
+            value: counts.total,
+            cls: "bg-secondary/15 text-secondary",
+          },
+          {
+            icon: AlertTriangle,
+            label: "أحداث حرجة",
+            value: counts.critical,
+            cls: "bg-destructive/15 text-destructive",
+          },
+          {
+            icon: AlertTriangle,
+            label: "تحذيرات",
+            value: counts.warning,
+            cls: "bg-warning/20 text-warning-foreground",
+          },
+          {
+            icon: Eye,
+            label: "معلومات",
+            value: counts.info,
+            cls: "bg-muted text-muted-foreground",
+          },
         ].map((k) => (
           <Card key={k.label} className="flex items-center gap-3 p-4">
             <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${k.cls}`}>
@@ -134,16 +190,28 @@ function AuditPage() {
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3 space-y-2 text-sm">
             <div className="flex gap-2">
-              <Badge variant="outline" className={levelMeta.info.cls}>معلومات</Badge>
-              <span className="text-muted-foreground">أنشطة عادية مثل تسجيل الدخول والتعديلات.</span>
+              <Badge variant="outline" className={levelMeta.info.cls}>
+                معلومات
+              </Badge>
+              <span className="text-muted-foreground">
+                أنشطة عادية مثل تسجيل الدخول والتعديلات.
+              </span>
             </div>
             <div className="flex gap-2">
-              <Badge variant="outline" className={levelMeta.warning.cls}>تحذيرات</Badge>
-              <span className="text-muted-foreground">أنشطة مشبوهة مثل محاولات الدخول الفاشلة وتغيير الصلاحيات.</span>
+              <Badge variant="outline" className={levelMeta.warning.cls}>
+                تحذيرات
+              </Badge>
+              <span className="text-muted-foreground">
+                أنشطة مشبوهة مثل محاولات الدخول الفاشلة وتغيير الصلاحيات.
+              </span>
             </div>
             <div className="flex gap-2">
-              <Badge variant="outline" className={levelMeta.critical.cls}>حرج</Badge>
-              <span className="text-muted-foreground">أحداث خطيرة مثل محاولات الوصول غير المصرح بها وقفل الحسابات.</span>
+              <Badge variant="outline" className={levelMeta.critical.cls}>
+                حرج
+              </Badge>
+              <span className="text-muted-foreground">
+                أحداث خطيرة مثل محاولات الوصول غير المصرح بها وقفل الحسابات.
+              </span>
             </div>
           </CollapsibleContent>
         </Card>
@@ -153,26 +221,66 @@ function AuditPage() {
       <div className="flex flex-wrap gap-2">
         <div className="relative max-w-xs flex-1">
           <Search className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="بحث في الأحداث..." className="pe-8" />
+          <Input
+            value={q}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
+            placeholder="بحث في الأحداث..."
+            className="pe-8"
+          />
         </div>
-        <Select value={user} onValueChange={(v) => { setUser(v); setPage(1); }}>
-          <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+        <Select
+          value={user}
+          onValueChange={(v) => {
+            setUser(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع المستخدمين</SelectItem>
-            {users.map((u) => <SelectItem key={u.id} value={u.nameAr}>{u.nameAr}</SelectItem>)}
+            {users.map((u) => (
+              <SelectItem key={u.id} value={u.nameAr}>
+                {u.nameAr}
+              </SelectItem>
+            ))}
             <SelectItem value="Admin User">Admin User</SelectItem>
             <SelectItem value="Unknown">Unknown</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={type} onValueChange={(v) => { setType(v); setPage(1); }}>
-          <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+        <Select
+          value={type}
+          onValueChange={(v) => {
+            setType(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع الأنواع</SelectItem>
-            {types.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            {types.map((t) => (
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <Select value={level} onValueChange={(v) => { setLevel(v); setPage(1); }}>
-          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+        <Select
+          value={level}
+          onValueChange={(v) => {
+            setLevel(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-44">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع المستويات</SelectItem>
             <SelectItem value="info">معلومات</SelectItem>
@@ -203,31 +311,54 @@ function AuditPage() {
                   لا توجد نتائج مطابقة
                 </TableCell>
               </TableRow>
-            ) : paged.map((e) => (
-              <TableRow key={e.id}>
-                <TableCell>
-                  <div className="flex items-center gap-1.5"><User className="h-3.5 w-3.5 text-muted-foreground" />{e.user}</div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1.5"><Activity className="h-3.5 w-3.5 text-muted-foreground" />{e.type}</div>
-                </TableCell>
-                <TableCell className="max-w-[260px] truncate text-muted-foreground">{e.description}</TableCell>
-                <TableCell>
-                  <div className="num flex items-center gap-1.5 text-xs text-muted-foreground"><Globe className="h-3.5 w-3.5" />{e.page}</div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={levelMeta[e.level].cls}>{levelMeta[e.level].ar}</Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="num flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />{formatTs(e.ts)}</div>
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => setToDelete(e)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            ) : (
+              paged.map((e) => (
+                <TableRow key={e.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      {e.user}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="h-3.5 w-3.5 text-muted-foreground" />
+                      {e.type}
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[260px] truncate text-muted-foreground">
+                    {e.description}
+                  </TableCell>
+                  <TableCell>
+                    <div className="num flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Globe className="h-3.5 w-3.5" />
+                      {e.page}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={levelMeta[e.level].cls}>
+                      {levelMeta[e.level].ar}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="num flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5" />
+                      {formatTs(e.ts)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() => setToDelete(e)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </Card>
@@ -235,11 +366,26 @@ function AuditPage() {
       {/* Pagination */}
       <div className="flex items-center justify-between text-sm">
         <div className="num text-muted-foreground">
-          عرض {filtered.length === 0 ? 0 : start + 1}-{Math.min(start + perPage, filtered.length)} من {filtered.length}
+          عرض {filtered.length === 0 ? 0 : start + 1}-{Math.min(start + perPage, filtered.length)}{" "}
+          من {filtered.length}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)}>السابق</Button>
-          <Button variant="outline" size="sm" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)}>التالي</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={safePage <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            السابق
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={safePage >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            التالي
+          </Button>
         </div>
       </div>
 

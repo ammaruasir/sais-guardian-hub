@@ -36,13 +36,19 @@ export function MyProjectsGrid() {
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-base font-semibold">مشاريعنا</h2>
-        <Link to="/portal/projects" className="text-xs text-secondary hover:underline inline-flex items-center gap-1">
+        <Link
+          to="/portal/projects"
+          className="text-xs text-secondary hover:underline inline-flex items-center gap-1"
+        >
           عرض الكل <ArrowLeft className="h-3 w-3" />
         </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {mine.map((p) => (
-          <div key={p.id} className="rounded-xl border border-border bg-background/40 p-4 hover:shadow-md transition">
+          <div
+            key={p.id}
+            className="rounded-xl border border-border bg-background/40 p-4 hover:shadow-md transition"
+          >
             <div className="flex items-start justify-between gap-2">
               <div className="font-semibold leading-snug">{p.nameAr}</div>
               <ClassificationBadge c={p.classification} />
@@ -52,7 +58,9 @@ export function MyProjectsGrid() {
             </div>
             <div className="mt-3 flex items-center justify-between">
               <StatusChip s={p.status} />
-              <div className="text-[11px] text-muted-foreground num">آخر تحديث: {p.submittedAt}</div>
+              <div className="text-[11px] text-muted-foreground num">
+                آخر تحديث: {p.submittedAt}
+              </div>
             </div>
             <Link
               to="/portal/projects/$id"

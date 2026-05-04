@@ -6,7 +6,13 @@ import type { Submission } from "@/data/submissions";
 import { StatusChip } from "@/components/projects/Badges";
 import { Button } from "@/components/ui/button";
 
-export function CurrentStatusCard({ project, submission }: { project: Project; submission?: Submission }) {
+export function CurrentStatusCard({
+  project,
+  submission,
+}: {
+  project: Project;
+  submission?: Submission;
+}) {
   const reviewer = reviewers.find((r) => r.id === project.reviewerId);
   return (
     <div className="space-y-4">
@@ -61,13 +67,28 @@ export function CurrentStatusCard({ project, submission }: { project: Project; s
         />
       )}
       {project.status === "approved" && project.stage === 4 && (
-        <CalloutCard tone="success" icon={CheckCircle2} title="المشروع مكتمل" body="تم اعتماد جميع المراحل بنجاح." />
+        <CalloutCard
+          tone="success"
+          icon={CheckCircle2}
+          title="المشروع مكتمل"
+          body="تم اعتماد جميع المراحل بنجاح."
+        />
       )}
       {project.status === "under_review" && (
-        <CalloutCard tone="info" icon={Clock} title="التقديم قيد المراجعة" body="سيتم إشعاركم عند صدور القرار." />
+        <CalloutCard
+          tone="info"
+          icon={Clock}
+          title="التقديم قيد المراجعة"
+          body="سيتم إشعاركم عند صدور القرار."
+        />
       )}
       {project.status === "pending_final" && (
-        <CalloutCard tone="warning" icon={Clock} title="بانتظار الاعتماد النهائي" body="جاري إعداد التوصية النهائية من قِبل لجنة الاعتماد." />
+        <CalloutCard
+          tone="warning"
+          icon={Clock}
+          title="بانتظار الاعتماد النهائي"
+          body="جاري إعداد التوصية النهائية من قِبل لجنة الاعتماد."
+        />
       )}
     </div>
   );
@@ -105,7 +126,9 @@ function CalloutCard({
           <p className="mt-1 text-sm text-muted-foreground">{body}</p>
           {ctaLabel && ctaTo && (
             <Button asChild className="mt-3" size="sm">
-              <Link to={ctaTo} search={ctaSearch as never}>{ctaLabel}</Link>
+              <Link to={ctaTo} search={ctaSearch as never}>
+                {ctaLabel}
+              </Link>
             </Button>
           )}
         </div>

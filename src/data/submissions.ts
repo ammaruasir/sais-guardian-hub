@@ -3,7 +3,12 @@ import { projects, type Stage, type ProjectStatus } from "./index";
 export type DocItem = { name: string; size: string; type: string };
 export type ChecklistResult = "pass" | "fail" | "na";
 export type ChecklistItem = { code: string; labelAr: string; result: ChecklistResult };
-export type SubmissionStatus = "approved" | "under_review" | "additional_docs" | "rejected" | "pending_final";
+export type SubmissionStatus =
+  | "approved"
+  | "under_review"
+  | "additional_docs"
+  | "rejected"
+  | "pending_final";
 
 export type Submission = {
   id: string;
@@ -107,7 +112,8 @@ export const submissions: Submission[] = projects.flatMap((p) => {
     checklist: checklistByStage[p.stage].map((c, i) =>
       p.status === "additional_docs" && i === 0 ? { ...c, result: "fail" as ChecklistResult } : c,
     ),
-    comments: p.status === "additional_docs" ? "يرجى تحديث تقرير المخاطر بأحدث البيانات." : undefined,
+    comments:
+      p.status === "additional_docs" ? "يرجى تحديث تقرير المخاطر بأحدث البيانات." : undefined,
   });
   return list;
 });

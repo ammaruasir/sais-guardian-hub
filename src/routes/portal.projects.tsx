@@ -13,7 +13,9 @@ function PortalProjectsPage() {
     <div className="space-y-5">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">مشاريعنا</h1>
-        <p className="mt-1 text-sm text-muted-foreground">جميع المشاريع المسجلة لدى الهيئة العليا للأمن الصناعي</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          جميع المشاريع المسجلة لدى الهيئة العليا للأمن الصناعي
+        </p>
       </header>
       <div className="grid gap-5 lg:grid-cols-2">
         {mine.map((p) => (

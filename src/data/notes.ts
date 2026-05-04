@@ -1,6 +1,12 @@
 import { projects } from "./index";
 
-export type ProjectNote = { id: string; projectId: string; author: string; ts: string; text: string };
+export type ProjectNote = {
+  id: string;
+  projectId: string;
+  author: string;
+  ts: string;
+  text: string;
+};
 export type ProjectActivity = {
   id: string;
   projectId: string;

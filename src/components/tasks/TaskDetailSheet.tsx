@@ -2,18 +2,40 @@ import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
-import { type Task, type TaskComment, type TaskStatus, taskPriorityLabel, taskStatusLabel, taskTypeLabel } from "@/data/tasks";
+import {
+  type Task,
+  type TaskComment,
+  type TaskStatus,
+  taskPriorityLabel,
+  taskStatusLabel,
+  taskTypeLabel,
+} from "@/data/tasks";
 import { reviewers } from "@/data";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/appStore";
 
-export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; open: boolean; onClose: () => void }) {
+export function TaskDetailSheet({
+  task,
+  open,
+  onClose,
+}: {
+  task: Task | null;
+  open: boolean;
+  onClose: () => void;
+}) {
   const projects = useAppStore((s) => s.projects);
   const updateTask = useAppStore((s) => s.updateTask);
   const updateTaskStatus = useAppStore((s) => s.updateTaskStatus);
+  const deleteTask = useAppStore((s) => s.deleteTask);
   const [status, setStatus] = useState<TaskStatus>("new");
   const [assignee, setAssignee] = useState<string>("");
   const [comments, setComments] = useState<TaskComment[]>([]);
@@ -47,9 +69,13 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
         </SheetHeader>
         <div className="mt-4 space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className={prio.cls}>{prio.ar}</Badge>
+            <Badge variant="outline" className={prio.cls}>
+              {prio.ar}
+            </Badge>
             <Badge variant="outline">{taskTypeLabel[task.type]}</Badge>
-            <Badge variant="outline" className="num">{task.dueDate}</Badge>
+            <Badge variant="outline" className="num">
+              {task.dueDate}
+            </Badge>
           </div>
 
           {task.descriptionAr && (
@@ -59,7 +85,11 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
           {project && (
             <div className="text-sm">
               <span className="text-muted-foreground">المشروع: </span>
-              <Link to="/projects/$id" params={{ id: project.id }} className="text-secondary hover:underline">
+              <Link
+                to="/projects/$id"
+                params={{ id: project.id }}
+                className="text-secondary hover:underline"
+              >
                 {project.nameAr}
               </Link>
             </div>
@@ -68,22 +98,46 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">الحالة</label>
-              <Select value={status} onValueChange={(v) => { const ns = v as TaskStatus; setStatus(ns); if (task) { updateTaskStatus(task.id, ns); toast.success("تم تحديث الحالة"); } }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={status}
+                onValueChange={(v) => {
+                  const ns = v as TaskStatus;
+                  setStatus(ns);
+                  if (task) {
+                    updateTaskStatus(task.id, ns);
+                    toast.success("تم تحديث الحالة");
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(taskStatusLabel) as TaskStatus[]).map((s) => (
-                    <SelectItem key={s} value={s}>{taskStatusLabel[s]}</SelectItem>
+                    <SelectItem key={s} value={s}>
+                      {taskStatusLabel[s]}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">المسؤول</label>
-              <Select value={assignee} onValueChange={(v) => { setAssignee(v); if (task) updateTask(task.id, { assigneeId: v }); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={assignee}
+                onValueChange={(v) => {
+                  setAssignee(v);
+                  if (task) updateTask(task.id, { assigneeId: v });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {reviewers.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>{r.nameAr}</SelectItem>
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nameAr}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -102,12 +156,36 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
                   <div>{c.text}</div>
                 </div>
               ))}
-              {comments.length === 0 && <div className="text-xs text-muted-foreground">لا توجد تعليقات بعد</div>}
+              {comments.length === 0 && (
+                <div className="text-xs text-muted-foreground">لا توجد تعليقات بعد</div>
+              )}
             </div>
             <div className="mt-3 space-y-2">
-              <Textarea value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="إضافة تعليق…" rows={2} />
-              <Button size="sm" onClick={addComment}>إضافة تعليق</Button>
+              <Textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="إضافة تعليق…"
+                rows={2}
+              />
+              <Button size="sm" onClick={addComment}>
+                إضافة تعليق
+              </Button>
             </div>
+          </div>
+
+          <div className="border-t pt-4">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                if (!task) return;
+                deleteTask(task.id);
+                toast.success("تم حذف المهمة");
+                onClose();
+              }}
+            >
+              حذف المهمة
+            </Button>
           </div>
         </div>
       </SheetContent>

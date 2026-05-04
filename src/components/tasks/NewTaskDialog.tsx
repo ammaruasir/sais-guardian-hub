@@ -1,15 +1,33 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { taskPriorityLabel, taskTypeLabel, type TaskPriority, type TaskType } from "@/data/tasks";
 import { reviewers } from "@/data";
 import { toast } from "sonner";
 import { useAppStore } from "@/store/appStore";
 
-export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+export function NewTaskDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+}) {
   const projects = useAppStore((s) => s.projects);
   const addTask = useAppStore((s) => s.addTask);
   const [title, setTitle] = useState("");
@@ -40,7 +58,9 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     });
     toast.success("تمت إضافة المهمة");
     onOpenChange(false);
-    setTitle(""); setDesc(""); setDue("");
+    setTitle("");
+    setDesc("");
+    setDue("");
   };
 
   return (
@@ -52,16 +72,24 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         <div className="space-y-3">
           <div>
             <label className="mb-1 block text-xs text-muted-foreground">العنوان</label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان المهمة" />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="عنوان المهمة"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">النوع</label>
               <Select value={type} onValueChange={(v) => setType(v as TaskType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(taskTypeLabel) as TaskType[]).map((k) => (
-                    <SelectItem key={k} value={k}>{taskTypeLabel[k]}</SelectItem>
+                    <SelectItem key={k} value={k}>
+                      {taskTypeLabel[k]}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -69,10 +97,14 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">الأولوية</label>
               <Select value={priority} onValueChange={(v) => setPriority(v as TaskPriority)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(taskPriorityLabel) as TaskPriority[]).map((k) => (
-                    <SelectItem key={k} value={k}>{taskPriorityLabel[k].ar}</SelectItem>
+                    <SelectItem key={k} value={k}>
+                      {taskPriorityLabel[k].ar}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -80,18 +112,30 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">المسؤول</label>
               <Select value={assignee} onValueChange={setAssignee}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {reviewers.map((r) => <SelectItem key={r.id} value={r.id}>{r.nameAr}</SelectItem>)}
+                  {reviewers.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {r.nameAr}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">المشروع</label>
               <Select value={project} onValueChange={setProject}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {projects.map((p) => <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>)}
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nameAr}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -106,7 +150,9 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            إلغاء
+          </Button>
           <Button onClick={submit}>إضافة</Button>
         </DialogFooter>
       </DialogContent>

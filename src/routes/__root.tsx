@@ -9,9 +9,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">الصفحة غير موجودة</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          الصفحة التي تبحث عنها غير متاحة.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">الصفحة التي تبحث عنها غير متاحة.</p>
       </div>
     </div>
   );
@@ -23,7 +21,10 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "منصة SAIS — الهيئة العليا للأمن الصناعي" },
-      { name: "description", content: "منصة الهيئة العليا للأمن الصناعي لإدارة المشاريع والامتثال." },
+      {
+        name: "description",
+        content: "منصة الهيئة العليا للأمن الصناعي لإدارة المشاريع والامتثال.",
+      },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

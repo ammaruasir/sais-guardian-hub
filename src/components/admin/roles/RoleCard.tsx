@@ -19,7 +19,9 @@ export function RoleCard({
   onShowPermissions: () => void;
 }) {
   return (
-    <Card className={cn("p-5 flex flex-col gap-3", highlight && "border-primary border-2 shadow-md")}>
+    <Card
+      className={cn("p-5 flex flex-col gap-3", highlight && "border-primary border-2 shadow-md")}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-content-center rounded-full bg-primary/15 text-primary">
@@ -43,7 +45,12 @@ export function RoleCard({
             <Pencil className="h-4 w-4" />
           </Button>
           {!role.system && (
-            <Button size="icon" variant="ghost" onClick={onDelete} className="text-destructive hover:text-destructive">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={onDelete}
+              className="text-destructive hover:text-destructive"
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           )}

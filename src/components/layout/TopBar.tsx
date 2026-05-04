@@ -16,7 +16,9 @@ function RoleSwitcher() {
         onClick={() => setRole("sais")}
         className={cn(
           "flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all",
-          role === "sais" ? "bg-primary text-primary-foreground shadow" : "text-muted-foreground hover:text-foreground"
+          role === "sais"
+            ? "bg-primary text-primary-foreground shadow"
+            : "text-muted-foreground hover:text-foreground",
         )}
       >
         <Shield className="h-4 w-4" />
@@ -26,7 +28,9 @@ function RoleSwitcher() {
         onClick={() => setRole("company")}
         className={cn(
           "flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all",
-          role === "company" ? "bg-secondary text-secondary-foreground shadow" : "text-muted-foreground hover:text-foreground"
+          role === "company"
+            ? "bg-secondary text-secondary-foreground shadow"
+            : "text-muted-foreground hover:text-foreground",
         )}
       >
         <Building2 className="h-4 w-4" />
@@ -65,7 +69,9 @@ function Breadcrumbs() {
   }
   return (
     <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
-      <Link to="/" className="hover:text-foreground">الرئيسية</Link>
+      <Link to="/" className="hover:text-foreground">
+        الرئيسية
+      </Link>
       {label && (
         <>
           <ChevronLeft className="h-4 w-4 rotate-180" />
@@ -78,8 +84,9 @@ function Breadcrumbs() {
 
 export function TopBar() {
   const { role } = useRole();
-  const unread = useAppStore((s) =>
-    s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
+  const unread = useAppStore(
+    (s) =>
+      s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
   );
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur md:px-6">
@@ -104,8 +111,12 @@ export function TopBar() {
             </AvatarFallback>
           </Avatar>
           <div className="hidden text-end md:block">
-            <div className="text-xs font-semibold">{role === "sais" ? "م. خالد الحربي" : "أرامكو السعودية"}</div>
-            <div className="text-[11px] text-muted-foreground">{role === "sais" ? "مراجع أمني أول" : "مدير الامتثال"}</div>
+            <div className="text-xs font-semibold">
+              {role === "sais" ? "م. خالد الحربي" : "أرامكو السعودية"}
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              {role === "sais" ? "مراجع أمني أول" : "مدير الامتثال"}
+            </div>
           </div>
         </div>
       </div>

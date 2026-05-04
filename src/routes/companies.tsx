@@ -5,8 +5,21 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { SectorBadge } from "@/components/projects/Badges";
 import { sectorLabel, type Sector, type Company } from "@/data";
@@ -29,6 +42,7 @@ function GuardedCompanies() {
 }
 
 function CompaniesPage() {
+  const { currentUser } = useRole();
   const companies = useAppStore((s) => s.companies);
   const projects = useAppStore((s) => s.projects);
   const deleteCompany = useAppStore((s) => s.deleteCompany);
@@ -55,19 +69,35 @@ function CompaniesPage() {
             <h1 className="text-2xl font-bold tracking-tight">سجل المنشآت</h1>
             <p className="text-sm text-muted-foreground">قائمة المنشآت المسجلة لدى الهيئة</p>
           </div>
-          <Button size="sm" onClick={() => { setEditing(null); setDialogOpen(true); }}>
-            <Plus className="ms-1 h-4 w-4" />إضافة منشأة
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditing(null);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="ms-1 h-4 w-4" />
+            إضافة منشأة
           </Button>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ابحث باسم المنشأة" className="max-w-xs" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="ابحث باسم المنشأة"
+            className="max-w-xs"
+          />
           <Select value={sector} onValueChange={setSector}>
-            <SelectTrigger className="w-44"><SelectValue placeholder="القطاع" /></SelectTrigger>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="القطاع" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">كل القطاعات</SelectItem>
               {(Object.keys(sectorLabel) as Sector[]).map((s) => (
-                <SelectItem key={s} value={s}>{sectorLabel[s].ar}</SelectItem>
+                <SelectItem key={s} value={s}>
+                  {sectorLabel[s].ar}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -87,39 +117,71 @@ function CompaniesPage() {
             </TableHeader>
             <TableBody>
               {rows.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">لا توجد نتائج مطابقة</TableCell></TableRow>
-              ) : rows.map((c) => {
-                const facCount = facilities.filter((f) => f.companyId === c.id).length || c.facilitiesCount;
-                const activeCount = projects.filter((p) => p.companyId === c.id && p.status !== "approved" && p.status !== "rejected").length;
-                const score = companyComplianceScore[c.id] ?? 70;
-                const band = complianceBadgeFor(score);
-                return (
-                  <TableRow key={c.id} className="cursor-pointer">
-                    <TableCell>
-                      <Link to="/companies/$id" params={{ id: c.id }} className="block">
-                        <div className="font-semibold">{c.nameAr}</div>
-                        <div className="text-xs text-muted-foreground">{c.nameEn}</div>
-                      </Link>
-                    </TableCell>
-                    <TableCell><SectorBadge s={c.sector} /></TableCell>
-                    <TableCell className="num">{facCount}</TableCell>
-                    <TableCell className="num">{activeCount}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" style={{ color: band.color, borderColor: band.color }}>
-                        {band.ar}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditing(c); setDialogOpen(true); }}>تعديل</Button>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => setToDelete(c)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="py-10 text-center text-sm text-muted-foreground"
+                  >
+                    لا توجد نتائج مطابقة
+                  </TableCell>
+                </TableRow>
+              ) : (
+                rows.map((c) => {
+                  const facCount =
+                    facilities.filter((f) => f.companyId === c.id).length || c.facilitiesCount;
+                  const activeCount = projects.filter(
+                    (p) =>
+                      p.companyId === c.id && p.status !== "approved" && p.status !== "rejected",
+                  ).length;
+                  const score = companyComplianceScore[c.id] ?? 70;
+                  const band = complianceBadgeFor(score);
+                  return (
+                    <TableRow key={c.id} className="cursor-pointer">
+                      <TableCell>
+                        <Link to="/companies/$id" params={{ id: c.id }} className="block">
+                          <div className="font-semibold">{c.nameAr}</div>
+                          <div className="text-xs text-muted-foreground">{c.nameEn}</div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <SectorBadge s={c.sector} />
+                      </TableCell>
+                      <TableCell className="num">{facCount}</TableCell>
+                      <TableCell className="num">{activeCount}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          style={{ color: band.color, borderColor: band.color }}
+                        >
+                          {band.ar}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditing(c);
+                              setDialogOpen(true);
+                            }}
+                          >
+                            تعديل
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10"
+                            onClick={() => setToDelete(c)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </div>
@@ -135,7 +197,13 @@ function CompaniesPage() {
         onConfirm={() => {
           if (toDelete) {
             deleteCompany(toDelete.id);
-            addAudit({ user: "Admin User", type: "حذف منشأة", description: `حذف ${toDelete.nameAr}`, page: "companies/", level: "warning" });
+            addAudit({
+              user: currentUser.name,
+              type: "حذف منشأة",
+              description: `حذف ${toDelete.nameAr}`,
+              page: "companies/",
+              level: "warning",
+            });
             toast.success("تم حذف المنشأة");
           }
         }}

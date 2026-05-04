@@ -18,6 +18,7 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import type { Submission } from "@/data/submissions";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { useRole } from "@/context/RoleContext";
 
 export const Route = createFileRoute("/projects/$id")({
   component: ProjectDetailPage,
@@ -33,8 +34,11 @@ export const Route = createFileRoute("/projects/$id")({
 function ProjectDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const { currentUser } = useRole();
   const project = useAppStore((s) => s.projects.find((p) => p.id === id));
-  const company = useAppStore((s) => project ? s.companies.find((c) => c.id === project.companyId) : undefined);
+  const company = useAppStore((s) =>
+    project ? s.companies.find((c) => c.id === project.companyId) : undefined,
+  );
   const deleteProject = useAppStore((s) => s.deleteProject);
   const addAudit = useAppStore((s) => s.addAudit);
 
@@ -52,7 +56,9 @@ function ProjectDetailPage() {
     <AppShell>
       <div className="space-y-5">
         <nav className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Link to="/projects" className="hover:text-foreground">المشاريع</Link>
+          <Link to="/projects" className="hover:text-foreground">
+            المشاريع
+          </Link>
           <ChevronRight className="h-3 w-3 rotate-180" />
           <span className="text-foreground">{project.nameAr}</span>
         </nav>
@@ -73,9 +79,22 @@ function ProjectDetailPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="ms-1 h-4 w-4" />تعديل</Button>
-              <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10" onClick={() => setConfirmDel(true)}><Trash2 className="ms-1 h-4 w-4" />حذف</Button>
-              <Button variant="outline" size="sm">تصدير ملف المشروع</Button>
+              <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+                <Pencil className="ms-1 h-4 w-4" />
+                تعديل
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:bg-destructive/10"
+                onClick={() => setConfirmDel(true)}
+              >
+                <Trash2 className="ms-1 h-4 w-4" />
+                حذف
+              </Button>
+              <Button variant="outline" size="sm">
+                تصدير ملف المشروع
+              </Button>
             </div>
           </div>
           <div className="mt-6">
@@ -120,7 +139,13 @@ function ProjectDetailPage() {
         confirmText="حذف"
         onConfirm={() => {
           deleteProject(project.id);
-          addAudit({ user: "Admin User", type: "حذف مشروع", description: `حذف ${project.nameAr}`, page: `projects/${project.id}`, level: "warning" });
+          addAudit({
+            user: currentUser.name,
+            type: "حذف مشروع",
+            description: `حذف ${project.nameAr}`,
+            page: `projects/${project.id}`,
+            level: "warning",
+          });
           toast.success("تم حذف المشروع");
           navigate({ to: "/projects" });
         }}

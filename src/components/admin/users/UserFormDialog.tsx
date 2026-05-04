@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,6 +22,7 @@ import { useAppStore } from "@/store/appStore";
 import { departments, type AdminUser } from "@/data/admin";
 import { PasswordRequirements, checkPassword } from "./PasswordRequirements";
 import { toast } from "sonner";
+import { useRole } from "@/context/RoleContext";
 
 type Props = {
   open: boolean;
@@ -23,6 +31,7 @@ type Props = {
 };
 
 export function UserFormDialog({ open, onOpenChange, user }: Props) {
+  const { currentUser } = useRole();
   const roles = useAppStore((s) => s.roles);
   const addUser = useAppStore((s) => s.addUser);
   const updateUser = useAppStore((s) => s.updateUser);
@@ -61,11 +70,23 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
     }
     if (editing && user) {
       updateUser(user.id, { nameAr, email, department, roleKey });
-      addAudit({ user: "Admin User", type: "تعديل مستخدم", description: `تعديل بيانات ${nameAr}`, page: "admin/users", level: "info" });
+      addAudit({
+        user: currentUser.name,
+        type: "تعديل مستخدم",
+        description: `تعديل بيانات ${nameAr}`,
+        page: "admin/users",
+        level: "info",
+      });
       toast.success("تم التحديث بنجاح ✓");
     } else {
       addUser({ nameAr, email, department, roleKey, active: true });
-      addAudit({ user: "Admin User", type: "إنشاء مستخدم", description: `إضافة مستخدم جديد: ${nameAr}`, page: "admin/users", level: "info" });
+      addAudit({
+        user: currentUser.name,
+        type: "إنشاء مستخدم",
+        description: `إضافة مستخدم جديد: ${nameAr}`,
+        page: "admin/users",
+        level: "info",
+      });
       toast.success("تم الإنشاء بنجاح ✓");
     }
     onOpenChange(false);
@@ -79,29 +100,48 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
             {editing ? "تعديل المستخدم" : "إضافة مستخدم جديد"}
           </DialogTitle>
           <DialogDescription className="text-end">
-            {editing ? "قم بتحديث بيانات المستخدم." : "أدخل بيانات المستخدم الجديد وحدد دوره في النظام."}
+            {editing
+              ? "قم بتحديث بيانات المستخدم."
+              : "أدخل بيانات المستخدم الجديد وحدد دوره في النظام."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label className="text-end block">الاسم الكامل</Label>
-            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className="text-end" />
+            <Input
+              value={nameAr}
+              onChange={(e) => setNameAr(e.target.value)}
+              className="text-end"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-end block">البريد الإلكتروني</Label>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@sais.gov.sa" type="email" />
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="user@sais.gov.sa"
+              type="email"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-end block">الإدارة</Label>
             <Select value={department} onValueChange={setDepartment}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {departments.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                {departments.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-end block">{editing ? "كلمة المرور (اختياري)" : "كلمة المرور الجديدة"}</Label>
+            <Label className="text-end block">
+              {editing ? "كلمة المرور (اختياري)" : "كلمة المرور الجديدة"}
+            </Label>
             <div className="relative">
               <Input
                 type={showPwd ? "text" : "password"}
@@ -122,16 +162,24 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
           <div className="space-y-1.5">
             <Label className="text-end block">الدور الوظيفي</Label>
             <Select value={roleKey} onValueChange={setRoleKey}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {roles.map((r) => <SelectItem key={r.key} value={r.key}>{r.nameAr}</SelectItem>)}
+                {roles.map((r) => (
+                  <SelectItem key={r.key} value={r.key}>
+                    {r.nameAr}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter className="flex-row justify-start gap-2 sm:justify-start">
           <Button onClick={submit}>حفظ المستخدم</Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>إلغاء</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            إلغاء
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

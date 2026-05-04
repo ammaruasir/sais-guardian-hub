@@ -84,7 +84,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => {
                 const isHome = item.to === "/" || item.to === "/portal";
-                const active = isHome ? path === item.to : path === item.to || path.startsWith(item.to + "/");
+                const active = isHome
+                  ? path === item.to
+                  : path === item.to || path.startsWith(item.to + "/");
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>

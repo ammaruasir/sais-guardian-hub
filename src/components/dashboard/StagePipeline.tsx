@@ -1,5 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Cell,
+} from "recharts";
 import { stageLabel } from "@/data";
 
 const data = [
@@ -23,8 +32,16 @@ export function StagePipeline() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="stage" tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} reversed />
-              <YAxis tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} orientation="right" allowDecimals={false} />
+              <XAxis
+                dataKey="stage"
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                reversed
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+                orientation="right"
+                allowDecimals={false}
+              />
               <Tooltip
                 contentStyle={{
                   background: "var(--popover)",

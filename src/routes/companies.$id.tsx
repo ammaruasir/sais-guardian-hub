@@ -63,7 +63,9 @@ function CompanyDetailPage() {
                 <div className="font-bold">{consultant.nameAr}</div>
                 <div className="text-xs text-muted-foreground">{consultant.nameEn}</div>
               </div>
-              <div className="num text-xs text-muted-foreground">رقم الترخيص: {consultant.licenseNo}</div>
+              <div className="num text-xs text-muted-foreground">
+                رقم الترخيص: {consultant.licenseNo}
+              </div>
             </div>
           </Card>
         )}
@@ -71,7 +73,9 @@ function CompanyDetailPage() {
         <section>
           <h2 className="mb-3 text-lg font-bold">المنشآت ({facs.length})</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {facs.map((f) => <FacilityCard key={f.id} facility={f} />)}
+            {facs.map((f) => (
+              <FacilityCard key={f.id} facility={f} />
+            ))}
           </div>
         </section>
 

@@ -11,7 +11,13 @@ export function InternalNotes({ initial }: { initial: ProjectNote[] }) {
   function add() {
     if (!text.trim()) return;
     setNotes([
-      { id: `n-${Date.now()}`, projectId: initial[0]?.projectId ?? "", author: "أنت", ts: "الآن", text },
+      {
+        id: `n-${Date.now()}`,
+        projectId: initial[0]?.projectId ?? "",
+        author: "أنت",
+        ts: "الآن",
+        text,
+      },
       ...notes,
     ]);
     setText("");
@@ -27,14 +33,22 @@ export function InternalNotes({ initial }: { initial: ProjectNote[] }) {
           rows={3}
         />
         <div className="mt-2 flex items-center justify-between">
-          <p className="text-[11px] text-muted-foreground">الملاحظات الداخلية لا تُعرض على المنشأة.</p>
-          <Button size="sm" onClick={add}>إضافة ملاحظة</Button>
+          <p className="text-[11px] text-muted-foreground">
+            الملاحظات الداخلية لا تُعرض على المنشأة.
+          </p>
+          <Button size="sm" onClick={add}>
+            إضافة ملاحظة
+          </Button>
         </div>
       </div>
       <div className="space-y-2">
         {notes.map((n) => (
           <div key={n.id} className="flex gap-3 rounded-lg border border-border bg-card p-3">
-            <Avatar className="h-9 w-9"><AvatarFallback className="bg-secondary text-secondary-foreground">{n.author[0]}</AvatarFallback></Avatar>
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-secondary text-secondary-foreground">
+                {n.author[0]}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold">{n.author}</span>

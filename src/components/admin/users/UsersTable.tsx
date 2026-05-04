@@ -4,15 +4,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import { useAppStore } from "@/store/appStore";
 import type { AdminUser } from "@/data/admin";
 import { UserFormDialog } from "./UserFormDialog";
 import { UserDetailSheet } from "./UserDetailSheet";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { toast } from "sonner";
+import { useRole } from "@/context/RoleContext";
 
 export function UsersTable() {
+  const { currentUser } = useRole();
   const users = useAppStore((s) => s.users);
   const roles = useAppStore((s) => s.roles);
   const deleteUser = useAppStore((s) => s.deleteUser);
@@ -44,7 +53,13 @@ export function UsersTable() {
       }
     }
     deleteUser(u.id);
-    addAudit({ user: "Admin User", type: "حذف مستخدم", description: `حذف المستخدم ${u.nameAr}`, page: "admin/users", level: "warning" });
+    addAudit({
+      user: currentUser.name,
+      type: "حذف مستخدم",
+      description: `حذف المستخدم ${u.nameAr}`,
+      page: "admin/users",
+      level: "warning",
+    });
     toast.success("تم الحذف بنجاح ✓");
   };
 
@@ -101,7 +116,9 @@ export function UsersTable() {
                   <TableCell className="text-sm">{u.department}</TableCell>
                   <TableCell>
                     {u.active ? (
-                      <Badge className="bg-success/15 text-success border border-success/30 hover:bg-success/15">نشط</Badge>
+                      <Badge className="bg-success/15 text-success border border-success/30 hover:bg-success/15">
+                        نشط
+                      </Badge>
                     ) : (
                       <Badge variant="secondary">غير نشط</Badge>
                     )}
@@ -132,7 +149,12 @@ export function UsersTable() {
                       <Button size="icon" variant="ghost" onClick={() => setEditUser(u)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button size="icon" variant="ghost" onClick={() => setDelUser(u)} className="text-destructive hover:text-destructive">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setDelUser(u)}
+                        className="text-destructive hover:text-destructive"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -152,13 +174,23 @@ export function UsersTable() {
       </div>
 
       <UserFormDialog open={createOpen} onOpenChange={setCreateOpen} />
-      <UserFormDialog open={!!editUser} onOpenChange={(v) => !v && setEditUser(null)} user={editUser} />
-      <UserDetailSheet user={viewUser} open={!!viewUser} onOpenChange={(v) => !v && setViewUser(null)} />
+      <UserFormDialog
+        open={!!editUser}
+        onOpenChange={(v) => !v && setEditUser(null)}
+        user={editUser}
+      />
+      <UserDetailSheet
+        user={viewUser}
+        open={!!viewUser}
+        onOpenChange={(v) => !v && setViewUser(null)}
+      />
       <ConfirmDialog
         open={!!delUser}
         onOpenChange={(v) => !v && setDelUser(null)}
         title="تأكيد الحذف"
-        description={delUser ? `هل أنت متأكد من حذف المستخدم "${delUser.nameAr}"؟ لا يمكن التراجع.` : ""}
+        description={
+          delUser ? `هل أنت متأكد من حذف المستخدم "${delUser.nameAr}"؟ لا يمكن التراجع.` : ""
+        }
         confirmText="حذف"
         onConfirm={() => delUser && handleDelete(delUser)}
       />

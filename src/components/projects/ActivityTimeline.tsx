@@ -1,7 +1,15 @@
-import { CheckCircle2, FileUp, MessageCircle, AlertTriangle, XCircle, UserCog } from "lucide-react";
+import {
+  CheckCircle2,
+  FileUp,
+  MessageCircle,
+  AlertTriangle,
+  XCircle,
+  UserCog,
+  type LucideIcon,
+} from "lucide-react";
 import type { ProjectActivity } from "@/data/notes";
 
-const map: Record<ProjectActivity["type"], { Icon: any; cls: string }> = {
+const map: Record<ProjectActivity["type"], { Icon: LucideIcon; cls: string }> = {
   approved: { Icon: CheckCircle2, cls: "bg-success/15 text-success" },
   submitted: { Icon: FileUp, cls: "bg-secondary/15 text-secondary" },
   comment: { Icon: MessageCircle, cls: "bg-muted text-muted-foreground" },
@@ -17,7 +25,9 @@ export function ActivityTimeline({ items }: { items: ProjectActivity[] }) {
         const { Icon, cls } = map[a.type];
         return (
           <li key={a.id} className="relative">
-            <span className={`absolute -end-[34px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-background ${cls}`}>
+            <span
+              className={`absolute -end-[34px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-background ${cls}`}
+            >
               <Icon className="h-3.5 w-3.5" />
             </span>
             <div className="rounded-lg border border-border bg-card p-3">

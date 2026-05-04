@@ -1,6 +1,11 @@
 import { CheckCircle2, Circle, XCircle, Upload, Lock } from "lucide-react";
 import { toast } from "sonner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { portalStages, type PortalRequirement } from "@/data/portalRequirements";
@@ -125,11 +130,16 @@ function RequirementRow({
             {req.directive}
           </Badge>
           {req.required ? (
-            <Badge variant="outline" className="text-[10px] bg-destructive/10 text-destructive border-destructive/20">
+            <Badge
+              variant="outline"
+              className="text-[10px] bg-destructive/10 text-destructive border-destructive/20"
+            >
               مطلوب
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-[10px]">اختياري</Badge>
+            <Badge variant="outline" className="text-[10px]">
+              اختياري
+            </Badge>
           )}
         </div>
         <div className="text-[11px] text-muted-foreground">{req.nameEn}</div>
@@ -155,7 +165,9 @@ function RequirementRow({
         <Button
           size="sm"
           variant="outline"
-          onClick={() => toast.success(state === "rejected" ? "تم فتح إعادة الرفع" : "تم فتح نافذة الرفع")}
+          onClick={() =>
+            toast.success(state === "rejected" ? "تم فتح إعادة الرفع" : "تم فتح نافذة الرفع")
+          }
         >
           <Upload className="ms-1 h-3.5 w-3.5" /> {state === "rejected" ? "إعادة الرفع" : "رفع"}
         </Button>
