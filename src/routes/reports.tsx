@@ -96,7 +96,11 @@ function ChartCard({ title, en, children }: { title: string; en: string; childre
 
 function ReportsContent() {
   const [range, setRange] = useState("6m");
-  const maxReviewer = Math.max(...reviewers.map((r) => r.count));
+  const factor = range === "30d" ? 0.85 : range === "3m" ? 0.92 : range === "1y" ? 1.15 : 1;
+  const monthlyR = monthly.map((d) => ({ ...d, v: Math.max(1, Math.round(d.v * factor)) }));
+  const stagesR = stages.map((d) => ({ ...d, days: Number((d.days * factor).toFixed(1)) }));
+  const reviewersR = reviewers.map((d) => ({ ...d, count: Math.max(1, Math.round(d.count * factor)) }));
+  const maxReviewer = Math.max(...reviewersR.map((r) => r.count));
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -119,7 +123,7 @@ function ReportsContent() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartCard title="المشاريع المكتملة شهرياً" en="Projects Completed per Month">
-          <BarChart data={monthly}>
+          <BarChart data={monthlyR}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis dataKey="m" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
@@ -129,7 +133,7 @@ function ReportsContent() {
         </ChartCard>
 
         <ChartCard title="متوسط وقت المراجعة حسب المرحلة" en="Avg Review Time by Stage">
-          <BarChart data={stages} layout="vertical" margin={{ left: 20 }}>
+          <BarChart data={stagesR} layout="vertical" margin={{ left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis type="number" tick={{ fontSize: 12 }} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
@@ -151,13 +155,13 @@ function ReportsContent() {
         </ChartCard>
 
         <ChartCard title="أعباء المراجعين" en="Reviewer Workload">
-          <BarChart data={reviewers} layout="vertical" margin={{ left: 30 }}>
+          <BarChart data={reviewersR} layout="vertical" margin={{ left: 30 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v} مهمة`, "نشط"]} />
             <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-              {reviewers.map((r, i) => (
+              {reviewersR.map((r, i) => (
                 <Cell key={i} fill={r.count === maxReviewer ? "var(--warning)" : "var(--primary)"} />
               ))}
             </Bar>

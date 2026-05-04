@@ -1,86 +1,125 @@
-# Sub-Phase 7B — Store Migration + Settings + NCA + Email
+# Sub-Phase 7C — Final Polish & Wiring
 
-## Part 1: Migrate all app data into the Zustand store
+This is the final sub-phase. Three pillars: **(1) Audit Log page**, **(2) Drag-and-Drop boards**, **(3) CRUD for remaining entities + full platform polish audit**.
 
-Extend `src/store/appStore.ts` so it owns every domain entity. Keep static seed files (`src/data/index.ts`, `tasks.ts`, `submissions.ts`, `notifications.ts`, `consultants.ts`, `facilities.ts`) unchanged — the store imports them as initial state. Components stop importing the static arrays directly and read from selectors instead.
+---
 
-### New store slices & actions
+## 1. Security Audit Log Page (`/admin/audit`)
 
-- **projects**: `addProject`, `updateProject`, `deleteProject`, `updateProjectStatus(id, status, stage?)` — auto-advances stage and resets to `awaiting_submission` on intermediate approvals; final stage 4 approval stays `approved`.
-- **companies**: `addCompany`, `updateCompany`, `deleteCompany`.
-- **tasks**: `addTask`, `updateTask`, `deleteTask`, `updateTaskStatus(id, status)`.
-- **submissions**: `addSubmission`, `updateSubmission`, `updateSubmissionDecision(id, decision, comments?)` — internally calls `updateProjectStatus` and `addNotification` + `addActivity`.
-- **notifications**: `addNotification`, `markAsRead`, `markAllAsRead(role)`, `deleteNotification`, selector `getUnreadCount(role)` (counts unread where `forRole === role || forRole === "both"`).
-- **activity**: `addActivity` (prepends).
-- **consultants**: `addConsultant`, `updateConsultant`, `deleteConsultant`.
-- **facilities**: read-only initial state (no CRUD required this phase).
+**File:** replace `src/routes/admin.audit.tsx` placeholder.
 
-`resetDemo` extended to re-seed every slice. Persist key bumped to `sais-app-store-v2` to avoid stale localStorage shape.
+- Header `الأحداث الأمنية` (shield-alert icon) + subtitle + `تحديث` button (forces local re-render via state bump).
+- **4 KPI cards** computed from `useAppStore(s => s.audit)`:
+  - Total / Critical (`level==='critical'`) / Warnings (`level==='warning'`) / Info (`level==='info'`).
+- **Collapsible guide card** `دليل الأحداث الأمنية والمستويات` (Collapsible from shadcn) explaining the 3 levels.
+- **Filter bar:** search input + 3 Selects (User / Type / Level). All actively filter the table.
+- **Table** (RTL) with the 7 columns specified (User, Event, Description, Page, Level, Time, Actions). Level badges: info=teal, warning=amber, critical=red. Delete action with `ConfirmDialog` → `store.deleteAuditEntry(id)`.
+- **Pagination:** 15 per page with prev/next + counter `عرض X-Y من Z`.
+- **Seed data:** extend `appStore.ts` initial `audit` array with the 15 listed entries (only seed if empty on first persisted load — handled in store initializer).
+- New store actions: `deleteAuditEntry(id)`, ensure existing `logActivity` continues feeding this list.
 
-### Component wiring (existing screens)
+---
 
-| Component | Change |
-|---|---|
-| `KpiCards.tsx` | Compute KPIs live from `projects` + `submissions`. |
-| `SubmissionReviewSheet.tsx` | `decide()` calls `updateSubmissionDecision`, emits notification + activity, then toast/close. |
-| `portal.submissions.new.tsx` | On submit: `addSubmission` → `addNotification` (sais) → `addActivity` → success screen. |
-| `TaskBoard.tsx`, `NewTaskDialog`, `TaskDetailSheet` | Read tasks from store; create/update via store actions. |
-| `KanbanBoard.tsx` | Read `projects` from store (re-renders on stage change; full DnD deferred to 7C). |
-| `TopBar.tsx` | Bell badge = `getUnreadCount(role)`. |
-| `portal.index.tsx` (Action Required + Recent Updates) | Computed from store filtered by `companyId === "aramco"`. |
-| `OverdueTable.tsx` | `projects.filter(p => p.overdue)` from store. |
-| `ActivityFeed.tsx` | Reads `activity` from store. |
-| Lists: `companies.tsx`, `consultants.tsx`, `projects.tsx`, `tasks.tsx`, project/company detail pages, `MyProjectsGrid`, `PortalProjectCard`, `SubmissionList`, `notifications` pages | Switch to `useAppStore` selectors. |
+## 2. Drag-and-Drop for Boards
 
-KPI formulas:
-- `activeProjects = projects.length`
-- `pendingReviews = projects.filter(p => p.status === "under_review").length`
-- `overdue = projects.filter(p => p.overdue).length`
-- `approvalRate = approvedDecisions / decidedSubmissions * 100`
-- `avgReviewDays = mean(daysInStage of projects under_review)`
+Native HTML5 DnD (no new dependency).
 
-## Part 2: Settings page (`/admin/settings`)
+**`src/components/tasks/TaskBoard.tsx`:**
+- Each `TaskCard` wrapper: `draggable`, `onDragStart` sets `dataTransfer` taskId + dims opacity to 0.5 via local state.
+- Each column: `onDragOver={e=>e.preventDefault()}`, `onDragEnter` toggles `border-primary border-dashed` highlight, `onDrop` calls `store.updateTaskStatus(taskId, columnStatus)` and logs activity.
 
-Replace the placeholder route. Layout: page header + two-column grid with vertical RTL tabs on the right (icon + label) and tab content on the left. Default tab: **الأمان**.
+**`src/components/projects/KanbanBoard.tsx`:**
+- Same pattern. `onDrop` → `store.updateProjectStatus(projectId, 'under_review', targetStage)`.
+- Reset `daysInStage` already handled inside the action.
 
-### Tabs
+---
 
-1. **عام** — platform name, default language, timezone, Hijri/Gregorian toggle.
-2. **الإشعارات** — 5 toggle rows bound to `notify*` settings.
-3. **المظهر** — radio groups for `themeMode`, `fontSize`, `sidebarMode`.
-4. **الأمان** (default) — 4 cards:
-   - **إعدادات الجلسة**: `sessionTimeout`, `maxLoginAttempts`, `lockoutMinutes`.
-   - **سياسة كلمة المرور**: `passwordMinLength`, `passwordExpiryDays`, 2×2 toggles for upper/lower/number/special.
-   - **إعدادات أمان إضافية**: rows for 2FA (disabled + "قريباً" badge), `ipWhitelist`, `watermark`, `copyProtection`, `disableRightClick`.
-   - **ضوابط الأمن السيبراني (ECC)**: progress bar (70%), three count badges (8/2/1), 10-row checklist with colored status pill per spec. Static metadata in `src/data/ncaControls.ts`.
-5. **النسخ الاحتياطي** — last backup info, schedule, "إنشاء نسخة احتياطية الآن" button (toast), table of 5 mock backups.
-6. **البريد الإلكتروني** — provider dropdown, sender name/email, collapsible SMTP card (server/port/user/password/TLS toggle), amber security note.
+## 3. CRUD for Remaining Entities
 
-All inputs are controlled and write through `updateSettings`. Floating bottom-left **حفظ التغييرات** button shows the success toast (state already persists via Zustand `persist` — button confirms intent).
+### Projects (`/projects`)
+- `+ إضافة مشروع` button → new `ProjectFormDialog.tsx` with fields: nameAr, nameEn, companyId (Select from store.companies), facilityAr, sector, classification, reviewerId (Select from store.users where role contains reviewer). Defaults stage=1, status=`awaiting_submission`.
+- Project detail header: `تعديل` (pre-filled dialog) and `حذف` (ConfirmDialog → `store.deleteProject` → navigate `/projects`).
+- Store: add `addProject`, `updateProject`, `deleteProject`.
 
-## Files
+### Companies (`/companies`)
+- `+ إضافة منشأة` button → `CompanyFormDialog.tsx` (nameAr, nameEn, sector, facilitiesCount, compliance).
+- Edit on detail page; Delete from list with confirm.
+- Store: `addCompany`, `updateCompany`, `deleteCompany`.
 
-**New**
-- `src/data/ncaControls.ts`
-- `src/components/admin/settings/SettingsTabs.tsx`
-- `src/components/admin/settings/SecurityTab.tsx`
-- `src/components/admin/settings/NcaCompliancePanel.tsx`
-- `src/components/admin/settings/EmailTab.tsx`
-- `src/components/admin/settings/GeneralTab.tsx`
-- `src/components/admin/settings/NotificationsTab.tsx`
-- `src/components/admin/settings/AppearanceTab.tsx`
-- `src/components/admin/settings/BackupTab.tsx`
+### Consultants (`/consultants`)
+- `+ إضافة استشاري` button → `ConsultantFormDialog.tsx` (nameAr, nameEn, licenseNo, specializations checkboxes, licenseExpiry date, status, phone, email).
+- Edit/delete from detail dialog.
+- Store: `addConsultant`, `updateConsultant`, `deleteConsultant`.
 
-**Edited**
-- `src/store/appStore.ts` (large extension)
-- `src/data/admin.ts` (extend `AppSettings` with date format already covered; add backup fields if needed)
-- `src/routes/admin.settings.tsx` (replace placeholder)
-- All components listed in the wiring table above
+### Notifications (`/notifications` and `/portal/notifications`)
+- Row click → `markAsRead(id)` (blue dot disappears).
+- Top button `تحديد الكل كمقروء` → `markAllAsRead(role)`.
+- X button per row → `deleteNotification(id)` (no confirm, instant).
+- Filter tabs (`الكل / غير مقروءة / اعتمادات / طلبات / مواعيد`) actually filter by `read` flag and `type`.
+- Store: `markAsRead`, `markAllAsRead`, `deleteNotification`.
 
-## Verification before stopping
+---
 
-- Approving a submission in the review sheet flips the project's status (visible in Kanban + KPIs).
-- Submitting via the company wizard adds a row to the SAIS project's submissions tab and bumps the SAIS bell count.
-- Bell count differs per role and decreases when "mark all read" is clicked.
-- All 6 settings tabs render; toggles persist after reload (Zustand persist).
-- NCA panel shows progress bar + 10 controls with correct colors.
+## 4. Full Platform Polish Audit
+
+Pass through every page; fix in-place:
+
+**Navigation/Routing**
+- Verify all sidebar `<Link>`s in both `AppSidebar` portals resolve. Confirm `activeProps` highlights correctly. Add 150ms fade transition wrapper on portal switch in `AppShell.tsx` (CSS `transition-opacity`).
+- Ensure breadcrumbs are clickable per-segment (audit `Breadcrumb` usage on each route).
+
+**Interactive Elements**
+- Hook every previously-static button to either nav, dialog, or `toast.success`.
+- Make rows on `/companies` and `/consultants` clickable (cursor-pointer + onClick).
+- All deletes routed through `ConfirmDialog`. All success paths emit `sonner` toast.
+
+**Visual Consistency**
+- Centralize status badge mapping in `src/lib/statusBadge.ts` (approved=green, under_review=secondary, additional_docs=amber, rejected=red, awaiting=gray, pending_final=amber). Replace ad-hoc usages across project/submission components.
+- Ensure RTL alignment + LTR numerals (already via Tailwind `dir`).
+
+**Empty states**
+- Add empty state blocks (icon + message) to: KanbanBoard columns, NotificationsList, search-filtered tables, submissions tab. Reusable `<EmptyState icon message />` in `src/components/common/EmptyState.tsx`.
+
+**Loading polish**
+- Add `Skeleton` shimmer to KPI cards via 200ms artificial mount delay in dashboard.
+- 150ms cross-fade on role switch.
+
+**Reports page**
+- Wire date-range Select to `useState`; on change, multiply the hardcoded chart datasets by a deterministic factor (±10-15% based on range key) so visuals shift.
+- Verify all 4 charts have Arabic labels.
+
+**Demo Badge**
+- Verify `DemoBadge.tsx` is mounted in `AppShell` with `fixed bottom-4 right-4 opacity-70 pointer-events-none`.
+
+---
+
+## 5. End-to-End Workflow Verification
+
+After implementation, walk through and document pass/fail for:
+1. **Submission → Approval cycle** (Portal wizard → SAIS review → KPI/Kanban update → Portal sees approval).
+2. **Task drag-and-drop** persistence across navigation.
+3. **Admin CRUD → Audit log** (add/edit/delete user surfaces 3 audit entries).
+
+---
+
+## Files to Create
+
+- `src/components/common/EmptyState.tsx`
+- `src/components/projects/ProjectFormDialog.tsx`
+- `src/components/companies/CompanyFormDialog.tsx`
+- `src/components/consultants/ConsultantFormDialog.tsx`
+- `src/lib/statusBadge.ts`
+
+## Files to Modify
+
+- `src/routes/admin.audit.tsx` (full implementation)
+- `src/store/appStore.ts` (seed audit, add CRUD actions for projects/companies/consultants, notification actions, audit delete)
+- `src/components/tasks/TaskBoard.tsx`, `src/components/projects/KanbanBoard.tsx` (DnD)
+- `src/routes/projects.tsx`, `src/routes/companies.tsx`, `src/routes/consultants.tsx` (+ detail routes/dialogs) — add buttons & wiring
+- `src/components/notifications/NotificationsList.tsx` (mark-read, delete, filter tabs)
+- `src/components/layout/AppShell.tsx` (fade transition, ensure DemoBadge)
+- `src/components/dashboard/KpiCards.tsx` (skeleton shimmer)
+- `src/routes/reports.tsx` (date-range reactivity)
+- Replace ad-hoc status badges with `statusBadge.ts` helper across project/submission components.
+
+After implementation I'll report which of the 3 workflows pass end-to-end.
