@@ -3,6 +3,7 @@ import { Search, Plus, Eye, Pencil, Trash2, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Table,
@@ -25,6 +26,7 @@ export function UsersTable() {
   const users = useAppStore((s) => s.users);
   const roles = useAppStore((s) => s.roles);
   const deleteUser = useAppStore((s) => s.deleteUser);
+  const updateUser = useAppStore((s) => s.updateUser);
   const addAudit = useAppStore((s) => s.addAudit);
 
   const [q, setQ] = useState("");
@@ -115,13 +117,29 @@ export function UsersTable() {
                   <TableCell className="text-sm">{role?.nameAr ?? "—"}</TableCell>
                   <TableCell className="text-sm">{u.department}</TableCell>
                   <TableCell>
-                    {u.active ? (
-                      <Badge className="bg-success/15 text-success border border-success/30 hover:bg-success/15">
-                        نشط
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">غير نشط</Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={u.active}
+                        onCheckedChange={(v) => {
+                          updateUser(u.id, { active: v });
+                          addAudit({
+                            user: currentUser.name,
+                            type: v ? "تفعيل مستخدم" : "تعطيل مستخدم",
+                            description: `${v ? "تفعيل" : "تعطيل"} حساب ${u.nameAr}`,
+                            page: "admin/users",
+                            level: "warning",
+                          });
+                          toast.success(v ? "تم تفعيل الحساب ✓" : "تم تعطيل الحساب");
+                        }}
+                      />
+                      {u.active ? (
+                        <Badge className="bg-success/15 text-success border border-success/30 hover:bg-success/15">
+                          نشط
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">غير نشط</Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {u.events === 0 ? (
