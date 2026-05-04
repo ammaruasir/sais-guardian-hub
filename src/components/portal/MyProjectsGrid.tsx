@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { projects, type Stage } from "@/data";
+import { type Stage } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { StatusChip, ClassificationBadge } from "@/components/projects/Badges";
 import { cn } from "@/lib/utils";
 
