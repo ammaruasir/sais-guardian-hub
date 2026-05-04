@@ -1,80 +1,126 @@
-# Phase 6 — Notifications, Reports, Polish & Demo Mode
+# Phase 7 — Admin Panel, User Management, Security & NCA Compliance
 
-## 1. Notifications (shared)
+Implemented in **3 sub-phases**, stopping after each for review. Underpinning all of it is a single **Zustand store** that turns existing read-only mock data into mutable, app-wide reactive state so every CRUD action ripples instantly across SAIS and Company portals.
 
-**New data file:** `src/data/notifications.ts`
-- Export `AppNotification` type and `notifications` array seeded with the 12 entries (6 SAIS + 6 Aramco) per the spec.
-- Helper: `getNotificationsForRole(role)` filtering by `forRole === role || "both"`.
-- Helper: `unreadCountForRole(role)`.
+---
 
-**New shared component:** `src/components/notifications/NotificationsList.tsx`
-- Local state for `read` map (toggled in-memory) + active filter tab.
-- Tabs (shadcn `Tabs`): الكل / غير مقروءة / اعتمادات / طلبات / مواعيد.
-- Row layout (RTL): icon-on-right (CircleCheck/FileQuestion/XCircle/Clock/FileUp/MessageCircle with proper tone bg), title bold, description muted, timestamp left-aligned, blue dot for unread. Whole row is a `<Link>` to `linkTo` with hover bg.
-- "تحديد الكل كمقروء" button top-left clears unread map.
-- Empty state when filter has no matches.
+## Foundation (added at start of 7A, used by all sub-phases)
 
-**New routes:**
-- Create `src/routes/notifications.tsx` → SAIS notifications page (guard: redirect to `/portal/notifications` if role is company).
-- Replace stub `src/routes/portal.notifications.tsx` with company list (guard: redirect to `/notifications` if role is sais).
-- Both pages just render `<NotificationsList role={...} />` inside `AppShell`.
+**`src/store/appStore.ts`** — Zustand store seeding from existing `src/data/*` modules and exposing CRUD actions for: projects, submissions, tasks, companies, consultants, facilities, notifications, conversations, users, roles, permissions matrix, settings, and audit events. Persisted to `localStorage` so the demo survives reloads but resettable via a debug "reset demo" action.
 
-**TopBar bell:**
-- Use `useRole` + `unreadCountForRole`; badge shows actual count (hide if zero).
-- Wrap bell in `<Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>`.
-- Add `/notifications` and `/portal/notifications` to Breadcrumbs map (already partially present).
+Existing data files stay as the seed source. Components that currently import arrays directly from `src/data/*` are migrated to `useAppStore(s => s.projects)` etc. so changes propagate.
 
-**Sidebar:** SAIS nav already links `/notifications`; company nav currently points to `/notifications` — fix it to `/portal/notifications`.
+**Toast system** — already have `sonner` Toaster mounted; add a tiny `src/lib/toast.ts` wrapper exposing `toast.success/info/error` with the standard Arabic strings.
 
-## 2. Reports (`/reports`, SAIS only)
+**Confirm dialog** — small reusable `<ConfirmDialog>` (shadcn AlertDialog) for all destructive actions.
 
-**New route:** `src/routes/reports.tsx` (guard: redirect company role to `/portal`).
-- Header "التقارير والإحصائيات" + EN subtitle; date-range `Select` top-left with the 4 options, default "آخر 6 أشهر" (purely cosmetic).
-- 2x2 grid (`lg:grid-cols-2`) of `Card`s, each with Arabic title + EN subtitle:
-  1. **BarChart** monthly completed projects (Recharts) — values 3,2,4,2,5,3 across نوفمبر→أبريل, fill `var(--primary)`.
-  2. **Horizontal BarChart** avg review time by stage (layout="vertical") — 3.2/5.1/6.8/4.5, fill `var(--secondary)`; tooltip suffix "يوم".
-  3. **Donut PieChart** submissions by sector — 35/25/15/15/10 using chart palette colors.
-  4. **Horizontal BarChart** reviewer workload — bars with `Cell` so the max value (خالد=4) is amber, others primary.
+---
 
-## 3. Help (`/portal/help`)
+## SUB-PHASE 7A — User Management + Roles & Permissions
 
-Replace stub with:
-- Header "المساعدة والدعم".
-- `Accordion` with the 5 FAQ items (text per spec).
-- Contact card (`Card` + Phone/Mail/Clock icons) with hotline, email, business hours.
-- Quick-links row: 3 outline buttons linking to `/portal/requirements`, `/portal/submissions/new`, and an info `Dialog`/disabled card for "الاستشاريون المعتمدون" (SAIS-only page; show as text since company role can't navigate there) — alternative: show a Button that toggles a small inline note. Will use simple tile buttons that open `/portal/requirements` etc.
+### Sidebar
+Update `AppSidebar.tsx`: add a second `SidebarGroup` (only when `role === "sais"`) labelled **الإدارة** with items:
+- المستخدمون → `/admin/users`
+- الصلاحيات والأدوار → `/admin/roles`
+- الأحداث الأمنية → `/admin/audit`
+- الإعدادات → `/admin/settings`
 
-## 4. Polish pass
+Use `Users`, `Shield`, `ShieldAlert`, `Settings` icons. Group label uses existing muted style.
 
-**Demo badge** — add `src/components/layout/DemoBadge.tsx`: fixed `bottom-4 left-4`, subtle backdrop-blur chip "نموذج توضيحي — POC Demo". Mount it in `AppShell` so it persists everywhere.
+### Data
+`src/data/admin.ts` — seeds for users (10 entries from spec), roles (7 entries), permissions matrix (modules × roles boolean map), departments list, audit events (15 from spec, plus generators). Store hydrates from this.
 
-**Role transition fade** — wrap `AppShell` children in a keyed div using `role` as key with Tailwind `animate-in fade-in duration-200` to give a soft fade when switching portals.
+### Routes
+- **`src/routes/admin.tsx`** — pathless layout: guards SAIS role (redirect to `/portal` for company), renders `<Outlet />` inside AppShell.
+- **`src/routes/admin.users.tsx`** — header + search + "+ إضافة مستخدم" button. Table per spec (Avatar, name/email, role, dept, status badge, security events badge, login history link, view/edit/delete actions). 
+  - `<UserFormDialog>` for create+edit (shared) with live password requirements checker (5 rules, green check when met, summary line).
+  - `<UserDetailSheet>` for view (read-only with recent activity from audit log filtered to user).
+  - Delete uses `<ConfirmDialog>`; blocks deleting last super_admin.
+- **`src/routes/admin.roles.tsx`** — Tabs: "مصفوفة الصلاحيات" (default) | "الأدوار".
+  - Roles tab: grid of role cards (`<RoleCard>`), super_admin highlighted with primary border, system roles get "نظام" badge and no delete button. "+ إضافة دور" opens `<RoleFormDialog>` (name Ar, key En, description). Edit and delete wired through store; new roles appear as new columns in matrix.
+  - Matrix tab: horizontally scrollable table grouped by module (Dashboard/Projects/Reviews/Users/Settings) with section header rows (colored dot). Checkboxes (shadcn `Checkbox`) toggle and persist via `setPermission(roleKey, permKey, value)`. super_admin column has light-primary background. Alternating row backgrounds.
 
-**Loading skeletons** — add brief mount-time skeleton flashes:
-- `src/components/dashboard/KpiCards.tsx`: `useState(loading=true)` cleared via `setTimeout(400)`, render 4 `Skeleton` cards while loading.
-- Same trick on `StagePipeline` and `SectorDonut`.
+### Audit hook
+Every store action records an entry into `auditEvents` with `{user: currentUser, type, description, page, level, ts}` so the audit page in 7C is populated by real demo activity, not just seeds.
 
-**Sidebar active state fix** — current logic `path.startsWith(item.to)` can match `/portal` for `/portal/projects` too. Adjust so when item.to is the dashboard (`/` or `/portal`) we require exact match; for nested items keep startsWith. Ensures only one item highlights per route.
+**⏸ Stop after 7A.**
 
-**Breadcrumbs map** — extend `TopBar.Breadcrumbs.map` to include `/reports`, `/companies`, `/consultants`, `/projects/$id` patterns (for dynamic routes derive from first segment fallback).
+---
 
-**Status badge consistency** — quick audit of `Badges.tsx` — colors already align with spec (approved=success/green, under_review=secondary, additional_docs=warning/amber, rejected=destructive/red, awaiting=muted, pending_final=warning). No code change unless drift found during edit.
+## SUB-PHASE 7B — Security Settings & Email Configuration
 
-## 5. Files
+### Route
+**`src/routes/admin.settings.tsx`** — header + vertical tabs on the right (RTL) with 7 entries (General, Notifications, Appearance, Security, Backup, AI, Email). Default active tab = **Security**. Sticky bottom-left "حفظ التغييرات" button (toast on click).
 
-**Create:**
-- `src/data/notifications.ts`
-- `src/components/notifications/NotificationsList.tsx`
-- `src/components/layout/DemoBadge.tsx`
-- `src/routes/notifications.tsx`
-- `src/routes/reports.tsx`
+Tab state held in store so it persists across navigation.
 
-**Edit:**
-- `src/routes/portal.notifications.tsx` (real impl)
-- `src/routes/portal.help.tsx` (real impl)
-- `src/components/layout/TopBar.tsx` (bell link + count, breadcrumb map)
-- `src/components/layout/AppSidebar.tsx` (active-state fix, fix company notifications link)
-- `src/components/layout/AppShell.tsx` (mount DemoBadge, keyed fade wrapper)
-- `src/components/dashboard/KpiCards.tsx`, `StagePipeline.tsx`, `SectorDonut.tsx` (skeleton flash)
+### Tab components (under `src/components/admin/settings/`)
+- **`SecurityTab.tsx`** — Session card, Password Policy card (number inputs + 4 requirement toggles in 2×2 grid), Additional Security card (5 toggle rows: 2FA with "قريباً" badge, IP whitelist, watermark, copy protection, disable right-click — each in bordered row with icon + description). Then **NCA ECC card**: header with NCA shield label, summary bar (70% progress + count badges 8/2/1), checklist of 10 controls with status indicator (green ✓ / amber ⚠ / red ✗) per spec.
+- **`EmailTab.tsx`** — Provider dropdown, sender name/email, collapsible SMTP card (server/port/user/password/TLS toggle), amber security note card.
+- **`GeneralTab.tsx`**, **`NotificationsTab.tsx`**, **`AppearanceTab.tsx`**, **`BackupTab.tsx`** — per spec (simple inputs, toggles, radios, last-5-backups table with "إنشاء نسخة احتياطية الآن" button that prepends a new row + toast).
+- **`AiTab.tsx`** — coming soon card.
 
-After implementation I'll stop and present the finished demo for review.
+All toggles/inputs bind to `store.settings.*`. Save button writes to store + emits success toast + records audit event "تعديل إعدادات".
+
+**⏸ Stop after 7B.**
+
+---
+
+## SUB-PHASE 7C — Audit Log + Full Platform CRUD/Dynamic Wiring
+
+### Audit Log page
+**`src/routes/admin.audit.tsx`** — Header + "تحديث" button (re-reads store, toast). 4 KPI cards (computed from store, not hardcoded — but seeded so totals show 1656/83/84/1489). Expandable guide (shadcn `Accordion`) explaining severity levels.
+
+Filter bar: search input + 3 dropdowns (user, type, level) all wired to local state filtering the table. Table columns per spec; level rendered via `<Badge>` with proper tone. Delete row → ConfirmDialog → store removes entry. Pagination (15/page) with prev/next + "عرض X-Y من Z" label.
+
+### CRUD wiring across the platform
+For each entity, swap data source from `src/data/*` import to `useAppStore` selector and add the missing C/U/D entry points:
+
+| Page | Add | Edit | Delete | Notes |
+|---|---|---|---|---|
+| `/projects` | "+ إضافة مشروع" → `<ProjectFormDialog>` | row action + detail header button | row action / detail header | Kanban drag updates `stage` |
+| `/projects/$id` | — | edit modal | delete with confirm | Approve/reject/request-docs in `SubmissionReviewSheet` updates submission AND project status, advances stage on approval |
+| `/tasks` | existing `NewTaskDialog` wired to store | `TaskDetailSheet` form | delete in detail | Drag-drop between columns updates status |
+| `/companies` | "+ إضافة منشأة" dialog | detail edit | delete | |
+| `/consultants` | "+ إضافة استشاري" dialog | detail dialog edit mode | delete | |
+| `/portal/submissions/new` | wizard final step writes new submission to store, generates SAIS+company notifications, records audit event | — | — | After success → redirect to project detail showing the new submission |
+| `/portal/projects/$id` Messages | message input writes to `portalConversations` store slice | — | — | New message appears immediately with current role's branding |
+| `/notifications` & `/portal/notifications` | — | click row → mark read; "تحديد الكل كمقروء" | per-row dismiss button | Bell badge in TopBar reads live `unreadCountForRole` |
+
+Drag & drop uses lightweight HTML5 DnD (no new dep) on `KanbanBoard` and `TaskBoard`.
+
+### Cross-cutting polish
+- Every successful action calls toast helper.
+- Every destructive action uses `<ConfirmDialog>`.
+- All modals close on X / outside click / Escape (shadcn defaults — verified).
+- Breadcrumb map in `TopBar` extended for `/admin/*` routes.
+- All admin routes guarded: company role visiting `/admin/*` redirects to `/portal`.
+
+### Demo workflow verification (manual checklist run at end)
+1. Company submits via wizard → submission appears in both portals + 2 notifications + activity feed entry + audit event.
+2. SAIS approves submission → project status updates everywhere, stage advances, Kanban card moves, dashboard KPIs recompute.
+3. Task drag from "جديدة" → "مكتملة" → KPI counts update.
+4. Create a user → add role → toggle a permission → all three pages reflect it.
+5. Toggle a security setting → save → toast + audit event row appears in `/admin/audit`.
+
+**⏸ Stop after 7C with summary of what's now fully dynamic.**
+
+---
+
+## Files
+
+**New (~25):**
+- `src/store/appStore.ts`, `src/lib/toast.ts`, `src/components/common/ConfirmDialog.tsx`
+- `src/data/admin.ts`
+- `src/routes/admin.tsx`, `admin.users.tsx`, `admin.roles.tsx`, `admin.settings.tsx`, `admin.audit.tsx`
+- `src/components/admin/users/{UsersTable,UserFormDialog,UserDetailSheet,PasswordRequirements}.tsx`
+- `src/components/admin/roles/{RoleCard,RoleFormDialog,PermissionsMatrix}.tsx`
+- `src/components/admin/audit/{AuditTable,AuditFilters,AuditKpis}.tsx`
+- `src/components/admin/settings/{SecurityTab,EmailTab,GeneralTab,NotificationsTab,AppearanceTab,BackupTab,AiTab,NcaCompliance}.tsx`
+- New entity dialogs: `CompanyFormDialog`, `ConsultantFormDialog`, `ProjectFormDialog`
+
+**Edited (CRUD + store migration):** `AppSidebar`, `TopBar`, all dashboard widgets, projects/companies/consultants/tasks routes and their components, portal projects/submissions/notifications, RoleContext (currentUser bind), `routeTree.gen.ts`.
+
+**Dependency:** `bun add zustand`.
+
+After approval I'll execute 7A first and stop for your review.
