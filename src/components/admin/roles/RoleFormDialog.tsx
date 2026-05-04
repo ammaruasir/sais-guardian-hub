@@ -26,6 +26,7 @@ export function RoleFormDialog({
   role?: Role | null;
 }) {
   const { currentUser } = useRole();
+  const roles = useAppStore((s) => s.roles);
   const addRole = useAppStore((s) => s.addRole);
   const updateRole = useAppStore((s) => s.updateRole);
   const addAudit = useAppStore((s) => s.addAudit);
@@ -60,7 +61,12 @@ export function RoleFormDialog({
       });
       toast.success("تم التحديث بنجاح ✓");
     } else {
-      addRole({ nameAr, key: key.replace(/\s+/g, "_").toLowerCase(), description });
+      const normalizedKey = key.replace(/\s+/g, "_").toLowerCase();
+      if (roles.some((r) => r.key === normalizedKey)) {
+        toast.error("المفتاح مستخدم بالفعل، يرجى اختيار مفتاح فريد");
+        return;
+      }
+      addRole({ nameAr, key: normalizedKey, description });
       addAudit({
         user: currentUser.name,
         type: "إنشاء دور",
