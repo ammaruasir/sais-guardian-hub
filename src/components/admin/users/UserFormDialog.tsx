@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useAppStore } from "@/store/appStore";
 import { departments, type AdminUser } from "@/data/admin";
 import { PasswordRequirements, checkPassword } from "./PasswordRequirements";
@@ -43,6 +44,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [roleKey, setRoleKey] = useState(roles[0]?.key ?? "viewer");
+  const [active, setActive] = useState(true);
 
   useEffect(() => {
     if (open) {
@@ -50,6 +52,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
       setEmail(user?.email ?? "");
       setDepartment(user?.department ?? departments[0]);
       setRoleKey(user?.roleKey ?? roles[0]?.key ?? "viewer");
+      setActive(user?.active ?? true);
       setPassword("");
       setShowPwd(false);
     }
@@ -69,7 +72,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
       return;
     }
     if (editing && user) {
-      updateUser(user.id, { nameAr, email, department, roleKey });
+      updateUser(user.id, { nameAr, email, department, roleKey, active });
       addAudit({
         user: currentUser.name,
         type: "تعديل مستخدم",
@@ -79,7 +82,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
       });
       toast.success("تم التحديث بنجاح ✓");
     } else {
-      addUser({ nameAr, email, department, roleKey, active: true });
+      addUser({ nameAr, email, department, roleKey, active });
       addAudit({
         user: currentUser.name,
         type: "إنشاء مستخدم",
