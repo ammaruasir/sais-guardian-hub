@@ -20,9 +20,10 @@ function GuardedProjects() {
 }
 
 function ProjectsPage() {
+  const projects = useAppStore((s) => s.projects);
   const [filters, setFilters] = useState<ProjectFilters>(defaultFilters);
   const [view, setView] = useState<"kanban" | "table">("kanban");
-  const filtered = useMemo(() => applyFilters(projects, filters), [filters]);
+  const filtered = useMemo(() => applyFilters(projects, filters), [filters, projects]);
 
   return (
     <AppShell>
