@@ -3,11 +3,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { projects, companies, reviewers, stageLabel } from "@/data";
+import { reviewers, stageLabel } from "@/data";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useAppStore } from "@/store/appStore";
 
 export function OverdueTable() {
+  const projects = useAppStore((s) => s.projects);
+  const companies = useAppStore((s) => s.companies);
   const rows = projects.filter((p) => p.overdue);
   return (
     <Card>
