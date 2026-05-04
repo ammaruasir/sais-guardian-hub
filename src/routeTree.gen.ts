@@ -13,8 +13,10 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as LandingRouteImport } from './routes/landing'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as CompaniesRouteImport } from './routes/companies'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
@@ -53,6 +55,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsultantsRoute = ConsultantsRouteImport.update({
   id: '/consultants',
   path: '/consultants',
@@ -61,6 +68,11 @@ const ConsultantsRoute = ConsultantsRouteImport.update({
 const CompaniesRoute = CompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -152,8 +164,10 @@ const PortalProjectsIdRoute = PortalProjectsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/landing': typeof LandingRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
   '/reports': typeof ReportsRoute
@@ -176,8 +190,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/landing': typeof LandingRoute
   '/notifications': typeof NotificationsRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
@@ -201,8 +217,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/auth': typeof AuthRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/landing': typeof LandingRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
   '/reports': typeof ReportsRoute
@@ -228,8 +246,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/auth'
     | '/companies'
     | '/consultants'
+    | '/landing'
     | '/notifications'
     | '/portal'
     | '/reports'
@@ -252,8 +272,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/companies'
     | '/consultants'
+    | '/landing'
     | '/notifications'
     | '/reports'
     | '/tasks'
@@ -276,8 +298,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/auth'
     | '/companies'
     | '/consultants'
+    | '/landing'
     | '/notifications'
     | '/portal'
     | '/reports'
@@ -302,8 +326,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CompaniesRoute: typeof CompaniesRouteWithChildren
   ConsultantsRoute: typeof ConsultantsRoute
+  LandingRoute: typeof LandingRoute
   NotificationsRoute: typeof NotificationsRoute
   PortalRoute: typeof PortalRouteWithChildren
   ReportsRoute: typeof ReportsRoute
@@ -342,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/consultants': {
       id: '/consultants'
       path: '/consultants'
@@ -354,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/companies'
       fullPath: '/companies'
       preLoaderRoute: typeof CompaniesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -534,8 +574,10 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AuthRoute: AuthRoute,
   CompaniesRoute: CompaniesRouteWithChildren,
   ConsultantsRoute: ConsultantsRoute,
+  LandingRoute: LandingRoute,
   NotificationsRoute: NotificationsRoute,
   PortalRoute: PortalRouteWithChildren,
   ReportsRoute: ReportsRoute,
@@ -546,3 +588,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
