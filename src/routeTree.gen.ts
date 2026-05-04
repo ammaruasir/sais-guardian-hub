@@ -16,6 +16,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as CompaniesRouteImport } from './routes/companies'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
@@ -24,6 +25,10 @@ import { Route as PortalProjectsRouteImport } from './routes/portal.projects'
 import { Route as PortalNotificationsRouteImport } from './routes/portal.notifications'
 import { Route as PortalHelpRouteImport } from './routes/portal.help'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminRolesRouteImport } from './routes/admin.roles'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as PortalSubmissionsNewRouteImport } from './routes/portal.submissions.new'
 import { Route as PortalProjectsIdRouteImport } from './routes/portal.projects.$id'
 
@@ -60,6 +65,11 @@ const ConsultantsRoute = ConsultantsRouteImport.update({
 const CompaniesRoute = CompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -102,6 +112,26 @@ const CompaniesIdRoute = CompaniesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => CompaniesRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PortalSubmissionsNewRoute = PortalSubmissionsNewRouteImport.update({
   id: '/submissions/new',
   path: '/submissions/new',
@@ -115,6 +145,7 @@ const PortalProjectsIdRoute = PortalProjectsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
@@ -122,6 +153,10 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
@@ -134,12 +169,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
@@ -153,6 +193,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
@@ -160,6 +201,10 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
@@ -174,6 +219,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/companies'
     | '/consultants'
     | '/notifications'
@@ -181,6 +227,10 @@ export interface FileRouteTypes {
     | '/projects'
     | '/reports'
     | '/tasks'
+    | '/admin/audit'
+    | '/admin/roles'
+    | '/admin/settings'
+    | '/admin/users'
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
@@ -193,12 +243,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/companies'
     | '/consultants'
     | '/notifications'
     | '/projects'
     | '/reports'
     | '/tasks'
+    | '/admin/audit'
+    | '/admin/roles'
+    | '/admin/settings'
+    | '/admin/users'
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
@@ -211,6 +266,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/companies'
     | '/consultants'
     | '/notifications'
@@ -218,6 +274,10 @@ export interface FileRouteTypes {
     | '/projects'
     | '/reports'
     | '/tasks'
+    | '/admin/audit'
+    | '/admin/roles'
+    | '/admin/settings'
+    | '/admin/users'
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
@@ -231,6 +291,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CompaniesRoute: typeof CompaniesRouteWithChildren
   ConsultantsRoute: typeof ConsultantsRoute
   NotificationsRoute: typeof NotificationsRoute
@@ -291,6 +352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -347,6 +415,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompaniesIdRouteImport
       parentRoute: typeof CompaniesRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/portal/submissions/new': {
       id: '/portal/submissions/new'
       path: '/submissions/new'
@@ -363,6 +459,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminRolesRoute: typeof AdminRolesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAuditRoute: AdminAuditRoute,
+  AdminRolesRoute: AdminRolesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CompaniesRouteChildren {
   CompaniesIdRoute: typeof CompaniesIdRoute
@@ -423,6 +535,7 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   CompaniesRoute: CompaniesRouteWithChildren,
   ConsultantsRoute: ConsultantsRoute,
   NotificationsRoute: NotificationsRoute,
@@ -434,3 +547,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
