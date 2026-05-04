@@ -123,7 +123,7 @@ function ReportsContent() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartCard title="المشاريع المكتملة شهرياً" en="Projects Completed per Month">
-          <BarChart data={monthly}>
+          <BarChart data={monthlyR}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis dataKey="m" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
@@ -133,7 +133,7 @@ function ReportsContent() {
         </ChartCard>
 
         <ChartCard title="متوسط وقت المراجعة حسب المرحلة" en="Avg Review Time by Stage">
-          <BarChart data={stages} layout="vertical" margin={{ left: 20 }}>
+          <BarChart data={stagesR} layout="vertical" margin={{ left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis type="number" tick={{ fontSize: 12 }} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={80} />
@@ -155,13 +155,13 @@ function ReportsContent() {
         </ChartCard>
 
         <ChartCard title="أعباء المراجعين" en="Reviewer Workload">
-          <BarChart data={reviewers} layout="vertical" margin={{ left: 30 }}>
+          <BarChart data={reviewersR} layout="vertical" margin={{ left: 30 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v} مهمة`, "نشط"]} />
             <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-              {reviewers.map((r, i) => (
+              {reviewersR.map((r, i) => (
                 <Cell key={i} fill={r.count === maxReviewer ? "var(--warning)" : "var(--primary)"} />
               ))}
             </Bar>
