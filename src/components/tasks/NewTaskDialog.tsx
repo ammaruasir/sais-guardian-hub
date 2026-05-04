@@ -10,11 +10,13 @@ import { toast } from "sonner";
 import { useAppStore } from "@/store/appStore";
 
 export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const projects = useAppStore((s) => s.projects);
+  const addTask = useAppStore((s) => s.addTask);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<TaskType>("review");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [assignee, setAssignee] = useState(reviewers[0].id);
-  const [project, setProject] = useState(projects[0].id);
+  const [project, setProject] = useState(projects[0]?.id ?? "");
   const [due, setDue] = useState("");
   const [desc, setDesc] = useState("");
 
@@ -23,6 +25,19 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
       toast.error("الرجاء إدخال العنوان");
       return;
     }
+    addTask({
+      id: `t${Date.now()}`,
+      titleAr: title.trim(),
+      projectId: project,
+      type,
+      priority,
+      assigneeId: assignee,
+      status: "new",
+      dueDate: due || new Date().toISOString().slice(0, 10),
+      overdue: false,
+      descriptionAr: desc,
+      comments: [],
+    });
     toast.success("تمت إضافة المهمة");
     onOpenChange(false);
     setTitle(""); setDesc(""); setDue("");
