@@ -1,68 +1,161 @@
-# Phase 4 — Company Portal (Aramco view)
 
-Pivot the app so that switching the role to "بوابة المنشآت" presents a fully functional company portal scoped to أرامكو السعودية. This phase delivers the Dashboard and the Requirements Explorer; remaining portal pages (Our Projects, New Submission, Notifications, Help) get lightweight placeholder routes so the sidebar links don't 404 — they will be fleshed out in Phase 5.
+# Phase 5 — Company Portal: Project Tracker & Submission Wizard
 
-## 1. Role-aware shell updates
+Build the company-facing project tracking experience and a 5-step submission wizard, replacing the current placeholder routes (`/portal/projects`, `/portal/submissions/new`) with full implementations and adding a new dynamic route `/portal/projects/:id`.
 
-- **AppSidebar (`src/components/layout/AppSidebar.tsx`)**: when `role === "company"`, swap the SA branding block in `SidebarHeader` for an Aramco placeholder (Building2 icon tile + "أرامكو السعودية" title + "بوابة المنشآت" subtitle). Sidebar item list already exists for company role — confirmed.
-- **TopBar (`src/components/layout/TopBar.tsx`)**: avatar text "أ", name "أرامكو السعودية", subtitle "مدير الامتثال" (already wired). Extend `Breadcrumbs` map with the new portal routes.
+## 1. Data additions
 
-## 2. Routing & redirects
+New file `src/data/portalConversations.ts`:
+- `PortalMessage` type: `{ id, projectId, sender: "sais" | "company", senderName, ts, body, attachments? }`.
+- Seed 3–5 realistic messages per Aramco project (p1, p6, p9, p12) using the back-and-forth examples from the brief.
 
-- Replace the placeholder in `src/routes/index.tsx`: when `role === "company"`, render a `<Navigate to="/portal" />` (using `@tanstack/react-router`'s `Navigate`). Keep SAIS dashboard for SAIS role.
-- New route files:
-  - `src/routes/portal.tsx` — pathless layout returning `<AppShell><Outlet /></AppShell>`. Inside layout component, if `role === "sais"`, render `<Navigate to="/" />` so SAIS users can't sit on portal pages.
-  - `src/routes/portal.index.tsx` → `/portal` (Dashboard).
-  - `src/routes/portal.requirements.tsx` → `/portal/requirements` (Explorer).
-  - `src/routes/portal.projects.tsx`, `src/routes/portal.submissions.new.tsx`, `src/routes/portal.notifications.tsx`, `src/routes/portal.help.tsx` — minimal "قريباً — المرحلة 5" placeholder cards so sidebar links resolve.
-- Add a guard inside SAIS routes (`projects`, `tasks`, `companies`, `consultants`) — small shared `useRoleGuard("sais")` hook that redirects to `/portal` when in company mode. Implemented as a tiny effect in each existing route's component (or a single `RoleGuard` wrapper component in `src/components/layout/RoleGuard.tsx`).
+Extend `src/data/submissions.ts` (no breaking changes): seeded submissions already cover past + current per project; reuse as-is for the history tab. Add a tiny helper `nextSubmissionRef()` that mints a string like `SAIS-2026-04-P1-S3-001` from a project + stage.
 
-## 3. Company Dashboard — `/portal`
+No changes to existing requirement / stage data — `portalRequirements.portalStages` drives the wizard's checklist and the project detail "Requirements & Documents" tab.
 
-Components under `src/components/portal/`:
+## 2. New route: `/portal/projects` (Our Projects)
 
-- `WelcomeBanner.tsx` — gradient/secondary card, "مرحباً، أرامكو السعودية" + "لديكم 2 إجراءات مطلوبة" + subtle radial pattern.
-- `ActionRequiredCards.tsx` — two cards with amber `border-r-4 border-warning`:
-  1. "مطلوب مستندات إضافية" — توسعة رأس تنورة (p1) — "عرض التفاصيل" → `/projects/p1` (or portal project page placeholder).
-  2. "اقتراب موعد التقديم" — خط أنابيب الشرقية (p6) — "بدء التقديم" → `/portal/submissions/new`.
-- `MyProjectsGrid.tsx` — filters `projects` by `companyId === "aramco"` (p1, p6, p9, p12). Each card: name, mini 4-dot stepper (filled ≤ stage, ring on stage, empty after), status badge (reuse `Badges.tsx`), "آخر تحديث" date, "عرض المشروع" link.
-- `RecentUpdatesTimeline.tsx` — static array with the 5 entries from the brief, styled like `ActivityFeed` with timeline dots.
-- `ComplianceScoreWidget.tsx` — circular SVG gauge at 85%, success color, label "نسبة الامتثال الكلية" + "عبر جميع المنشآت" (reuse pattern from `companies/ComplianceGauge.tsx`).
+File: `src/routes/portal.projects.tsx` (replace stub).
 
-Layout: banner full width → action cards (2-col) → grid splitting "My Projects" (lg:col-span-2) and right column stacking ComplianceScore + RecentUpdates.
+Component renders a 2-col / 1-col responsive grid of `PortalProjectCard`s, filtered by `companyId === "aramco"`.
 
-## 4. Requirements Explorer — `/portal/requirements`
+New component `src/components/portal/projects/PortalProjectCard.tsx`:
+- Header: AR name (bold) + EN name (muted), facility line.
+- A compact horizontal `PortalStageStepper` (new component, see §4).
+- Status + classification badges (reuse `Badges.tsx`).
+- Last submission date (`p.submittedAt`).
+- Highlighted "Next action" line — colored bar + icon, computed from `(status, stage)`:
+  - `under_review` → neutral info ("التقديم قيد المراجعة لدى الهيئة")
+  - `additional_docs` → warning ("مطلوب مستندات إضافية — يرجى الرد")
+  - `approved` & stage<4 → success ("تم اعتماد المرحلة — يمكن الانتقال للمرحلة التالية")
+  - `approved` & stage===4 → success ("المشروع مكتمل ✅")
+  - `pending_final` → warning ("بانتظار الاعتماد النهائي")
+  - `awaiting_submission` → muted ("بانتظار تقديم المرحلة")
+- "عرض التفاصيل" button → `Link to="/portal/projects/$id" params={{id:p.id}}`.
 
-New file `src/data/portalRequirements.ts` containing the full 4-stage requirement catalog from the brief (each item: `id`, `code`, `nameAr`, `nameEn`, `directive` like `SEC-01`, `required: boolean`, `descriptionAr?`).
+## 3. New route: `/portal/projects/$id` (Company Project Detail)
 
-Components under `src/components/portal/requirements/`:
-- `RequirementsWizard.tsx` — three selector rows:
-  1. Sector dropdown (`Select` with the 7 sector options, default `petroleum`).
-  2. Project type as `ToggleGroup` with 4 buttons, default `expansion`.
-  3. Classification as `ToggleGroup` with 4 buttons, default `critical`.
-  Selections held in local `useState`; they don't actually filter the catalog (POC) but visually update.
-- `RequirementsTree.tsx` — `Accordion type="multiple"` with a card per stage. Trigger row: numbered circle (1–4), Arabic title, English subtitle, count chip ("6 متطلبات") on the trailing side.
-- `RequirementCard.tsx` — empty circle checkbox icon, AR name (bold) + EN name (muted), directive chip, مطلوب (destructive) / اختياري (muted) chip, description, "تحميل النموذج" outline button (no-op + toast optional).
+File: `src/routes/portal.projects.$id.tsx`.
 
-Page header: title "مستكشف المتطلبات" + descriptive subtitle.
+Guards: company-only (parent layout already enforces). 404 if project not found OR `companyId !== "aramco"` → render not-found card.
 
-## 5. Placeholder portal pages (Phase 5 stubs)
+Layout:
+- Breadcrumb: المشاريع › {project.nameAr}.
+- Header card: name AR/EN, company • facility, sector + classification badges (reuse SAIS pattern).
+- Prominent `PortalStageStepper` (new) — same 4-step shape but enriched: under each completed stage shows the approval date (from approved submissions); under the current stage shows the current status badge; future stages show "—".
+- `Tabs` (defaultValue="status") with 4 tabs:
 
-`portal.projects.tsx`, `portal.submissions.new.tsx`, `portal.notifications.tsx`, `portal.help.tsx` each render an `AppShell` + dashed-border card "هذه الصفحة قادمة في المرحلة 5". This keeps the sidebar functional without expanding scope.
+### Tab 1 — `status` "الحالة الحالية"
+New component `src/components/portal/projects/CurrentStatusCard.tsx`:
+- Stage name + number, large StatusChip, submission date.
+- Reviewer comment quote-card (styled callout, includes reviewer name from `reviewers[]`) when `currentSub.comments` exists.
+- Conditional CTA card matching status:
+  - `additional_docs`: warning callout + "إرفاق المستندات المطلوبة" button → `/portal/submissions/new?project=p1&stage=3`.
+  - `approved` & stage<4: success callout + "بدء تقديم المرحلة {stage+1}" button → wizard.
+  - `approved` & stage===4: success "تم اعتماد المشروع".
+  - `under_review` / `pending_final`: info card.
 
-## Technical notes
+### Tab 2 — `requirements` "المتطلبات والمستندات"
+New component `src/components/portal/projects/CompanyRequirementsList.tsx`:
+- For each of 4 stages, render an `Accordion` item; the *current* stage is open by default.
+- Past stages: render items with green ✅ "مرفق" + mock filename + upload date (derived from past submission documents).
+- Current stage: render items with statuses driven from current submission's `documents.length` and `checklist`:
+  - Attached → ✅ green with name + date.
+  - Not attached → ⭕ row with outline "رفع" button (no-op toast).
+  - Rejected (when `checklist[i].result === "fail"` or status `additional_docs`) → ❌ red with SAIS comment + "إعادة الرفع" button.
+- Future stages: rows greyed out, "غير متاح بعد".
 
-- TanStack file routing: dot-separated names (`portal.requirements.tsx`). Do not edit `routeTree.gen.ts`; the plugin regenerates on save.
-- `Navigate` import from `@tanstack/react-router`.
-- Reuse existing primitives: `Card`, `Accordion`, `Select`, `ToggleGroup`, `Badge`, `Button`, `Avatar`.
-- Keep RTL: all new components use existing `border-r`, `text-right`, `flex-row` patterns consistent with prior phases.
-- No backend / no Lovable Cloud needed — all data static.
+### Tab 3 — `history` "سجل التقديمات"
+New component `src/components/portal/projects/SubmissionHistoryTimeline.tsx`:
+- Vertical timeline (dot + connector line). Newest first (`subs.reverse()`).
+- Each entry: date, "المرحلة {n}", list of document file names (from submission), SAIS decision badge + reviewer comments. Reuse `StatusChip` for decision.
 
-## Out of scope (deferred to Phase 5)
+### Tab 4 — `messages` "المراسلات"
+New component `src/components/portal/projects/ConversationThread.tsx`:
+- Chat bubbles: SAIS messages aligned start (right side in RTL → use `justify-end` carefully — actually in RTL, "left" visually = `flex-row-reverse`; we'll align SAIS bubbles `self-start` with muted background and SAIS avatar; Aramco bubbles `self-end` with secondary background + Aramco avatar "أ").
+- Seeded from `portalConversations.ts` filtered by projectId.
+- Footer composer: `Textarea` + paperclip `Button variant="ghost" size="icon"` + "إرسال رسالة" button. Local state appends a message to a `useState` list (no persistence). Toast on send.
 
-- Full /portal/projects detail with submissions
-- New Submission wizard interactivity
-- Help center content
-- Notifications panel content (route stub only)
+## 4. Shared component: `PortalStageStepper`
 
-⏸️ After implementation I will stop for review before Phase 5.
+File `src/components/portal/projects/PortalStageStepper.tsx` — new, slightly more compact + portal-flavored variant of `StageStepper`:
+- Props: `current`, optional `meta?: Record<Stage, { approvedAt?: string }>`.
+- Done = green filled circle + check.
+- Current = primary ring with pulse (`animate-pulse` on the ring or background, subtle).
+- Future = outlined gray circle.
+- Below each step: AR label; on detail page also the approval date (done) or status badge (current).
+
+Existing `MiniStepper` inside `MyProjectsGrid.tsx` stays as is (dashboard widget).
+
+## 5. Submission Wizard — `/portal/submissions/new`
+
+File `src/routes/portal.submissions.new.tsx` (replace stub). Accepts optional `?project=...&stage=...` query (parse manually from `useSearch({strict:false})` or `window.location.search` — keep it simple by using `Route.useSearch` with a minimal `validateSearch`).
+
+Top-level `WizardStepper` (new component) showing 5 numbered steps with AR labels and current highlighted.
+
+State held via `useState` for: `projectId`, `stage`, `files: Record<reqId, {name, size}>`, `consultantId`, `signatory`, `agreed`, `date`.
+
+### Step components (under `src/components/portal/wizard/`):
+1. `StepSelectProject.tsx` — `Select` of Aramco projects; on choose, render summary card (name, current stage, facility, classification).
+2. `StepSelectStage.tsx` — `RadioGroup` of 4 stages; completed stages disabled; default to suggested next stage (current+1 if approved, else current). Note text when stage === current ("إعادة تقديم بعد طلب مستندات إضافية").
+3. `StepUploadDocuments.tsx` — pulls `portalStages[stage-1].items`. Each row = requirement card with directive chip, required/optional badge, dashed dropzone. Clicking dropzone opens a hidden `<input type="file">` — on change we just store `{name: file.name, size: prettyBytes(file.size)}` in state; no real upload. Already-attached row shows file name/size + remove (X). `Progress` bar at top: `attachedRequiredCount / requiredCount`.
+4. `StepDeclaration.tsx` — `Textarea` (readonly) with declaration text; `Input` signatory pre-filled "م. أحمد الراشد — مدير الأمن الصناعي"; consultant `Select` populated from `src/data/consultants.ts`; `Checkbox` for agreement; date `Input type="date"` defaulting to today (`new Date().toISOString().slice(0,10)`).
+5. `StepReview.tsx` — summary read-out + large green "تقديم" button.
+
+Footer of every step: "السابق" (disabled on step 1) and "التالي" (disabled when validation fails). Step 3 "Next" enabled when all required files attached, but with a small "متابعة بدون اكتمال" link to bypass for the demo. Step 5 "تقديم" → set `submitted=true`.
+
+### Success view
+On submit, replace wizard body with `SubmissionSuccess` component:
+- Animated `CheckCircle2` (`animate-in zoom-in`) in a green circle.
+- "تم التقديم بنجاح" + reference number `SAIS-2026-04-${projectId.toUpperCase()}-S${stage}-001`.
+- Two info lines (5–7 days, notification on decision).
+- Buttons: "العودة للمشاريع" → `/portal/projects`, "تقديم آخر" → resets state to step 1.
+
+## 6. Wiring updates
+
+- `src/components/portal/MyProjectsGrid.tsx`: change card `Link to="/portal/projects"` → `Link to="/portal/projects/$id" params={{id:p.id}}`.
+- `src/components/portal/ActionRequiredCards.tsx`: first card (`p1`) `to` becomes `/portal/projects/$id` with params `{id:"p1"}`; second card stays `/portal/submissions/new` but adds `search={{project:"p6", stage:3}}`.
+- Sidebar already links to `/portal/projects`, `/portal/submissions/new` — no edits needed.
+
+## 7. Files created / edited
+
+**Created**
+- `src/data/portalConversations.ts`
+- `src/components/portal/projects/PortalStageStepper.tsx`
+- `src/components/portal/projects/PortalProjectCard.tsx`
+- `src/components/portal/projects/CurrentStatusCard.tsx`
+- `src/components/portal/projects/CompanyRequirementsList.tsx`
+- `src/components/portal/projects/SubmissionHistoryTimeline.tsx`
+- `src/components/portal/projects/ConversationThread.tsx`
+- `src/components/portal/wizard/WizardStepper.tsx`
+- `src/components/portal/wizard/StepSelectProject.tsx`
+- `src/components/portal/wizard/StepSelectStage.tsx`
+- `src/components/portal/wizard/StepUploadDocuments.tsx`
+- `src/components/portal/wizard/StepDeclaration.tsx`
+- `src/components/portal/wizard/StepReview.tsx`
+- `src/components/portal/wizard/SubmissionSuccess.tsx`
+- `src/routes/portal.projects.$id.tsx`
+
+**Edited (replace existing stubs)**
+- `src/routes/portal.projects.tsx`
+- `src/routes/portal.submissions.new.tsx`
+- `src/components/portal/MyProjectsGrid.tsx`
+- `src/components/portal/ActionRequiredCards.tsx`
+- `.lovable/plan.md`
+
+## 8. Technical notes
+
+- All routes added under `src/routes/portal.*.tsx` — TanStack file router auto-regenerates `routeTree.gen.ts`; do not edit manually.
+- Use `Link` with typed `params` / `search` (never string-interpolated `to`).
+- All UI uses existing shadcn primitives (`Tabs`, `Accordion`, `RadioGroup`, `Select`, `Checkbox`, `Progress`, `Textarea`, `Toaster`).
+- RTL preserved (`text-right`, `flex-row` defaults flip in RTL document).
+- No backend, no Lovable Cloud — all interactions are local state with toasts.
+- File upload is mocked: hidden `<input type="file">` reads filename + size; nothing is sent anywhere.
+
+## Out of scope
+
+- Real file storage / signed URLs (mock only).
+- Notifications page content, Help center content (still phase-X stubs).
+- Any SAIS-side behavior changes.
+
+⏸️ I will stop after Phase 5 for review.
