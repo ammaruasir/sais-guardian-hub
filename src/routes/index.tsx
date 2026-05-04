@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { KpiCards } from "@/components/dashboard/KpiCards";
 import { StagePipeline } from "@/components/dashboard/StagePipeline";
@@ -22,7 +22,7 @@ function IndexPage() {
 function RoleAwareDashboard() {
   const { role } = useRole();
   if (role === "company") {
-    return <CompanyPlaceholder />;
+    return <Navigate to="/portal" />;
   }
   return <SaisDashboard />;
 }
