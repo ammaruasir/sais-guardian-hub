@@ -23,6 +23,10 @@ export function SubmissionReviewSheet({
 }) {
   const [checks, setChecks] = useState<Record<string, ChecklistResult>>({});
   const [comment, setComment] = useState("");
+  const updateSubmissionDecision = useAppStore((s) => s.updateSubmissionDecision);
+  const addNotification = useAppStore((s) => s.addNotification);
+  const addActivity = useAppStore((s) => s.addActivity);
+  const projects = useAppStore((s) => s.projects);
 
   useEffect(() => {
     if (submission?.checklist) {
@@ -35,8 +39,26 @@ export function SubmissionReviewSheet({
 
   if (!submission) return null;
   const reviewer = reviewers.find((r) => r.id === submission.reviewerId);
+  const project = projects.find((p) => p.id === submission.projectId);
 
-  function decide(label: string) {
+  function decide(label: string, decision?: "approved" | "additional_docs" | "rejected") {
+    if (decision && submission) {
+      updateSubmissionDecision(submission.id, decision, comment);
+      addNotification({
+        type: decision === "approved" ? "approval" : decision === "rejected" ? "rejection" : "request",
+        titleAr: `${label} — ${project?.nameAr ?? ""}`,
+        descriptionAr: comment || `تم تسجيل قرار المراجعة: ${label}`,
+        ts: "الآن",
+        linkTo: `/portal/projects/${submission.projectId}`,
+        forRole: "company",
+      });
+      addActivity({
+        ts: "الآن",
+        who: reviewer?.nameAr ?? "مراجع",
+        ar: `${label} للمرحلة ${submission.stage} — ${project?.nameAr ?? ""}`,
+        type: decision === "approved" ? "approved" : decision === "rejected" ? "rejected" : "requested",
+      });
+    }
     toast.success(`تم تسجيل القرار: ${label}`);
     onOpenChange(false);
   }
