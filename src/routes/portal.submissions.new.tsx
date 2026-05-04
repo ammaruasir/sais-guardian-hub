@@ -39,6 +39,11 @@ type FileEntry = { name: string; size: string };
 
 function WizardPage() {
   const search = Route.useSearch();
+  const projects = useAppStore((s) => s.projects);
+  const consultants = useAppStore((s) => s.consultants);
+  const addSubmission = useAppStore((s) => s.addSubmission);
+  const addNotification = useAppStore((s) => s.addNotification);
+  const addActivity = useAppStore((s) => s.addActivity);
   const aramcoProjects = projects.filter((p) => p.companyId === "aramco");
   const initialProject = (search.project as string | undefined) ?? "";
   const initialStage = (search.stage as number | undefined) ?? 0;
