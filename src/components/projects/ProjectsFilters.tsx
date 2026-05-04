@@ -2,7 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
-import { companies, reviewers, sectorLabel, stageLabel, statusLabel, type ProjectStatus, type Sector, type Stage } from "@/data";
+import { reviewers, sectorLabel, stageLabel, statusLabel, type ProjectStatus, type Sector, type Stage } from "@/data";
+import { useAppStore } from "@/store/appStore";
 
 export type ProjectFilters = {
   q: string;
@@ -30,6 +31,7 @@ export function ProjectsFilters({
   onChange: (f: ProjectFilters) => void;
 }) {
   const set = <K extends keyof ProjectFilters>(k: K, v: ProjectFilters[K]) => onChange({ ...value, [k]: v });
+  const companies = useAppStore((s) => s.companies);
   return (
     <div className="grid gap-2 rounded-xl border border-border bg-card p-3 md:grid-cols-3 lg:grid-cols-7">
       <div className="relative lg:col-span-2">

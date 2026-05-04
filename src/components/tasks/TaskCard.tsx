@@ -3,7 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, ClipboardCheck, FileSearch, MessageSquare } from "lucide-react";
 import { type Task, taskPriorityLabel, taskTypeLabel } from "@/data/tasks";
-import { projects, reviewers } from "@/data";
+import { reviewers } from "@/data";
+import { useAppStore } from "@/store/appStore";
 
 const typeIcon = {
   review: FileSearch,
@@ -12,6 +13,7 @@ const typeIcon = {
 };
 
 export function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
+  const projects = useAppStore((s) => s.projects);
   const project = projects.find((p) => p.id === task.projectId);
   const assignee = reviewers.find((r) => r.id === task.assigneeId);
   const Icon = typeIcon[task.type];

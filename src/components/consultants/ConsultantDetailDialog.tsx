@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { type Consultant, specializationLabel, consultantStatusLabel } from "@/data/consultants";
-import { projects, companies } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { companyAssignedConsultant } from "@/data/facilities";
 import { Mail, Phone } from "lucide-react";
 
 export function ConsultantDetailDialog({ consultant, open, onOpenChange }: { consultant: Consultant | null; open: boolean; onOpenChange: (o: boolean) => void }) {
+  const projects = useAppStore((s) => s.projects);
+  const companies = useAppStore((s) => s.companies);
   if (!consultant) return null;
   const assignedCompanyIds = Object.entries(companyAssignedConsultant)
     .filter(([, cid]) => cid === consultant.id)

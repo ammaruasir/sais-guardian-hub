@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowLeft, ArrowUpDown } from "lucide-react";
 import type { Project } from "@/data";
-import { companies, reviewers, stageLabel, sectorLabel } from "@/data";
+import { reviewers, stageLabel, sectorLabel } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { ClassificationBadge, StatusChip } from "./Badges";
 
 type SortKey = "nameAr" | "company" | "sector" | "stage" | "status" | "reviewer" | "submittedAt";
@@ -13,6 +14,7 @@ type SortKey = "nameAr" | "company" | "sector" | "stage" | "status" | "reviewer"
 export function ProjectsTable({ projects }: { projects: Project[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("submittedAt");
   const [asc, setAsc] = useState(false);
+  const companies = useAppStore((s) => s.companies);
 
   const enrich = projects.map((p) => ({
     p,

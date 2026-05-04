@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { projects } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { PortalProjectCard } from "@/components/portal/projects/PortalProjectCard";
 
 export const Route = createFileRoute("/portal/projects")({
@@ -7,6 +7,7 @@ export const Route = createFileRoute("/portal/projects")({
 });
 
 function PortalProjectsPage() {
+  const projects = useAppStore((s) => s.projects);
   const mine = projects.filter((p) => p.companyId === "aramco");
   return (
     <div className="space-y-5">
