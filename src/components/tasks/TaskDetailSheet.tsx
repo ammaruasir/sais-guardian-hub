@@ -79,7 +79,7 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
             </div>
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">المسؤول</label>
-              <Select value={assignee} onValueChange={setAssignee}>
+              <Select value={assignee} onValueChange={(v) => { setAssignee(v); if (task) updateTask(task.id, { assigneeId: v }); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {reviewers.map((r) => (
