@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useRole } from "@/context/RoleContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanBoard } from "@/components/projects/KanbanBoard";
@@ -9,8 +10,14 @@ import { projects } from "@/data";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/projects")({
-  component: ProjectsPage,
+  component: GuardedProjects,
 });
+
+function GuardedProjects() {
+  const { role } = useRole();
+  if (role !== "sais") return <Navigate to="/portal" />;
+  return <ProjectsPage />;
+}
 
 function ProjectsPage() {
   const [filters, setFilters] = useState<ProjectFilters>(defaultFilters);
