@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanBoard } from "@/components/projects/KanbanBoard";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import { ProjectsFilters, applyFilters, defaultFilters, type ProjectFilters } from "@/components/projects/ProjectsFilters";
-import { projects } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/projects")({
