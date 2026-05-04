@@ -10,6 +10,10 @@ import {
   FileText,
   HelpCircle,
   PlusSquare,
+  Users,
+  Shield,
+  ShieldAlert,
+  Settings,
 } from "lucide-react";
 import {
   Sidebar,
