@@ -329,7 +329,34 @@ function WizardPage() {
           <Button
             size="lg"
             className="bg-success text-success-foreground hover:bg-success/90"
-            onClick={() => setSubmitted(true)}
+            onClick={() => {
+              if (!project || !stage) return;
+              const ref = nextSubmissionRef(project.id, stage as Stage);
+              const today = new Date().toISOString().slice(0, 10);
+              addSubmission({
+                id: ref,
+                projectId: project.id,
+                stage: stage as Stage,
+                submittedAt: today,
+                status: "under_review",
+                documents: Object.values(files).map((f) => ({ name: f.name, size: f.size, type: "pdf" })),
+              });
+              addNotification({
+                type: "submission",
+                titleAr: `تقديم جديد — ${project.nameAr} — المرحلة ${stage}`,
+                descriptionAr: `رقم المرجع ${ref} • بانتظار المراجعة`,
+                ts: "الآن",
+                linkTo: `/projects/${project.id}`,
+                forRole: "sais",
+              });
+              addActivity({
+                ts: "الآن",
+                who: "أرامكو السعودية",
+                ar: `قدّمت المرحلة ${stage} لمشروع ${project.nameAr}`,
+                type: "submitted",
+              });
+              setSubmitted(true);
+            }}
           >
             <CheckCircle2 className="ml-1 h-5 w-5" /> تقديم
           </Button>
