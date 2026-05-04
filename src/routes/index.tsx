@@ -59,13 +59,3 @@ function SaisDashboard() {
   );
 }
 
-function CompanyPlaceholder() {
-  return (
-    <div className="flex h-[60vh] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/50 text-center">
-      <div className="text-lg font-semibold">بوابة المنشآت</div>
-      <p className="max-w-md text-sm text-muted-foreground">
-        ستتوفر بوابة المنشآت في المرحلة 4 من البناء. بدّل الدور إلى «مركز الهيئة» لاستعراض لوحة المعلومات الحالية.
-      </p>
-    </div>
-  );
-}
