@@ -17,7 +17,7 @@ import { ProjectFormDialog } from "@/components/projects/ProjectFormDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
-export const Route = createFileRoute("/projects")({
+export const Route = createFileRoute("/projects/")({
   component: GuardedProjects,
 });
 
