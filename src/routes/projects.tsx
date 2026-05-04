@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KanbanBoard } from "@/components/projects/KanbanBoard";
 import { ProjectsTable } from "@/components/projects/ProjectsTable";
 import { ProjectsFilters, applyFilters, defaultFilters, type ProjectFilters } from "@/components/projects/ProjectsFilters";
-import { projects } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/projects")({
@@ -20,9 +20,10 @@ function GuardedProjects() {
 }
 
 function ProjectsPage() {
+  const projects = useAppStore((s) => s.projects);
   const [filters, setFilters] = useState<ProjectFilters>(defaultFilters);
   const [view, setView] = useState<"kanban" | "table">("kanban");
-  const filtered = useMemo(() => applyFilters(projects, filters), [filters]);
+  const filtered = useMemo(() => applyFilters(projects, filters), [filters, projects]);
 
   return (
     <AppShell>

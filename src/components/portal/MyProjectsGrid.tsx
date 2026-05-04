@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { projects, type Stage } from "@/data";
+import { type Stage } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { StatusChip, ClassificationBadge } from "@/components/projects/Badges";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ function MiniStepper({ stage }: { stage: Stage }) {
 }
 
 export function MyProjectsGrid() {
+  const projects = useAppStore((s) => s.projects);
   const mine = projects.filter((p) => p.companyId === "aramco");
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">

@@ -1,34 +1,40 @@
-import { CheckCircle2, FileWarning, Send, MessageSquare } from "lucide-react";
+import { CheckCircle2, FileWarning, Send, MessageSquare, XCircle } from "lucide-react";
+import { useAppStore } from "@/store/appStore";
 
-const updates = [
-  { icon: CheckCircle2, color: "var(--success)", text: "تم اعتماد المرحلة 2 — خط أنابيب الشرقية", time: "قبل يومين" },
-  { icon: FileWarning, color: "var(--warning)", text: "مطلوب مستندات إضافية — توسعة رأس تنورة", time: "قبل 3 أيام" },
-  { icon: CheckCircle2, color: "var(--success)", text: "تم اعتماد المرحلة 4 — مصفاة جازان", time: "قبل أسبوع" },
-  { icon: Send, color: "var(--secondary)", text: "تم تقديم المرحلة 3 — خط أنابيب الشرقية", time: "قبل أسبوع" },
-  { icon: MessageSquare, color: "var(--muted-foreground)", text: "تعليق من المراجع — ميناء جدة الجنوبي", time: "قبل أسبوعين" },
-];
+const iconMap = {
+  approved: { Icon: CheckCircle2, color: "var(--success)" },
+  submitted: { Icon: Send, color: "var(--secondary)" },
+  requested: { Icon: FileWarning, color: "var(--warning)" },
+  rejected: { Icon: XCircle, color: "var(--destructive)" },
+  comment: { Icon: MessageSquare, color: "var(--muted-foreground)" },
+} as const;
 
 export function RecentUpdatesTimeline() {
+  const activity = useAppStore((s) => s.activity);
+  const updates = activity.slice(0, 6);
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <h2 className="mb-4 text-base font-semibold">آخر التحديثات</h2>
       <ol className="relative space-y-4 pr-4">
         <span className="absolute right-[7px] top-1 bottom-1 w-px bg-border" />
-        {updates.map((u, i) => (
-          <li key={i} className="relative flex gap-3">
-            <span
-              className="absolute right-[-5px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-card ring-2"
-              style={{ color: u.color, boxShadow: `inset 0 0 0 2px ${u.color}` }}
-            />
-            <div className="mr-4 flex-1">
-              <div className="flex items-start gap-2">
-                <u.icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: u.color }} />
-                <div className="text-sm leading-snug">{u.text}</div>
+        {updates.map((u) => {
+          const m = iconMap[u.type];
+          return (
+            <li key={u.id} className="relative flex gap-3">
+              <span
+                className="absolute right-[-5px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-card ring-2"
+                style={{ color: m.color, boxShadow: `inset 0 0 0 2px ${m.color}` }}
+              />
+              <div className="mr-4 flex-1">
+                <div className="flex items-start gap-2">
+                  <m.Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: m.color }} />
+                  <div className="text-sm leading-snug">{u.ar}</div>
+                </div>
+                <div className="mt-1 mr-6 text-[11px] text-muted-foreground">{u.ts}</div>
               </div>
-              <div className="mt-1 mr-6 text-[11px] text-muted-foreground">{u.time}</div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ol>
     </div>
   );

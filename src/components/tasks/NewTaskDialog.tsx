@@ -5,15 +5,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { taskPriorityLabel, taskTypeLabel, type TaskPriority, type TaskType } from "@/data/tasks";
-import { projects, reviewers } from "@/data";
+import { reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const projects = useAppStore((s) => s.projects);
+  const addTask = useAppStore((s) => s.addTask);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<TaskType>("review");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [assignee, setAssignee] = useState(reviewers[0].id);
-  const [project, setProject] = useState(projects[0].id);
+  const [project, setProject] = useState(projects[0]?.id ?? "");
   const [due, setDue] = useState("");
   const [desc, setDesc] = useState("");
 
@@ -22,6 +25,19 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
       toast.error("الرجاء إدخال العنوان");
       return;
     }
+    addTask({
+      id: `t${Date.now()}`,
+      titleAr: title.trim(),
+      projectId: project,
+      type,
+      priority,
+      assigneeId: assignee,
+      status: "new",
+      dueDate: due || new Date().toISOString().slice(0, 10),
+      overdue: false,
+      descriptionAr: desc,
+      comments: [],
+    });
     toast.success("تمت إضافة المهمة");
     onOpenChange(false);
     setTitle(""); setDesc(""); setDue("");

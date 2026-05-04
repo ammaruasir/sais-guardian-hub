@@ -7,7 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Plus } from "lucide-react";
 import { TaskBoard } from "@/components/tasks/TaskBoard";
 import { NewTaskDialog } from "@/components/tasks/NewTaskDialog";
-import { tasks, currentUserId } from "@/data/tasks";
+import { currentUserId } from "@/data/tasks";
+import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/tasks")({
@@ -21,9 +22,10 @@ function GuardedTasks() {
 }
 
 function TasksPage() {
+  const tasks = useAppStore((s) => s.tasks);
   const [mine, setMine] = useState(false);
   const [open, setOpen] = useState(false);
-  const filtered = useMemo(() => (mine ? tasks.filter((t) => t.assigneeId === currentUserId) : tasks), [mine]);
+  const filtered = useMemo(() => (mine ? tasks.filter((t) => t.assigneeId === currentUserId) : tasks), [mine, tasks]);
 
   return (
     <AppShell>

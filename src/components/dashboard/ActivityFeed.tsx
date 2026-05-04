@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, FileUp, AlertCircle, XCircle, MessageSquare } from "lucide-react";
-import { activity } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { cn } from "@/lib/utils";
 
 const iconMap = {
@@ -12,6 +12,7 @@ const iconMap = {
 } as const;
 
 export function ActivityFeed() {
+  const activity = useAppStore((s) => s.activity);
   return (
     <Card className="h-full">
       <CardHeader>

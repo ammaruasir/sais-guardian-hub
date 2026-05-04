@@ -8,6 +8,7 @@ import { FileText, Eye, Download, CheckCircle2, AlertTriangle, XCircle, UserCog 
 import type { Submission, ChecklistResult } from "@/data/submissions";
 import { stageLabel, reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function SubmissionReviewSheet({
   submission,
@@ -22,6 +23,10 @@ export function SubmissionReviewSheet({
 }) {
   const [checks, setChecks] = useState<Record<string, ChecklistResult>>({});
   const [comment, setComment] = useState("");
+  const updateSubmissionDecision = useAppStore((s) => s.updateSubmissionDecision);
+  const addNotification = useAppStore((s) => s.addNotification);
+  const addActivity = useAppStore((s) => s.addActivity);
+  const projects = useAppStore((s) => s.projects);
 
   useEffect(() => {
     if (submission?.checklist) {
@@ -34,8 +39,26 @@ export function SubmissionReviewSheet({
 
   if (!submission) return null;
   const reviewer = reviewers.find((r) => r.id === submission.reviewerId);
+  const project = projects.find((p) => p.id === submission.projectId);
 
-  function decide(label: string) {
+  function decide(label: string, decision?: "approved" | "additional_docs" | "rejected") {
+    if (decision && submission) {
+      updateSubmissionDecision(submission.id, decision, comment);
+      addNotification({
+        type: decision === "approved" ? "approval" : decision === "rejected" ? "rejection" : "request",
+        titleAr: `${label} — ${project?.nameAr ?? ""}`,
+        descriptionAr: comment || `تم تسجيل قرار المراجعة: ${label}`,
+        ts: "الآن",
+        linkTo: `/portal/projects/${submission.projectId}`,
+        forRole: "company",
+      });
+      addActivity({
+        ts: "الآن",
+        who: reviewer?.nameAr ?? "مراجع",
+        ar: `${label} للمرحلة ${submission.stage} — ${project?.nameAr ?? ""}`,
+        type: decision === "approved" ? "approved" : decision === "rejected" ? "rejected" : "requested",
+      });
+    }
     toast.success(`تم تسجيل القرار: ${label}`);
     onOpenChange(false);
   }
@@ -114,13 +137,13 @@ export function SubmissionReviewSheet({
         </div>
 
         <div className="grid grid-cols-2 gap-2 border-t border-border bg-muted/40 p-4 sm:grid-cols-4">
-          <Button onClick={() => decide("اعتماد")} className="bg-success text-success-foreground hover:bg-success/90">
+          <Button onClick={() => decide("اعتماد", "approved")} className="bg-success text-success-foreground hover:bg-success/90">
             <CheckCircle2 className="h-4 w-4" /> اعتماد
           </Button>
-          <Button onClick={() => decide("طلب مستندات إضافية")} className="bg-warning text-warning-foreground hover:bg-warning/90">
+          <Button onClick={() => decide("طلب مستندات إضافية", "additional_docs")} className="bg-warning text-warning-foreground hover:bg-warning/90">
             <AlertTriangle className="h-4 w-4" /> مستندات إضافية
           </Button>
-          <Button onClick={() => decide("رفض")} variant="destructive">
+          <Button onClick={() => decide("رفض", "rejected")} variant="destructive">
             <XCircle className="h-4 w-4" /> رفض
           </Button>
           <Button onClick={() => decide("إعادة تعيين")} variant="secondary">

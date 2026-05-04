@@ -6,10 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
 import { type Task, type TaskComment, type TaskStatus, taskPriorityLabel, taskStatusLabel, taskTypeLabel } from "@/data/tasks";
-import { projects, reviewers } from "@/data";
+import { reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; open: boolean; onClose: () => void }) {
+  const projects = useAppStore((s) => s.projects);
+  const updateTask = useAppStore((s) => s.updateTask);
+  const updateTaskStatus = useAppStore((s) => s.updateTaskStatus);
   const [status, setStatus] = useState<TaskStatus>("new");
   const [assignee, setAssignee] = useState<string>("");
   const [comments, setComments] = useState<TaskComment[]>([]);
@@ -64,7 +68,7 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">الحالة</label>
-              <Select value={status} onValueChange={(v) => setStatus(v as TaskStatus)}>
+              <Select value={status} onValueChange={(v) => { const ns = v as TaskStatus; setStatus(ns); if (task) { updateTaskStatus(task.id, ns); toast.success("تم تحديث الحالة"); } }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {(Object.keys(taskStatusLabel) as TaskStatus[]).map((s) => (
@@ -75,7 +79,7 @@ export function TaskDetailSheet({ task, open, onClose }: { task: Task | null; op
             </div>
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">المسؤول</label>
-              <Select value={assignee} onValueChange={setAssignee}>
+              <Select value={assignee} onValueChange={(v) => { setAssignee(v); if (task) updateTask(task.id, { assigneeId: v }); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {reviewers.map((r) => (

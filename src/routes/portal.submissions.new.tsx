@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Toaster } from "@/components/ui/sonner";
-import { projects, stageLabel, type Stage } from "@/data";
+import { stageLabel, type Stage } from "@/data";
 import { portalStages } from "@/data/portalRequirements";
-import { consultants } from "@/data/consultants";
 import { nextSubmissionRef } from "@/data/portalConversations";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/appStore";
 
 type WizardSearch = { project?: string; stage?: number };
 
@@ -39,6 +39,11 @@ type FileEntry = { name: string; size: string };
 
 function WizardPage() {
   const search = Route.useSearch();
+  const projects = useAppStore((s) => s.projects);
+  const consultants = useAppStore((s) => s.consultants);
+  const addSubmission = useAppStore((s) => s.addSubmission);
+  const addNotification = useAppStore((s) => s.addNotification);
+  const addActivity = useAppStore((s) => s.addActivity);
   const aramcoProjects = projects.filter((p) => p.companyId === "aramco");
   const initialProject = (search.project as string | undefined) ?? "";
   const initialStage = (search.stage as number | undefined) ?? 0;
@@ -324,7 +329,34 @@ function WizardPage() {
           <Button
             size="lg"
             className="bg-success text-success-foreground hover:bg-success/90"
-            onClick={() => setSubmitted(true)}
+            onClick={() => {
+              if (!project || !stage) return;
+              const ref = nextSubmissionRef(project.id, stage as Stage);
+              const today = new Date().toISOString().slice(0, 10);
+              addSubmission({
+                id: ref,
+                projectId: project.id,
+                stage: stage as Stage,
+                submittedAt: today,
+                status: "under_review",
+                documents: Object.values(files).map((f) => ({ name: f.name, size: f.size, type: "pdf" })),
+              });
+              addNotification({
+                type: "submission",
+                titleAr: `تقديم جديد — ${project.nameAr} — المرحلة ${stage}`,
+                descriptionAr: `رقم المرجع ${ref} • بانتظار المراجعة`,
+                ts: "الآن",
+                linkTo: `/projects/${project.id}`,
+                forRole: "sais",
+              });
+              addActivity({
+                ts: "الآن",
+                who: "أرامكو السعودية",
+                ar: `قدّمت المرحلة ${stage} لمشروع ${project.nameAr}`,
+                type: "submitted",
+              });
+              setSubmitted(true);
+            }}
           >
             <CheckCircle2 className="ml-1 h-5 w-5" /> تقديم
           </Button>
