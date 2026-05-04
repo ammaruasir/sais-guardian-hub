@@ -1,16 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { projects } from "@/data";
+import { PortalProjectCard } from "@/components/portal/projects/PortalProjectCard";
 
 export const Route = createFileRoute("/portal/projects")({
-  component: () => <Stub title="مشاريعنا" />,
+  component: PortalProjectsPage,
 });
 
-function Stub({ title }: { title: string }) {
+function PortalProjectsPage() {
+  const mine = projects.filter((p) => p.companyId === "aramco");
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-      <div className="flex h-[50vh] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card/50 text-center">
-        <div className="text-lg font-semibold">قريباً</div>
-        <p className="max-w-md text-sm text-muted-foreground">سيتم تفعيل هذه الصفحة في المرحلة 5 من البناء.</p>
+    <div className="space-y-5">
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight">مشاريعنا</h1>
+        <p className="mt-1 text-sm text-muted-foreground">جميع المشاريع المسجلة لدى الهيئة العليا للأمن الصناعي</p>
+      </header>
+      <div className="grid gap-5 lg:grid-cols-2">
+        {mine.map((p) => (
+          <PortalProjectCard key={p.id} p={p} />
+        ))}
       </div>
     </div>
   );
