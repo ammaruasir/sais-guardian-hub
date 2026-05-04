@@ -1,81 +1,67 @@
-# SAIS Industrial Security Platform — Phased POC
 
-A bilingual (Arabic-first, RTL) pitch-grade demo for SAIS covering a SAIS Hub (regulator) and Company Portal (operators), toggled via a top-bar role switcher. All data is mock/static. Built phase-by-phase — I will stop after each phase for your review.
+# Phase 2 — Projects Pipeline & Submission Review
 
-## Design System
+## Goal
+Build `/projects` (Kanban + Table with filters), `/projects/$id` (header, stage stepper, 4 tabs), and a Submission Review slide-over. All RTL Arabic-first, using existing mock data.
 
-- **Language**: Arabic primary (RTL via `dir="rtl"`), English secondary labels where useful
-- **Fonts**: IBM Plex Sans Arabic (Arabic) + Inter (Latin), loaded from Google Fonts
-- **Palette** (mapped to semantic Tailwind tokens in `src/styles.css`):
-  - Primary navy `#1B3A5C`, Secondary teal `#0E918C`
-  - Success Saudi green `#006C35`, Warning `#D4A017`, Danger `#C0392B`
-  - Background `#F5F6FA`, Card white, Text `#1A1A2E` / muted `#6B7280`
-  - Rounded 12px cards, subtle shadow, government-grade restraint
-- **Components**: shadcn/ui (already present), Lucide icons, Recharts for charts
-- **Layout**: Right-side collapsible sidebar (RTL), top bar with role switcher + bell + avatar + breadcrumbs
+## Data additions (`src/data/`)
 
-## Phase Plan (I will STOP after each)
+Extend `src/data/index.ts` (or split into `submissions.ts`, `requirements.ts`, `notes.ts`):
 
-### Phase 1 — Foundation & SAIS Dashboard
-- Configure RTL globally in `__root.tsx`, load Arabic + Latin fonts, extend theme tokens in `src/styles.css`
-- Create `RoleContext` (`sais` | `company`) with persisted toggle
-- Build `AppShell`: right-side `Sidebar` (shadcn) that swaps nav items based on role, top bar with role switcher pill (مركز الهيئة | بوابة المنشآت), notifications bell w/ badge, avatar dropdown, breadcrumbs
-- Seed data files in `src/data/` (companies, facilities, projects, reviewers, submissions, tasks, consultants, notifications, directives, activity)
-- SAIS Dashboard route `/`: KPI cards row, Projects-by-Stage bar, Projects-by-Sector donut, Recent Activity feed, Overdue Reviews table
+- **Submission**: `{ id, projectId, stage, submittedAt, status, documents: {name, size, type}[], reviewedAt?, reviewerId?, decision?, comments?, checklist?: ChecklistItem[] }`
+- **ChecklistItem**: `{ code: 'SEC-01'|'SAF-01'|..., labelAr, result: 'pass'|'fail'|'na' }`
+- **RequirementDef**: per-stage list of directive codes + Arabic labels (Stage 1: SEC-01, RSK-01; Stage 2: SAF-01, DSG-01; Stage 3: ENG-01, INT-01; Stage 4: COM-01, OPS-01).
+- **ProjectNote**: `{ id, projectId, author, ts, text }` — 2–3 seeded per project.
+- **ProjectActivity**: timeline events per project (submitted, reviewed, comment, status_change).
 
-### Phase 2 — SAIS Projects Pipeline & Submission Review
-- `/projects` with Kanban ↔ Table toggle, filters, draggable cards (dnd-kit)
-- `/projects/$projectId` detail: 4-stage stepper, tabs (Submissions / Requirements / Activity / Notes)
-- Submission Review panel: docs list, directive-tied compliance checklist, comments, decision actions (Approve / Request Docs / Reject / Reassign)
+Seed deterministically: a project at stage N has approved submissions for stages 1..N-1 and a submission matching `project.status` for stage N.
 
-### Phase 3 — Tasks, Companies & Consultants (SAIS)
-- `/tasks` Kanban + My Tasks view + task detail modal (8–10 seeded tasks)
-- `/companies` table + `/companies/$id` detail (facilities, projects, compliance meter, consultant)
-- `/consultants` registry table
+## Routes
 
-### Phase 4 — Company Portal: Dashboard & Requirements Explorer
-- Sidebar swaps; header shows company (default Aramco)
-- `/portal` dashboard: action-required cards, project summaries, updates timeline, compliance gauge
-- `/portal/requirements` 3-step explorer (sector → project type → expandable stage requirement trees with directive refs and mock template downloads)
+### `src/routes/projects.tsx` — Pipeline page
+- Top bar: search input + 5 selects (Sector, Stage, Status, Company, Reviewer) using shadcn `Select` + `Input`. Reset button.
+- View toggle (Tabs / ToggleGroup): Kanban (default) | جدول.
+- **Kanban** (`components/projects/KanbanBoard.tsx`): 4 columns by stage. Cards show nameAr, companyAr, sector badge, classification badge (tone from `classificationLabel`), reviewer initials avatar, `daysInStage`, status chip. `draggable` attribute + cursor-grab; no persistence. Click → detail.
+- **Table** (`components/projects/ProjectsTable.tsx`): shadcn Table, sortable headers (local state, simple sort), columns per spec, action column with Link "فتح".
 
-### Phase 5 — Company Portal: Projects & Submission Wizard
-- `/portal/projects` + project detail with prominent stage stepper, current-stage checklist, upload slots, submission history, SAIS message thread
-- `/portal/submissions/new` 5-step wizard ending with reference number confirmation
+### `src/routes/projects.$id.tsx` — Detail
+- Header card: nameAr / nameEn, company, facility, sector + classification badges, status chip.
+- **StageStepper** component: 4 horizontal steps using `stageLabel`. `< project.stage` = green check, `=` = primary highlighted, `>` = muted.
+- Tabs (shadcn): التقديمات / المتطلبات / سجل النشاط / ملاحظات داخلية.
+  - **Submissions tab**: cards per submission — date, stage, document list (icons + name), status badge, "مراجعة" button → opens review Sheet.
+  - **Requirements tab**: checklist for current stage; CheckCircle2 (green) for submitted, Circle (muted) for missing, with code + Arabic label.
+  - **Activity tab**: vertical timeline (dot + line) of activity events.
+  - **Notes tab**: list of seeded notes + Textarea + "إضافة ملاحظة" button (local state).
 
-### Phase 6 — Notifications, Reports & Polish
-- `/notifications` shared inbox with unread state, bell wiring
-- `/reports` (SAIS only): 4 Recharts visuals + date range filter
-- Loading skeletons, empty states, hover/transitions, RTL audit, role-switch animation
-- Optional floating "عرض تجريبي" demo walkthrough
+### Submission Review (`components/projects/SubmissionReviewSheet.tsx`)
+- shadcn `Sheet` (slide-over from inline-start in RTL).
+- Sections: documents list with عرض/تنزيل buttons (no-op), compliance checklist (6–8 directive rows with pass/fail/N/A toggle group), reviewer comments Textarea, previous reviews accordion if any.
+- Footer: 4 decision buttons — اعتماد (green), طلب مستندات إضافية (amber), رفض (red), إعادة تعيين (gray). Click shows toast (sonner) + closes sheet.
 
-## Technical Notes
+## Wiring
+- Update `OverdueTable` "فتح" button to `<Link to="/projects/$id" params={{ id }}>`.
+- Update sidebar "المشاريع" link to `/projects`.
+- Both new routes use `createFileRoute` + `AppShell`.
 
-- Stack: TanStack Start + React 19 + Tailwind v4 + shadcn/ui + Recharts + Lucide + dnd-kit (Phase 2)
-- Routing: file-based under `src/routes/`; each major section is its own route file (no hash anchors)
-- Role state: lightweight React Context in a client provider mounted in `__root.tsx`
-- Data: typed mock constants in `src/data/*.ts`, shared by both portals so the story stays consistent
-- No backend / no Lovable Cloud needed for the POC
-
-## Phase 1 Deliverables (what you'll see first)
-
-```text
-src/
-  styles.css                 # tokens + fonts + RTL base
-  routes/__root.tsx          # <html dir="rtl">, providers, shell
-  routes/index.tsx           # SAIS dashboard
-  components/
-    layout/AppShell.tsx
-    layout/AppSidebar.tsx
-    layout/TopBar.tsx
-    layout/RoleSwitcher.tsx
-    dashboard/KpiCards.tsx
-    dashboard/StagePipeline.tsx
-    dashboard/SectorDonut.tsx
-    dashboard/ActivityFeed.tsx
-    dashboard/OverdueTable.tsx
-  context/RoleContext.tsx
-  data/{companies,facilities,projects,reviewers,submissions,tasks,
-        consultants,notifications,directives,activity}.ts
+## Components to create
+```
+src/components/projects/
+  KanbanBoard.tsx
+  ProjectCard.tsx
+  ProjectsTable.tsx
+  ProjectsFilters.tsx
+  StageStepper.tsx
+  SubmissionList.tsx
+  RequirementsChecklist.tsx
+  ActivityTimeline.tsx
+  InternalNotes.tsx
+  SubmissionReviewSheet.tsx
+src/data/submissions.ts
+src/data/requirements.ts
+src/data/notes.ts
 ```
 
-After Phase 1 I'll pause and wait for your go-ahead before starting Phase 2.
+## Out of scope (later phases)
+Tasks, company registry, consultants, reports, company portal, notifications.
+
+Stop after Phase 2 for review.
