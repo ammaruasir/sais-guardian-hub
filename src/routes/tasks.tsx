@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useRole } from "@/context/RoleContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -10,8 +11,14 @@ import { tasks, currentUserId } from "@/data/tasks";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/tasks")({
-  component: TasksPage,
+  component: GuardedTasks,
 });
+
+function GuardedTasks() {
+  const { role } = useRole();
+  if (role !== "sais") return <Navigate to="/portal" />;
+  return <TasksPage />;
+}
 
 function TasksPage() {
   const [mine, setMine] = useState(false);

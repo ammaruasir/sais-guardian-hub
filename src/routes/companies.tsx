@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { useRole } from "@/context/RoleContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,8 +12,14 @@ import { facilities, companyComplianceScore } from "@/data/facilities";
 import { complianceBadgeFor } from "@/components/companies/ComplianceGauge";
 
 export const Route = createFileRoute("/companies")({
-  component: CompaniesPage,
+  component: GuardedCompanies,
 });
+
+function GuardedCompanies() {
+  const { role } = useRole();
+  if (role !== "sais") return <Navigate to="/portal" />;
+  return <CompaniesPage />;
+}
 
 function CompaniesPage() {
   const [q, setQ] = useState("");

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useRole } from "@/context/RoleContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,8 +10,14 @@ import { consultants, consultantStatusLabel, specializationLabel, type Consultan
 import { ConsultantDetailDialog } from "@/components/consultants/ConsultantDetailDialog";
 
 export const Route = createFileRoute("/consultants")({
-  component: ConsultantsPage,
+  component: GuardedConsultants,
 });
+
+function GuardedConsultants() {
+  const { role } = useRole();
+  if (role !== "sais") return <Navigate to="/portal" />;
+  return <ConsultantsPage />;
+}
 
 function ConsultantsPage() {
   const [q, setQ] = useState("");
