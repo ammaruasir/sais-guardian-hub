@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useRole } from "@/context/RoleContext";
 import { cn } from "@/lib/utils";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { unreadCountForRole } from "@/data/notifications";
+import { useAppStore } from "@/store/appStore";
 
 function RoleSwitcher() {
   const { role, setRole } = useRole();
