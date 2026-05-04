@@ -12,6 +12,7 @@ const iconMap = {
 } as const;
 
 export function ActivityFeed() {
+  const activity = useAppStore((s) => s.activity);
   return (
     <Card className="h-full">
       <CardHeader>
