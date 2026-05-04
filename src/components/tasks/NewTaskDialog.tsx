@@ -5,8 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { taskPriorityLabel, taskTypeLabel, type TaskPriority, type TaskType } from "@/data/tasks";
-import { projects, reviewers } from "@/data";
+import { reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const [title, setTitle] = useState("");
