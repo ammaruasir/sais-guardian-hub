@@ -86,13 +86,13 @@ function ConsultantsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">اسم الشركة</TableHead>
-                <TableHead className="text-right">رقم الترخيص</TableHead>
-                <TableHead className="text-right">التخصص</TableHead>
-                <TableHead className="text-right">المشاريع النشطة</TableHead>
-                <TableHead className="text-right">انتهاء الترخيص</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">إجراءات</TableHead>
+                <TableHead className="text-end">اسم الشركة</TableHead>
+                <TableHead className="text-end">رقم الترخيص</TableHead>
+                <TableHead className="text-end">التخصص</TableHead>
+                <TableHead className="text-end">المشاريع النشطة</TableHead>
+                <TableHead className="text-end">انتهاء الترخيص</TableHead>
+                <TableHead className="text-end">الحالة</TableHead>
+                <TableHead className="text-end">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

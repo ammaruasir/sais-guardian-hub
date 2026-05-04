@@ -20,7 +20,7 @@ export function ConsultantDetailDialog({ consultant, open, onOpenChange }: { con
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-right">
+          <DialogTitle className="text-end">
             <div>{consultant.nameAr}</div>
             <div className="text-xs font-normal text-muted-foreground">{consultant.nameEn}</div>
           </DialogTitle>

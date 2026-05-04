@@ -28,7 +28,7 @@ export function CompanyRequirementsList({
             className="rounded-xl border border-border bg-card px-4"
           >
             <AccordionTrigger className="hover:no-underline">
-              <div className="flex flex-1 items-center gap-3 text-right">
+              <div className="flex flex-1 items-center gap-3 text-end">
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
                     isPast

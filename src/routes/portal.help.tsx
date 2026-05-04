@@ -58,7 +58,7 @@ function HelpPage() {
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((f, i) => (
                 <AccordionItem key={i} value={`q${i}`}>
-                  <AccordionTrigger className="text-right">{f.q}</AccordionTrigger>
+                  <AccordionTrigger className="text-end">{f.q}</AccordionTrigger>
                   <AccordionContent className="text-sm leading-7 text-muted-foreground">
                     {f.a}
                   </AccordionContent>

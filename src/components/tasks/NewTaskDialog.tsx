@@ -47,7 +47,7 @@ export function NewTaskDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-right">إضافة مهمة جديدة</DialogTitle>
+          <DialogTitle className="text-end">إضافة مهمة جديدة</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>

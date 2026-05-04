@@ -77,12 +77,12 @@ function CompaniesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">اسم المنشأة</TableHead>
-                <TableHead className="text-right">القطاع</TableHead>
-                <TableHead className="text-right">المنشآت</TableHead>
-                <TableHead className="text-right">المشاريع النشطة</TableHead>
-                <TableHead className="text-right">حالة الامتثال</TableHead>
-                <TableHead className="text-right">إجراءات</TableHead>
+                <TableHead className="text-end">اسم المنشأة</TableHead>
+                <TableHead className="text-end">القطاع</TableHead>
+                <TableHead className="text-end">المنشآت</TableHead>
+                <TableHead className="text-end">المشاريع النشطة</TableHead>
+                <TableHead className="text-end">حالة الامتثال</TableHead>
+                <TableHead className="text-end">إجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

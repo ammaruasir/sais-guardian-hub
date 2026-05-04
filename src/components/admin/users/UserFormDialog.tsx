@@ -75,24 +75,24 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-right">
+          <DialogTitle className="text-end">
             {editing ? "تعديل المستخدم" : "إضافة مستخدم جديد"}
           </DialogTitle>
-          <DialogDescription className="text-right">
+          <DialogDescription className="text-end">
             {editing ? "قم بتحديث بيانات المستخدم." : "أدخل بيانات المستخدم الجديد وحدد دوره في النظام."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-right block">الاسم الكامل</Label>
-            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className="text-right" />
+            <Label className="text-end block">الاسم الكامل</Label>
+            <Input value={nameAr} onChange={(e) => setNameAr(e.target.value)} className="text-end" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-right block">البريد الإلكتروني</Label>
+            <Label className="text-end block">البريد الإلكتروني</Label>
             <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@sais.gov.sa" type="email" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-right block">الإدارة</Label>
+            <Label className="text-end block">الإدارة</Label>
             <Select value={department} onValueChange={setDepartment}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -101,7 +101,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-right block">{editing ? "كلمة المرور (اختياري)" : "كلمة المرور الجديدة"}</Label>
+            <Label className="text-end block">{editing ? "كلمة المرور (اختياري)" : "كلمة المرور الجديدة"}</Label>
             <div className="relative">
               <Input
                 type={showPwd ? "text" : "password"}
@@ -120,7 +120,7 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
             {(password || !editing) && <PasswordRequirements password={password} />}
           </div>
           <div className="space-y-1.5">
-            <Label className="text-right block">الدور الوظيفي</Label>
+            <Label className="text-end block">الدور الوظيفي</Label>
             <Select value={roleKey} onValueChange={setRoleKey}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>

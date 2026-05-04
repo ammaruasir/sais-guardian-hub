@@ -42,7 +42,7 @@ export function ConversationThread({ projectId }: { projectId: string }) {
               >
                 {isCompany ? <Building2 className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
               </div>
-              <div className={cn("max-w-[75%]", isCompany ? "text-left" : "text-right")}>
+              <div className={cn("max-w-[75%]", isCompany ? "text-start" : "text-end")}>
                 <div className={cn("flex items-center gap-2 text-[11px] text-muted-foreground", isCompany && "flex-row-reverse")}>
                   <span className="font-semibold">{m.senderName}</span>
                   <span className="num">{m.ts}</span>

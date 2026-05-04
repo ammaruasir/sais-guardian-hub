@@ -22,12 +22,12 @@ export function OverdueTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">المشروع</TableHead>
-              <TableHead className="text-right">المنشأة</TableHead>
-              <TableHead className="text-right">المرحلة</TableHead>
-              <TableHead className="text-right">أيام التأخير</TableHead>
-              <TableHead className="text-right">المراجع</TableHead>
-              <TableHead className="text-right">الإجراء</TableHead>
+              <TableHead className="text-end">المشروع</TableHead>
+              <TableHead className="text-end">المنشأة</TableHead>
+              <TableHead className="text-end">المرحلة</TableHead>
+              <TableHead className="text-end">أيام التأخير</TableHead>
+              <TableHead className="text-end">المراجع</TableHead>
+              <TableHead className="text-end">الإجراء</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

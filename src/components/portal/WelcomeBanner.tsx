@@ -24,7 +24,7 @@ export function WelcomeBanner() {
             لديكم <span className="num font-semibold">2</span> إجراءات مطلوبة
           </p>
         </div>
-        <div className="text-right text-xs opacity-80">
+        <div className="text-end text-xs opacity-80">
           <div>اليوم</div>
           <div className="num">٤ مايو ٢٠٢٦</div>
         </div>

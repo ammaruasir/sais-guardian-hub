@@ -103,7 +103,7 @@ export function TopBar() {
               {role === "sais" ? "خ" : "أ"}
             </AvatarFallback>
           </Avatar>
-          <div className="hidden text-right md:block">
+          <div className="hidden text-end md:block">
             <div className="text-xs font-semibold">{role === "sais" ? "م. خالد الحربي" : "أرامكو السعودية"}</div>
             <div className="text-[11px] text-muted-foreground">{role === "sais" ? "مراجع أمني أول" : "مدير الامتثال"}</div>
           </div>

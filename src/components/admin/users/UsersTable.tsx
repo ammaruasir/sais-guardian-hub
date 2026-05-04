@@ -57,7 +57,7 @@ export function UsersTable() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="بحث في النظام..."
-            className="pe-10 text-right"
+            className="pe-10 text-end"
           />
         </div>
         <Button onClick={() => setCreateOpen(true)} className="gap-2">
@@ -70,13 +70,13 @@ export function UsersTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">المستخدم</TableHead>
-              <TableHead className="text-right">الدور الوظيفي</TableHead>
-              <TableHead className="text-right">الإدارة</TableHead>
-              <TableHead className="text-right">الحالة</TableHead>
-              <TableHead className="text-right">الأحداث الأمنية</TableHead>
-              <TableHead className="text-right">سجل الدخول</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">المستخدم</TableHead>
+              <TableHead className="text-end">الدور الوظيفي</TableHead>
+              <TableHead className="text-end">الإدارة</TableHead>
+              <TableHead className="text-end">الحالة</TableHead>
+              <TableHead className="text-end">الأحداث الأمنية</TableHead>
+              <TableHead className="text-end">سجل الدخول</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

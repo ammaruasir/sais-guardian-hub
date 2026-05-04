@@ -38,7 +38,7 @@ export function CompanyFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent dir="rtl" className="sm:max-w-lg">
-        <DialogHeader><DialogTitle className="text-right">{initial ? "تعديل منشأة" : "إضافة منشأة"}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle className="text-end">{initial ? "تعديل منشأة" : "إضافة منشأة"}</DialogTitle></DialogHeader>
         <div className="grid grid-cols-2 gap-3">
           <div><Label>الاسم بالعربية</Label><Input value={form.nameAr} onChange={(e) => setForm({ ...form, nameAr: e.target.value })} /></div>
           <div><Label>الاسم بالإنجليزية</Label><Input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} /></div>

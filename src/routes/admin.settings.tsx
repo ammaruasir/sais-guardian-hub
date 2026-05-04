@@ -60,14 +60,14 @@ function SettingsPage() {
                 key={t.key}
                 onClick={() => setActive(t.key)}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors text-right",
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors text-end",
                   active === t.key
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <t.Icon className="h-4 w-4" />
-                <span className="flex-1 text-right">{t.ar}</span>
+                <span className="flex-1 text-end">{t.ar}</span>
               </button>
             ))}
           </nav>
@@ -116,7 +116,7 @@ function ToggleRow({ title, desc, checked, onChange, badge, disabled }: { title:
   return (
     <div className="flex items-start justify-between gap-3 rounded-lg border border-border p-3">
       <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
-      <div className="flex-1 text-right">
+      <div className="flex-1 text-end">
         <div className="flex items-center justify-end gap-2">
           {badge && <Badge variant="outline" className="text-[10px]">{badge}</Badge>}
           <span className="text-sm font-medium">{title}</span>
@@ -383,9 +383,9 @@ function BackupTab() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-right">التاريخ</TableHead>
-              <TableHead className="text-right">الحجم</TableHead>
-              <TableHead className="text-right">الحالة</TableHead>
+              <TableHead className="text-end">التاريخ</TableHead>
+              <TableHead className="text-end">الحجم</TableHead>
+              <TableHead className="text-end">الحالة</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
