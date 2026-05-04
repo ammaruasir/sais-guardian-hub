@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useAppStore } from "@/store/appStore";
 import { PortalProjectCard } from "@/components/portal/projects/PortalProjectCard";
 
-export const Route = createFileRoute("/portal/projects")({
+export const Route = createFileRoute("/portal/projects/")({
   component: PortalProjectsPage,
 });
 

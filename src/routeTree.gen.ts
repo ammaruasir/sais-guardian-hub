@@ -11,17 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 import { Route as PortalRequirementsRouteImport } from './routes/portal.requirements'
-import { Route as PortalProjectsRouteImport } from './routes/portal.projects'
 import { Route as PortalNotificationsRouteImport } from './routes/portal.notifications'
 import { Route as PortalHelpRouteImport } from './routes/portal.help'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
@@ -29,6 +28,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as PortalProjectsIndexRouteImport } from './routes/portal.projects.index'
 import { Route as PortalSubmissionsNewRouteImport } from './routes/portal.submissions.new'
 import { Route as PortalProjectsIdRouteImport } from './routes/portal.projects.$id'
 
@@ -40,11 +40,6 @@ const TasksRoute = TasksRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -77,24 +72,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PortalRoute,
 } as any)
 const ProjectsIdRoute = ProjectsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ProjectsRoute,
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRequirementsRoute = PortalRequirementsRouteImport.update({
   id: '/requirements',
   path: '/requirements',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalProjectsRoute = PortalProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalNotificationsRoute = PortalNotificationsRouteImport.update({
@@ -132,15 +127,20 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AdminRoute,
 } as any)
+const PortalProjectsIndexRoute = PortalProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalSubmissionsNewRoute = PortalSubmissionsNewRouteImport.update({
   id: '/submissions/new',
   path: '/submissions/new',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalProjectsIdRoute = PortalProjectsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => PortalProjectsRoute,
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => PortalRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -150,7 +150,6 @@ export interface FileRoutesByFullPath {
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
-  '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -160,12 +159,13 @@ export interface FileRoutesByFullPath {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal/': typeof PortalIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
+  '/portal/projects/': typeof PortalProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,7 +173,6 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -183,12 +182,13 @@ export interface FileRoutesByTo {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal': typeof PortalIndexRoute
+  '/projects': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
+  '/portal/projects': typeof PortalProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,7 +198,6 @@ export interface FileRoutesById {
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
-  '/projects': typeof ProjectsRouteWithChildren
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -208,12 +207,13 @@ export interface FileRoutesById {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal/': typeof PortalIndexRoute
+  '/projects/': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
+  '/portal/projects/': typeof PortalProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -224,7 +224,6 @@ export interface FileRouteTypes {
     | '/consultants'
     | '/notifications'
     | '/portal'
-    | '/projects'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -234,12 +233,13 @@ export interface FileRouteTypes {
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
-    | '/portal/projects'
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal/'
+    | '/projects/'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
+    | '/portal/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -247,7 +247,6 @@ export interface FileRouteTypes {
     | '/companies'
     | '/consultants'
     | '/notifications'
-    | '/projects'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -257,12 +256,13 @@ export interface FileRouteTypes {
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
-    | '/portal/projects'
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal'
+    | '/projects'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
+    | '/portal/projects'
   id:
     | '__root__'
     | '/'
@@ -271,7 +271,6 @@ export interface FileRouteTypes {
     | '/consultants'
     | '/notifications'
     | '/portal'
-    | '/projects'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -281,12 +280,13 @@ export interface FileRouteTypes {
     | '/companies/$id'
     | '/portal/help'
     | '/portal/notifications'
-    | '/portal/projects'
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal/'
+    | '/projects/'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
+    | '/portal/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,9 +296,10 @@ export interface RootRouteChildren {
   ConsultantsRoute: typeof ConsultantsRoute
   NotificationsRoute: typeof NotificationsRoute
   PortalRoute: typeof PortalRouteWithChildren
-  ProjectsRoute: typeof ProjectsRouteWithChildren
   ReportsRoute: typeof ReportsRoute
   TasksRoute: typeof TasksRoute
+  ProjectsIdRoute: typeof ProjectsIdRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -315,13 +316,6 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -366,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/': {
       id: '/portal/'
       path: '/'
@@ -375,23 +376,16 @@ declare module '@tanstack/react-router' {
     }
     '/projects/$id': {
       id: '/projects/$id'
-      path: '/$id'
+      path: '/projects/$id'
       fullPath: '/projects/$id'
       preLoaderRoute: typeof ProjectsIdRouteImport
-      parentRoute: typeof ProjectsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/portal/requirements': {
       id: '/portal/requirements'
       path: '/requirements'
       fullPath: '/portal/requirements'
       preLoaderRoute: typeof PortalRequirementsRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/projects': {
-      id: '/portal/projects'
-      path: '/projects'
-      fullPath: '/portal/projects'
-      preLoaderRoute: typeof PortalProjectsRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/notifications': {
@@ -443,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAuditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/portal/projects/': {
+      id: '/portal/projects/'
+      path: '/projects'
+      fullPath: '/portal/projects/'
+      preLoaderRoute: typeof PortalProjectsIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/submissions/new': {
       id: '/portal/submissions/new'
       path: '/submissions/new'
@@ -452,10 +453,10 @@ declare module '@tanstack/react-router' {
     }
     '/portal/projects/$id': {
       id: '/portal/projects/$id'
-      path: '/$id'
+      path: '/projects/$id'
       fullPath: '/portal/projects/$id'
       preLoaderRoute: typeof PortalProjectsIdRouteImport
-      parentRoute: typeof PortalProjectsRoute
+      parentRoute: typeof PortalRoute
     }
   }
 }
@@ -488,50 +489,28 @@ const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
   CompaniesRouteChildren,
 )
 
-interface PortalProjectsRouteChildren {
-  PortalProjectsIdRoute: typeof PortalProjectsIdRoute
-}
-
-const PortalProjectsRouteChildren: PortalProjectsRouteChildren = {
-  PortalProjectsIdRoute: PortalProjectsIdRoute,
-}
-
-const PortalProjectsRouteWithChildren = PortalProjectsRoute._addFileChildren(
-  PortalProjectsRouteChildren,
-)
-
 interface PortalRouteChildren {
   PortalHelpRoute: typeof PortalHelpRoute
   PortalNotificationsRoute: typeof PortalNotificationsRoute
-  PortalProjectsRoute: typeof PortalProjectsRouteWithChildren
   PortalRequirementsRoute: typeof PortalRequirementsRoute
   PortalIndexRoute: typeof PortalIndexRoute
+  PortalProjectsIdRoute: typeof PortalProjectsIdRoute
   PortalSubmissionsNewRoute: typeof PortalSubmissionsNewRoute
+  PortalProjectsIndexRoute: typeof PortalProjectsIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalHelpRoute: PortalHelpRoute,
   PortalNotificationsRoute: PortalNotificationsRoute,
-  PortalProjectsRoute: PortalProjectsRouteWithChildren,
   PortalRequirementsRoute: PortalRequirementsRoute,
   PortalIndexRoute: PortalIndexRoute,
+  PortalProjectsIdRoute: PortalProjectsIdRoute,
   PortalSubmissionsNewRoute: PortalSubmissionsNewRoute,
+  PortalProjectsIndexRoute: PortalProjectsIndexRoute,
 }
 
 const PortalRouteWithChildren =
   PortalRoute._addFileChildren(PortalRouteChildren)
-
-interface ProjectsRouteChildren {
-  ProjectsIdRoute: typeof ProjectsIdRoute
-}
-
-const ProjectsRouteChildren: ProjectsRouteChildren = {
-  ProjectsIdRoute: ProjectsIdRoute,
-}
-
-const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
-  ProjectsRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -540,9 +519,10 @@ const rootRouteChildren: RootRouteChildren = {
   ConsultantsRoute: ConsultantsRoute,
   NotificationsRoute: NotificationsRoute,
   PortalRoute: PortalRouteWithChildren,
-  ProjectsRoute: ProjectsRouteWithChildren,
   ReportsRoute: ReportsRoute,
   TasksRoute: TasksRoute,
+  ProjectsIdRoute: ProjectsIdRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
