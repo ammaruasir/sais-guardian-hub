@@ -54,11 +54,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
-            SA
+            {role === "sais" ? "SA" : <Building2 className="h-5 w-5" />}
           </div>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="truncate text-sm font-bold text-sidebar-foreground">الهيئة العليا للأمن الصناعي</div>
-            <div className="truncate text-[11px] text-sidebar-foreground/60">SAIS Platform</div>
+            <div className="truncate text-sm font-bold text-sidebar-foreground">
+              {role === "sais" ? "الهيئة العليا للأمن الصناعي" : "أرامكو السعودية"}
+            </div>
+            <div className="truncate text-[11px] text-sidebar-foreground/60">
+              {role === "sais" ? "SAIS Platform" : "بوابة المنشآت"}
+            </div>
           </div>
         </div>
       </SidebarHeader>

@@ -49,6 +49,7 @@ function Breadcrumbs() {
     "/portal/projects": "مشاريعنا",
     "/portal/submissions/new": "تقديم جديد",
     "/portal/requirements": "المتطلبات",
+    "/portal/notifications": "الإشعارات",
     "/portal/help": "المساعدة",
   };
   const label = map[path] ?? "";

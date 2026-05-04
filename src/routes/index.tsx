@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
 import { KpiCards } from "@/components/dashboard/KpiCards";
 import { StagePipeline } from "@/components/dashboard/StagePipeline";
@@ -22,7 +22,7 @@ function IndexPage() {
 function RoleAwareDashboard() {
   const { role } = useRole();
   if (role === "company") {
-    return <CompanyPlaceholder />;
+    return <Navigate to="/portal" />;
   }
   return <SaisDashboard />;
 }
@@ -59,13 +59,3 @@ function SaisDashboard() {
   );
 }
 
-function CompanyPlaceholder() {
-  return (
-    <div className="flex h-[60vh] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/50 text-center">
-      <div className="text-lg font-semibold">بوابة المنشآت</div>
-      <p className="max-w-md text-sm text-muted-foreground">
-        ستتوفر بوابة المنشآت في المرحلة 4 من البناء. بدّل الدور إلى «مركز الهيئة» لاستعراض لوحة المعلومات الحالية.
-      </p>
-    </div>
-  );
-}
