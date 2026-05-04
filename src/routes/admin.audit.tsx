@@ -243,13 +243,13 @@ function AuditPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">جميع المستخدمين</SelectItem>
-            {users.map((u) => (
-              <SelectItem key={u.id} value={u.nameAr}>
-                {u.nameAr}
+            {Array.from(
+              new Set([...users.map((u) => u.nameAr), ...audit.map((e) => e.user)]),
+            ).map((name) => (
+              <SelectItem key={name} value={name}>
+                {name}
               </SelectItem>
             ))}
-            <SelectItem value="Admin User">Admin User</SelectItem>
-            <SelectItem value="Unknown">Unknown</SelectItem>
           </SelectContent>
         </Select>
         <Select

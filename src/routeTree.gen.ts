@@ -19,6 +19,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
 import { Route as PortalRequirementsRouteImport } from './routes/portal.requirements'
 import { Route as PortalNotificationsRouteImport } from './routes/portal.notifications'
@@ -81,6 +82,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PortalRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ProjectsIdRoute = ProjectsIdRouteImport.update({
   id: '/projects/$id',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
@@ -169,7 +176,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/notifications': typeof NotificationsRoute
@@ -184,6 +190,7 @@ export interface FileRoutesByTo {
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
+  '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
@@ -209,6 +216,7 @@ export interface FileRoutesById {
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
@@ -235,6 +243,7 @@ export interface FileRouteTypes {
     | '/portal/notifications'
     | '/portal/requirements'
     | '/projects/$id'
+    | '/admin/'
     | '/portal/'
     | '/projects/'
     | '/portal/projects/$id'
@@ -243,7 +252,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/companies'
     | '/consultants'
     | '/notifications'
@@ -258,6 +266,7 @@ export interface FileRouteTypes {
     | '/portal/notifications'
     | '/portal/requirements'
     | '/projects/$id'
+    | '/admin'
     | '/portal'
     | '/projects'
     | '/portal/projects/$id'
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/portal/notifications'
     | '/portal/requirements'
     | '/projects/$id'
+    | '/admin/'
     | '/portal/'
     | '/projects/'
     | '/portal/projects/$id'
@@ -373,6 +383,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/projects/$id': {
       id: '/projects/$id'
@@ -466,6 +483,7 @@ interface AdminRouteChildren {
   AdminRolesRoute: typeof AdminRolesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -473,6 +491,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRolesRoute: AdminRolesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
