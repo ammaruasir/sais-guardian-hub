@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   CircleCheck,
@@ -13,11 +13,8 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  getNotificationsForRole,
-  type AppNotification,
-  type NotificationType,
-} from "@/data/notifications";
+import type { NotificationType } from "@/data/notifications";
+import { useAppStore } from "@/store/appStore";
 
 const typeMeta: Record<NotificationType, { icon: typeof CircleCheck; cls: string }> = {
   approval: { icon: CircleCheck, cls: "bg-success/15 text-success" },
@@ -39,13 +36,11 @@ const filterLabels: Record<Filter, string> = {
 };
 
 export function NotificationsList({ role }: { role: "sais" | "company" }) {
-  const base = useMemo(() => getNotificationsForRole(role), [role]);
-  const [readMap, setReadMap] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(base.map((n) => [n.id, n.read])),
-  );
+  const allNotifications = useAppStore((s) => s.notifications);
+  const markAsRead = useAppStore((s) => s.markAsRead);
+  const markAllAsRead = useAppStore((s) => s.markAllAsRead);
+  const items = allNotifications.filter((n) => n.forRole === role || n.forRole === "both");
   const [filter, setFilter] = useState<Filter>("all");
-
-  const items: AppNotification[] = base.map((n) => ({ ...n, read: readMap[n.id] ?? n.read }));
 
   const filtered = items.filter((n) => {
     if (filter === "all") return true;
@@ -53,8 +48,8 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
     return n.type === filter;
   });
 
-  const markAll = () => setReadMap(Object.fromEntries(base.map((n) => [n.id, true])));
-  const markOne = (id: string) => setReadMap((m) => ({ ...m, [id]: true }));
+  const markAll = () => markAllAsRead(role);
+  const markOne = (id: string) => markAsRead(id);
 
   const unreadTotal = items.filter((n) => !n.read).length;
 
