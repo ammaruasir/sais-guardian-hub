@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,6 +32,11 @@ const TasksRoute = TasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -38,6 +45,11 @@ const ProjectsRoute = ProjectsRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsultantsRoute = ConsultantsRouteImport.update({
@@ -105,8 +117,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
   '/projects': typeof ProjectsRouteWithChildren
+  '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
@@ -122,7 +136,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/notifications': typeof NotificationsRoute
   '/projects': typeof ProjectsRouteWithChildren
+  '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
@@ -139,8 +155,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
+  '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
   '/projects': typeof ProjectsRouteWithChildren
+  '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
@@ -158,8 +176,10 @@ export interface FileRouteTypes {
     | '/'
     | '/companies'
     | '/consultants'
+    | '/notifications'
     | '/portal'
     | '/projects'
+    | '/reports'
     | '/tasks'
     | '/companies/$id'
     | '/portal/help'
@@ -175,7 +195,9 @@ export interface FileRouteTypes {
     | '/'
     | '/companies'
     | '/consultants'
+    | '/notifications'
     | '/projects'
+    | '/reports'
     | '/tasks'
     | '/companies/$id'
     | '/portal/help'
@@ -191,8 +213,10 @@ export interface FileRouteTypes {
     | '/'
     | '/companies'
     | '/consultants'
+    | '/notifications'
     | '/portal'
     | '/projects'
+    | '/reports'
     | '/tasks'
     | '/companies/$id'
     | '/portal/help'
@@ -209,8 +233,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CompaniesRoute: typeof CompaniesRouteWithChildren
   ConsultantsRoute: typeof ConsultantsRoute
+  NotificationsRoute: typeof NotificationsRoute
   PortalRoute: typeof PortalRouteWithChildren
   ProjectsRoute: typeof ProjectsRouteWithChildren
+  ReportsRoute: typeof ReportsRoute
   TasksRoute: typeof TasksRoute
 }
 
@@ -221,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects': {
@@ -235,6 +268,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/consultants': {
@@ -385,8 +425,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CompaniesRoute: CompaniesRouteWithChildren,
   ConsultantsRoute: ConsultantsRoute,
+  NotificationsRoute: NotificationsRoute,
   PortalRoute: PortalRouteWithChildren,
   ProjectsRoute: ProjectsRouteWithChildren,
+  ReportsRoute: ReportsRoute,
   TasksRoute: TasksRoute,
 }
 export const routeTree = rootRouteImport

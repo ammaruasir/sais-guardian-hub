@@ -40,7 +40,7 @@ const companyNav = [
   { to: "/portal/projects", icon: FolderKanban, ar: "مشاريعنا", en: "Our Projects" },
   { to: "/portal/submissions/new", icon: PlusSquare, ar: "تقديم جديد", en: "New Submission" },
   { to: "/portal/requirements", icon: FileText, ar: "المتطلبات", en: "Requirements" },
-  { to: "/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
+  { to: "/portal/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
   { to: "/portal/help", icon: HelpCircle, ar: "المساعدة", en: "Help" },
 ];
 
@@ -72,7 +72,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                const active = item.to === "/" ? path === "/" : path.startsWith(item.to);
+                const isHome = item.to === "/" || item.to === "/portal";
+                const active = isHome ? path === item.to : path === item.to || path.startsWith(item.to + "/");
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>
