@@ -30,6 +30,7 @@ function MiniStepper({ stage }: { stage: Stage }) {
 }
 
 export function MyProjectsGrid() {
+  const projects = useAppStore((s) => s.projects);
   const mine = projects.filter((p) => p.companyId === "aramco");
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
