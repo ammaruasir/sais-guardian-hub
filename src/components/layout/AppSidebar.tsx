@@ -28,6 +28,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
+import logoUrl from "@/assets/logo.svg";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
