@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopBar } from "./TopBar";
-import { DemoBadge } from "./DemoBadge";
 import { useRole } from "@/context/RoleContext";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -17,7 +16,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             {children}
           </main>
         </SidebarInset>
-        <DemoBadge />
       </div>
     </SidebarProvider>
   );
