@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Toaster } from "@/components/ui/sonner";
-import { projects, stageLabel, type Stage } from "@/data";
+import { stageLabel, type Stage } from "@/data";
 import { portalStages } from "@/data/portalRequirements";
-import { consultants } from "@/data/consultants";
 import { nextSubmissionRef } from "@/data/portalConversations";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/appStore";
 
 type WizardSearch = { project?: string; stage?: number };
 
