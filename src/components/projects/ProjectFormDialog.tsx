@@ -32,9 +32,10 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   initial?: Project | null;
+  defaultCompanyId?: string;
 };
 
-export function ProjectFormDialog({ open, onOpenChange, initial }: Props) {
+export function ProjectFormDialog({ open, onOpenChange, initial, defaultCompanyId }: Props) {
   const { currentUser } = useRole();
   const companies = useAppStore((s) => s.companies);
   const users = useAppStore((s) => s.users);
@@ -49,7 +50,7 @@ export function ProjectFormDialog({ open, onOpenChange, initial }: Props) {
     id: "",
     nameAr: "",
     nameEn: "",
-    companyId: companies[0]?.id ?? "",
+    companyId: defaultCompanyId ?? companies[0]?.id ?? "",
     facilityAr: "",
     sector: "petroleum",
     classification: "medium",
@@ -62,8 +63,16 @@ export function ProjectFormDialog({ open, onOpenChange, initial }: Props) {
 
   useEffect(() => {
     if (initial) setForm(initial);
-    else setForm((f) => ({ ...f, id: "", nameAr: "", nameEn: "", facilityAr: "" }));
-  }, [initial, open]);
+    else
+      setForm((f) => ({
+        ...f,
+        id: "",
+        nameAr: "",
+        nameEn: "",
+        facilityAr: "",
+        companyId: defaultCompanyId ?? f.companyId,
+      }));
+  }, [initial, open, defaultCompanyId]);
 
   const submit = () => {
     if (!form.nameAr.trim()) {
