@@ -6,7 +6,6 @@ import { SectorDonut } from "@/components/dashboard/SectorDonut";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { OverdueTable } from "@/components/dashboard/OverdueTable";
 import { useRole } from "@/context/RoleContext";
-import { RequireAuth } from "@/components/auth/RequireAuth";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
@@ -14,11 +13,9 @@ export const Route = createFileRoute("/")({
 
 function IndexPage() {
   return (
-    <RequireAuth>
-      <AppShell>
-        <RoleAwareDashboard />
-      </AppShell>
-    </RequireAuth>
+    <AppShell>
+      <RoleAwareDashboard />
+    </AppShell>
   );
 }
 
