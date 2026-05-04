@@ -23,6 +23,7 @@ import { Route as PortalNotificationsRouteImport } from './routes/portal.notific
 import { Route as PortalHelpRouteImport } from './routes/portal.help'
 import { Route as CompaniesIdRouteImport } from './routes/companies.$id'
 import { Route as PortalSubmissionsNewRouteImport } from './routes/portal.submissions.new'
+import { Route as PortalProjectsIdRouteImport } from './routes/portal.projects.$id'
 
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
@@ -94,6 +95,11 @@ const PortalSubmissionsNewRoute = PortalSubmissionsNewRouteImport.update({
   path: '/submissions/new',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalProjectsIdRoute = PortalProjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PortalProjectsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,10 +111,11 @@ export interface FileRoutesByFullPath {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRoute
+  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal/': typeof PortalIndexRoute
+  '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
 }
 export interface FileRoutesByTo {
@@ -120,10 +127,11 @@ export interface FileRoutesByTo {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRoute
+  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal': typeof PortalIndexRoute
+  '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
 }
 export interface FileRoutesById {
@@ -137,10 +145,11 @@ export interface FileRoutesById {
   '/companies/$id': typeof CompaniesIdRoute
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
-  '/portal/projects': typeof PortalProjectsRoute
+  '/portal/projects': typeof PortalProjectsRouteWithChildren
   '/portal/requirements': typeof PortalRequirementsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/portal/': typeof PortalIndexRoute
+  '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
 }
 export interface FileRouteTypes {
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal/'
+    | '/portal/projects/$id'
     | '/portal/submissions/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal'
+    | '/portal/projects/$id'
     | '/portal/submissions/new'
   id:
     | '__root__'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/portal/requirements'
     | '/projects/$id'
     | '/portal/'
+    | '/portal/projects/$id'
     | '/portal/submissions/new'
   fileRoutesById: FileRoutesById
 }
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalSubmissionsNewRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/projects/$id': {
+      id: '/portal/projects/$id'
+      path: '/$id'
+      fullPath: '/portal/projects/$id'
+      preLoaderRoute: typeof PortalProjectsIdRouteImport
+      parentRoute: typeof PortalProjectsRoute
+    }
   }
 }
 
@@ -317,10 +336,22 @@ const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
   CompaniesRouteChildren,
 )
 
+interface PortalProjectsRouteChildren {
+  PortalProjectsIdRoute: typeof PortalProjectsIdRoute
+}
+
+const PortalProjectsRouteChildren: PortalProjectsRouteChildren = {
+  PortalProjectsIdRoute: PortalProjectsIdRoute,
+}
+
+const PortalProjectsRouteWithChildren = PortalProjectsRoute._addFileChildren(
+  PortalProjectsRouteChildren,
+)
+
 interface PortalRouteChildren {
   PortalHelpRoute: typeof PortalHelpRoute
   PortalNotificationsRoute: typeof PortalNotificationsRoute
-  PortalProjectsRoute: typeof PortalProjectsRoute
+  PortalProjectsRoute: typeof PortalProjectsRouteWithChildren
   PortalRequirementsRoute: typeof PortalRequirementsRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalSubmissionsNewRoute: typeof PortalSubmissionsNewRoute
@@ -329,7 +360,7 @@ interface PortalRouteChildren {
 const PortalRouteChildren: PortalRouteChildren = {
   PortalHelpRoute: PortalHelpRoute,
   PortalNotificationsRoute: PortalNotificationsRoute,
-  PortalProjectsRoute: PortalProjectsRoute,
+  PortalProjectsRoute: PortalProjectsRouteWithChildren,
   PortalRequirementsRoute: PortalRequirementsRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalSubmissionsNewRoute: PortalSubmissionsNewRoute,
