@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { projects, companies, reviewers, stageLabel } from "@/data";
 import { ArrowLeft } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function OverdueTable() {
   const rows = projects.filter((p) => p.overdue);
@@ -51,8 +52,10 @@ export function OverdueTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="ghost" className="gap-1">
-                      فتح <ArrowLeft className="h-3.5 w-3.5" />
+                    <Button asChild size="sm" variant="ghost" className="gap-1">
+                      <Link to="/projects/$id" params={{ id: p.id }}>
+                        فتح <ArrowLeft className="h-3.5 w-3.5" />
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>
