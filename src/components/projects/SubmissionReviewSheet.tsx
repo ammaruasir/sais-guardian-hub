@@ -8,6 +8,7 @@ import { FileText, Eye, Download, CheckCircle2, AlertTriangle, XCircle, UserCog 
 import type { Submission, ChecklistResult } from "@/data/submissions";
 import { stageLabel, reviewers } from "@/data";
 import { toast } from "sonner";
+import { useAppStore } from "@/store/appStore";
 
 export function SubmissionReviewSheet({
   submission,
