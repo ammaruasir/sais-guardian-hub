@@ -92,26 +92,34 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
             const meta = typeMeta[n.type];
             const Icon = meta.icon;
             return (
-              <Link
-                key={n.id}
-                to={n.linkTo}
-                onClick={() => markOne(n.id)}
-                className="flex items-center gap-4 p-4 transition-colors hover:bg-accent/40"
-              >
-                <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", meta.cls)}>
+              <div key={n.id} className="group relative flex items-center gap-4 p-4 transition-colors hover:bg-accent/40">
+                <Link
+                  to={n.linkTo}
+                  onClick={() => markOne(n.id)}
+                  className="absolute inset-0"
+                  aria-label={n.titleAr}
+                />
+                <div className={cn("relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", meta.cls)}>
                   <Icon className="h-5 w-5" />
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="relative z-10 min-w-0 flex-1 pointer-events-none">
                   <div className={cn("truncate text-sm", !n.read ? "font-bold text-foreground" : "font-medium text-foreground/90")}>
                     {n.titleAr}
                   </div>
                   <div className="truncate text-xs text-muted-foreground">{n.descriptionAr}</div>
                 </div>
-                <div className="shrink-0 text-[11px] text-muted-foreground">{n.ts}</div>
-                <div className="w-2 shrink-0">
+                <div className="relative z-10 shrink-0 text-[11px] text-muted-foreground pointer-events-none">{n.ts}</div>
+                <div className="relative z-10 w-2 shrink-0">
                   {!n.read && <span className="block h-2 w-2 rounded-full bg-secondary" />}
                 </div>
-              </Link>
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteNotification(n.id); }}
+                  className="relative z-10 rounded p-1 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                  aria-label="حذف"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             );
           })
         )}
