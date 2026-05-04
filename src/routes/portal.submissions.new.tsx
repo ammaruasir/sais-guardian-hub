@@ -17,13 +17,13 @@ import { consultants } from "@/data/consultants";
 import { nextSubmissionRef } from "@/data/portalConversations";
 import { cn } from "@/lib/utils";
 
-const searchSchema = z.object({
-  project: fallback(z.string().optional(), undefined).default(undefined as never),
-  stage: fallback(z.number().optional(), undefined).default(undefined as never),
-});
+type WizardSearch = { project?: string; stage?: number };
 
 export const Route = createFileRoute("/portal/submissions/new")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch: (s: Record<string, unknown>): WizardSearch => ({
+    project: typeof s.project === "string" ? s.project : undefined,
+    stage: typeof s.stage === "number" ? s.stage : s.stage ? Number(s.stage) : undefined,
+  }),
   component: WizardPage,
 });
 
