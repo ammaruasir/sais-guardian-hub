@@ -2,22 +2,14 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Clock, AlertTriangle, CheckCircle2, FileSearch } from "lucide-react";
-import { kpis } from "@/data";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/appStore";
 
 function Kpi({
-  icon: Icon,
-  label,
-  sub,
-  value,
-  trend,
-  tone = "primary",
+  icon: Icon, label, sub, value, trend, tone = "primary",
 }: {
-  icon: LucideIcon;
-  label: string;
-  sub: string;
-  value: string;
+  icon: LucideIcon; label: string; sub: string; value: string;
   trend?: { dir: "up" | "down"; text: string };
   tone?: "primary" | "secondary" | "warning" | "destructive" | "success";
 }) {
@@ -53,11 +45,26 @@ function Kpi({
 }
 
 export function KpiCards() {
+  const projects = useAppStore((s) => s.projects);
+  const submissions = useAppStore((s) => s.submissions);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 350);
     return () => clearTimeout(t);
   }, []);
+
+  const activeProjects = projects.length;
+  const pendingReviews = projects.filter((p) => p.status === "under_review").length;
+  const overdue = projects.filter((p) => p.overdue).length;
+  const decided = submissions.filter((s) => !!s.decision);
+  const approvalRate = decided.length
+    ? Math.round((decided.filter((s) => s.decision === "approved").length / decided.length) * 100)
+    : 0;
+  const reviewing = projects.filter((p) => p.status === "under_review");
+  const avgReviewDays = reviewing.length
+    ? (reviewing.reduce((a, p) => a + p.daysInStage, 0) / reviewing.length).toFixed(1)
+    : "0";
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
@@ -72,11 +79,11 @@ export function KpiCards() {
   }
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-      <Kpi icon={FileSearch} label="المشاريع النشطة" sub="Active Projects" value={String(kpis.activeProjects)} tone="primary" trend={{ dir: "up", text: "+2" }} />
-      <Kpi icon={Clock} label="قيد المراجعة" sub="Pending Reviews" value={String(kpis.pendingReviews)} tone="secondary" />
-      <Kpi icon={AlertTriangle} label="متأخرة" sub="Overdue" value={String(kpis.overdue)} tone="destructive" trend={{ dir: "down", text: "-1" }} />
-      <Kpi icon={CheckCircle2} label="نسبة الاعتماد" sub="Approval Rate" value={`${kpis.approvalRate}%`} tone="success" trend={{ dir: "up", text: "+4%" }} />
-      <Kpi icon={Clock} label="متوسط وقت المراجعة" sub="Avg Review (days)" value={`${kpis.avgReviewDays}`} tone="warning" />
+      <Kpi icon={FileSearch} label="المشاريع النشطة" sub="Active Projects" value={String(activeProjects)} tone="primary" />
+      <Kpi icon={Clock} label="قيد المراجعة" sub="Pending Reviews" value={String(pendingReviews)} tone="secondary" />
+      <Kpi icon={AlertTriangle} label="متأخرة" sub="Overdue" value={String(overdue)} tone="destructive" />
+      <Kpi icon={CheckCircle2} label="نسبة الاعتماد" sub="Approval Rate" value={`${approvalRate}%`} tone="success" />
+      <Kpi icon={Clock} label="متوسط وقت المراجعة" sub="Avg Review (days)" value={`${avgReviewDays}`} tone="warning" />
     </div>
   );
 }
