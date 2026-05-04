@@ -76,7 +76,15 @@ const reviewers = [
   { name: "م. عبدالله الدوسري", count: 2 },
 ];
 
-function ChartCard({ title, en, children }: { title: string; en: string; children: React.ReactNode }) {
+function ChartCard({
+  title,
+  en,
+  children,
+}: {
+  title: string;
+  en: string;
+  children: React.ReactNode;
+}) {
   return (
     <Card>
       <CardHeader>
@@ -99,7 +107,10 @@ function ReportsContent() {
   const factor = range === "30d" ? 0.85 : range === "3m" ? 0.92 : range === "1y" ? 1.15 : 1;
   const monthlyR = monthly.map((d) => ({ ...d, v: Math.max(1, Math.round(d.v * factor)) }));
   const stagesR = stages.map((d) => ({ ...d, days: Number((d.days * factor).toFixed(1)) }));
-  const reviewersR = reviewers.map((d) => ({ ...d, count: Math.max(1, Math.round(d.count * factor)) }));
+  const reviewersR = reviewers.map((d) => ({
+    ...d,
+    count: Math.max(1, Math.round(d.count * factor)),
+  }));
   const maxReviewer = Math.max(...reviewersR.map((r) => r.count));
   return (
     <div className="space-y-6">
@@ -144,7 +155,14 @@ function ReportsContent() {
 
         <ChartCard title="التقديمات حسب القطاع" en="Submissions by Sector">
           <PieChart>
-            <Pie data={sectors} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95} paddingAngle={2}>
+            <Pie
+              data={sectors}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={55}
+              outerRadius={95}
+              paddingAngle={2}
+            >
               {sectors.map((s, i) => (
                 <Cell key={i} fill={s.color} stroke="var(--card)" strokeWidth={2} />
               ))}
@@ -162,7 +180,10 @@ function ReportsContent() {
             <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v} مهمة`, "نشط"]} />
             <Bar dataKey="count" radius={[0, 6, 6, 0]}>
               {reviewersR.map((r, i) => (
-                <Cell key={i} fill={r.count === maxReviewer ? "var(--warning)" : "var(--primary)"} />
+                <Cell
+                  key={i}
+                  fill={r.count === maxReviewer ? "var(--warning)" : "var(--primary)"}
+                />
               ))}
             </Bar>
           </BarChart>

@@ -39,7 +39,9 @@ function PortalProjectDetailPage() {
   return (
     <div className="space-y-5">
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
-        <Link to="/portal/projects" className="hover:text-foreground">المشاريع</Link>
+        <Link to="/portal/projects" className="hover:text-foreground">
+          المشاريع
+        </Link>
         <ChevronRight className="h-3 w-3 rotate-180" />
         <span className="text-foreground">{project.nameAr}</span>
       </nav>

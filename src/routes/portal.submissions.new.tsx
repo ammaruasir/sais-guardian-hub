@@ -2,7 +2,13 @@ import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, ChevronRight, ChevronLeft, FileUp, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +22,7 @@ import { portalStages } from "@/data/portalRequirements";
 import { nextSubmissionRef } from "@/data/portalConversations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
+import { useRole } from "@/context/RoleContext";
 
 type WizardSearch = { project?: string; stage?: number };
 
@@ -39,12 +46,14 @@ type FileEntry = { name: string; size: string };
 
 function WizardPage() {
   const search = Route.useSearch();
+  const { currentUser } = useRole();
   const projects = useAppStore((s) => s.projects);
   const consultants = useAppStore((s) => s.consultants);
   const addSubmission = useAppStore((s) => s.addSubmission);
   const addNotification = useAppStore((s) => s.addNotification);
   const addActivity = useAppStore((s) => s.addActivity);
-  const aramcoProjects = projects.filter((p) => p.companyId === "aramco");
+  const companyId = currentUser.companyId ?? "aramco";
+  const aramcoProjects = projects.filter((p) => p.companyId === companyId);
   const initialProject = (search.project as string | undefined) ?? "";
   const initialStage = (search.stage as number | undefined) ?? 0;
 
@@ -111,7 +120,9 @@ function WizardPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">تقديم جديد</h1>
-        <p className="mt-1 text-sm text-muted-foreground">معالج تقديم المستندات للهيئة العليا للأمن الصناعي</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          معالج تقديم المستندات للهيئة العليا للأمن الصناعي
+        </p>
       </header>
 
       {/* Step indicator */}
@@ -134,11 +145,20 @@ function WizardPage() {
                   >
                     {done ? <CheckCircle2 className="h-4 w-4" /> : <span className="num">{n}</span>}
                   </div>
-                  <div className={cn("text-center text-[11px] font-medium", active ? "text-foreground" : "text-muted-foreground")}>
+                  <div
+                    className={cn(
+                      "text-center text-[11px] font-medium",
+                      active ? "text-foreground" : "text-muted-foreground",
+                    )}
+                  >
                     {label}
                   </div>
                 </div>
-                {i < STEPS.length - 1 && <div className={cn("h-0.5 flex-1 rounded", n < step ? "bg-success" : "bg-border")} />}
+                {i < STEPS.length - 1 && (
+                  <div
+                    className={cn("h-0.5 flex-1 rounded", n < step ? "bg-success" : "bg-border")}
+                  />
+                )}
               </div>
             );
           })}
@@ -152,10 +172,14 @@ function WizardPage() {
             <div>
               <Label>اختر المشروع</Label>
               <Select value={projectId} onValueChange={setProjectId}>
-                <SelectTrigger className="mt-2"><SelectValue placeholder="— اختر مشروعاً —" /></SelectTrigger>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="— اختر مشروعاً —" />
+                </SelectTrigger>
                 <SelectContent>
                   {aramcoProjects.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.nameAr}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.nameAr}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -166,7 +190,10 @@ function WizardPage() {
                 <div className="text-xs text-muted-foreground">{project.nameEn}</div>
                 <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
                   <Info label="المنشأة" value={project.facilityAr} />
-                  <Info label="المرحلة الحالية" value={`${project.stage} — ${stageLabel[project.stage].ar}`} />
+                  <Info
+                    label="المرحلة الحالية"
+                    value={`${project.stage} — ${stageLabel[project.stage].ar}`}
+                  />
                   <Info label="التصنيف" value={project.classification} />
                 </div>
               </div>
@@ -189,16 +216,29 @@ function WizardPage() {
                     key={n}
                     className={cn(
                       "flex items-center gap-3 rounded-lg border p-3",
-                      completed ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:bg-muted/50",
+                      completed
+                        ? "opacity-60 cursor-not-allowed"
+                        : "cursor-pointer hover:bg-muted/50",
                       String(stage) === String(n) && "border-primary bg-primary/5",
                     )}
                   >
                     <RadioGroupItem value={String(n)} disabled={completed} />
                     <div className="flex-1">
-                      <div className="font-medium">المرحلة {n} — {stageLabel[n as Stage].ar}</div>
-                      <div className="text-xs text-muted-foreground">{stageLabel[n as Stage].en}</div>
+                      <div className="font-medium">
+                        المرحلة {n} — {stageLabel[n as Stage].ar}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {stageLabel[n as Stage].en}
+                      </div>
                     </div>
-                    {completed && <Badge variant="outline" className="bg-success/10 text-success border-success/30">معتمدة</Badge>}
+                    {completed && (
+                      <Badge
+                        variant="outline"
+                        className="bg-success/10 text-success border-success/30"
+                      >
+                        معتمدة
+                      </Badge>
+                    )}
                     {n === project.stage && <Badge variant="outline">المرحلة الحالية</Badge>}
                   </label>
                 );
@@ -217,9 +257,12 @@ function WizardPage() {
             <div>
               <div className="mb-2 flex items-center justify-between text-sm">
                 <span className="font-medium">
-                  <span className="num">{attachedAll}</span> من <span className="num">{stageItems.length}</span> مستندات مرفقة
+                  <span className="num">{attachedAll}</span> من{" "}
+                  <span className="num">{stageItems.length}</span> مستندات مرفقة
                 </span>
-                <span className="num text-xs text-muted-foreground">المطلوب: {attachedRequired}/{requiredItems.length}</span>
+                <span className="num text-xs text-muted-foreground">
+                  المطلوب: {attachedRequired}/{requiredItems.length}
+                </span>
               </div>
               <Progress value={(attachedAll / stageItems.length) * 100} />
             </div>
@@ -234,7 +277,13 @@ function WizardPage() {
                   required={it.required}
                   file={files[it.id]}
                   onChange={(f) => setFiles((prev) => ({ ...prev, [it.id]: f }))}
-                  onRemove={() => setFiles((prev) => { const c = { ...prev }; delete c[it.id]; return c; })}
+                  onRemove={() =>
+                    setFiles((prev) => {
+                      const c = { ...prev };
+                      delete c[it.id];
+                      return c;
+                    })
+                  }
                 />
               ))}
             </div>
@@ -244,28 +293,41 @@ function WizardPage() {
         {step === 4 && (
           <div className="space-y-4">
             <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed">
-              أقر أنا المُوقع أدناه بأن جميع المستندات المقدمة تتوافق مع متطلبات الهيئة العليا للأمن الصناعي
-              وأن المعلومات الواردة فيها صحيحة ودقيقة.
+              أقر أنا المُوقع أدناه بأن جميع المستندات المقدمة تتوافق مع متطلبات الهيئة العليا للأمن
+              الصناعي وأن المعلومات الواردة فيها صحيحة ودقيقة.
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>اسم المُوقّع</Label>
-                <Input value={signatory} onChange={(e) => setSignatory(e.target.value)} className="mt-2" />
+                <Input
+                  value={signatory}
+                  onChange={(e) => setSignatory(e.target.value)}
+                  className="mt-2"
+                />
               </div>
               <div>
                 <Label>الاستشاري المعتمد</Label>
                 <Select value={consultantId} onValueChange={setConsultantId}>
-                  <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {consultants.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.nameAr}</SelectItem>
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nameAr}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label>التاريخ</Label>
-                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mt-2 num" />
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="mt-2 num"
+                />
               </div>
             </div>
             <label className="flex items-center gap-2 text-sm">
@@ -279,7 +341,10 @@ function WizardPage() {
           <div className="space-y-4">
             <Info label="المشروع" value={`${project.nameAr} — ${project.facilityAr}`} />
             <Info label="المرحلة" value={`${stage} — ${stageLabel[stage as Stage].ar}`} />
-            <Info label="الاستشاري" value={consultants.find((c) => c.id === consultantId)?.nameAr ?? "—"} />
+            <Info
+              label="الاستشاري"
+              value={consultants.find((c) => c.id === consultantId)?.nameAr ?? "—"}
+            />
             <Info label="المُوقّع" value={signatory} />
             <Info label="التاريخ" value={date} />
             <div>
@@ -293,7 +358,9 @@ function WizardPage() {
                   </li>
                 ))}
                 {Object.keys(files).length === 0 && (
-                  <li className="text-xs text-muted-foreground">لا توجد مستندات مرفقة (للعرض التجريبي).</li>
+                  <li className="text-xs text-muted-foreground">
+                    لا توجد مستندات مرفقة (للعرض التجريبي).
+                  </li>
                 )}
               </ul>
             </div>
@@ -339,7 +406,11 @@ function WizardPage() {
                 stage: stage as Stage,
                 submittedAt: today,
                 status: "under_review",
-                documents: Object.values(files).map((f) => ({ name: f.name, size: f.size, type: "pdf" })),
+                documents: Object.values(files).map((f) => ({
+                  name: f.name,
+                  size: f.size,
+                  type: "pdf",
+                })),
               });
               addNotification({
                 type: "submission",
@@ -377,10 +448,20 @@ function Info({ label, value }: { label: string; value: string }) {
 }
 
 function UploadRow({
-  reqId, nameAr, nameEn, directive, required, file, onChange, onRemove,
+  reqId,
+  nameAr,
+  nameEn,
+  directive,
+  required,
+  file,
+  onChange,
+  onRemove,
 }: {
   reqId: string;
-  nameAr: string; nameEn: string; directive: string; required: boolean;
+  nameAr: string;
+  nameEn: string;
+  directive: string;
+  required: boolean;
   file?: FileEntry;
   onChange: (f: FileEntry) => void;
   onRemove: () => void;
@@ -390,11 +471,20 @@ function UploadRow({
     <div className="rounded-xl border border-border bg-background/40 p-4">
       <div className="flex flex-wrap items-center gap-2">
         <div className="font-semibold">{nameAr}</div>
-        <Badge variant="outline" className="num text-[10px] bg-accent/30 border-accent">{directive}</Badge>
+        <Badge variant="outline" className="num text-[10px] bg-accent/30 border-accent">
+          {directive}
+        </Badge>
         {required ? (
-          <Badge variant="outline" className="text-[10px] bg-destructive/10 text-destructive border-destructive/20">مطلوب</Badge>
+          <Badge
+            variant="outline"
+            className="text-[10px] bg-destructive/10 text-destructive border-destructive/20"
+          >
+            مطلوب
+          </Badge>
         ) : (
-          <Badge variant="outline" className="text-[10px]">اختياري</Badge>
+          <Badge variant="outline" className="text-[10px]">
+            اختياري
+          </Badge>
         )}
       </div>
       <div className="text-[11px] text-muted-foreground">{nameEn}</div>
@@ -406,7 +496,11 @@ function UploadRow({
             <span className="font-medium">{file.name}</span>
             <span className="num text-xs text-muted-foreground">{file.size}</span>
           </div>
-          <button onClick={onRemove} className="text-muted-foreground hover:text-destructive" aria-label="إزالة">
+          <button
+            onClick={onRemove}
+            className="text-muted-foreground hover:text-destructive"
+            aria-label="إزالة"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>

@@ -65,7 +65,9 @@ export function AppSidebar() {
     <Sidebar side="left" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${role === "sais" ? "bg-white p-1" : "bg-sidebar-primary text-sidebar-primary-foreground font-bold"}`}>
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${role === "sais" ? "bg-white p-1" : "bg-sidebar-primary text-sidebar-primary-foreground font-bold"}`}
+          >
             {role === "sais" ? (
               <img src={logoUrl} alt="SAIS" className="h-full w-full object-contain" />
             ) : (
@@ -89,7 +91,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => {
                 const isHome = item.to === "/" || item.to === "/portal";
-                const active = isHome ? path === item.to : path === item.to || path.startsWith(item.to + "/");
+                const active = isHome
+                  ? path === item.to
+                  : path === item.to || path.startsWith(item.to + "/");
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>

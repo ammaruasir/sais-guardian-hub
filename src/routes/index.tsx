@@ -33,7 +33,9 @@ function SaisDashboard() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">لوحة معلومات الهيئة</h1>
-          <p className="text-sm text-muted-foreground">نظرة شاملة على المشاريع والمراجعات والامتثال</p>
+          <p className="text-sm text-muted-foreground">
+            نظرة شاملة على المشاريع والمراجعات والامتثال
+          </p>
         </div>
         <div className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground">
           آخر تحديث: قبل دقيقتين
@@ -58,4 +60,3 @@ function SaisDashboard() {
     </div>
   );
 }
-

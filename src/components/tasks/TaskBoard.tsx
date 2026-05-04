@@ -35,21 +35,29 @@ export function TaskBoard({ tasks }: { tasks: Task[] }) {
           return (
             <div
               key={status}
-              onDragOver={(e) => { e.preventDefault(); setHoverCol(status); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setHoverCol(status);
+              }}
               onDragLeave={() => setHoverCol((c) => (c === status ? null : c))}
               onDrop={(e) => onDrop(status, e)}
               className={`rounded-lg border bg-muted/30 p-3 transition ${isHover ? "border-dashed border-primary bg-primary/5" : ""}`}
             >
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-bold">{taskStatusLabel[status]}</h3>
-                <span className="num rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground">{items.length}</span>
+                <span className="num rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground">
+                  {items.length}
+                </span>
               </div>
               <div className="space-y-2">
                 {items.map((t) => (
                   <div
                     key={t.id}
                     draggable
-                    onDragStart={(e) => { e.dataTransfer.setData("text/plain", t.id); setDraggingId(t.id); }}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", t.id);
+                      setDraggingId(t.id);
+                    }}
                     onDragEnd={() => setDraggingId(null)}
                     style={{ opacity: draggingId === t.id ? 0.5 : 1 }}
                   >

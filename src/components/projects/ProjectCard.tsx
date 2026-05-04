@@ -12,12 +12,7 @@ export function ProjectCard({ p }: { p: Project }) {
   const company = companies.find((c) => c.id === p.companyId);
   const reviewer = reviewers.find((r) => r.id === p.reviewerId);
   return (
-    <Link
-      to="/projects/$id"
-      params={{ id: p.id }}
-      draggable={false}
-      className="group block"
-    >
+    <Link to="/projects/$id" params={{ id: p.id }} draggable={false} className="group block">
       <Card className="cursor-grab gap-2 p-3 transition-all hover:shadow-md active:cursor-grabbing">
         <div className="flex items-start justify-between gap-2">
           <h4 className="line-clamp-2 text-sm font-semibold leading-tight">{p.nameAr}</h4>
@@ -37,7 +32,9 @@ export function ProjectCard({ p }: { p: Project }) {
         </div>
         <div className="flex items-center gap-2 border-t border-border/60 pt-2">
           <Avatar className="h-6 w-6">
-            <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">{reviewer?.initials}</AvatarFallback>
+            <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
+              {reviewer?.initials}
+            </AvatarFallback>
           </Avatar>
           <span className="truncate text-xs text-muted-foreground">{reviewer?.nameAr}</span>
         </div>

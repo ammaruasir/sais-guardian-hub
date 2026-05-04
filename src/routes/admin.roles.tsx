@@ -11,12 +11,15 @@ import { PermissionsMatrix } from "@/components/admin/roles/PermissionsMatrix";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import type { Role } from "@/data/admin";
 import { toast } from "sonner";
+import { useRole } from "@/context/RoleContext";
+import { NoAccess } from "@/components/common/NoAccess";
 
 export const Route = createFileRoute("/admin/roles")({
   component: AdminRolesPage,
 });
 
 function AdminRolesPage() {
+  const { hasPermission, currentUser } = useRole();
   const roles = useAppStore((s) => s.roles);
   const deleteRole = useAppStore((s) => s.deleteRole);
   const addAudit = useAppStore((s) => s.addAudit);
@@ -24,10 +27,17 @@ function AdminRolesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editRole, setEditRole] = useState<Role | null>(null);
   const [delRole, setDelRole] = useState<Role | null>(null);
+  if (!hasPermission("users.view")) return <NoAccess />;
 
   const handleDelete = (r: Role) => {
     deleteRole(r.key);
-    addAudit({ user: "Admin User", type: "حذف دور", description: `حذف الدور ${r.nameAr}`, page: "admin/roles", level: "warning" });
+    addAudit({
+      user: currentUser.name,
+      type: "حذف دور",
+      description: `حذف الدور ${r.nameAr}`,
+      page: "admin/roles",
+      level: "warning",
+    });
     toast.success("تم الحذف بنجاح ✓");
   };
 
@@ -36,7 +46,9 @@ function AdminRolesPage() {
       <Toaster position="top-center" />
       <header>
         <h1 className="text-2xl font-bold">الصلاحيات والأدوار</h1>
-        <p className="text-sm text-muted-foreground">إدارة مصفوفة الصلاحيات للأدوار المختلفة في النظام</p>
+        <p className="text-sm text-muted-foreground">
+          إدارة مصفوفة الصلاحيات للأدوار المختلفة في النظام
+        </p>
       </header>
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -80,12 +92,18 @@ function AdminRolesPage() {
       </Tabs>
 
       <RoleFormDialog open={createOpen} onOpenChange={setCreateOpen} />
-      <RoleFormDialog open={!!editRole} onOpenChange={(v) => !v && setEditRole(null)} role={editRole} />
+      <RoleFormDialog
+        open={!!editRole}
+        onOpenChange={(v) => !v && setEditRole(null)}
+        role={editRole}
+      />
       <ConfirmDialog
         open={!!delRole}
         onOpenChange={(v) => !v && setDelRole(null)}
         title="تأكيد حذف الدور"
-        description={delRole ? `سيتم حذف الدور "${delRole.nameAr}" وإزالة عموده من مصفوفة الصلاحيات.` : ""}
+        description={
+          delRole ? `سيتم حذف الدور "${delRole.nameAr}" وإزالة عموده من مصفوفة الصلاحيات.` : ""
+        }
         confirmText="حذف"
         onConfirm={() => delRole && handleDelete(delRole)}
       />

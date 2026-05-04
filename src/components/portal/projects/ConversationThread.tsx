@@ -37,13 +37,20 @@ export function ConversationThread({ projectId }: { projectId: string }) {
               <div
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                  isCompany ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground",
+                  isCompany
+                    ? "bg-secondary text-secondary-foreground"
+                    : "bg-primary text-primary-foreground",
                 )}
               >
                 {isCompany ? <Building2 className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
               </div>
               <div className={cn("max-w-[75%]", isCompany ? "text-start" : "text-end")}>
-                <div className={cn("flex items-center gap-2 text-[11px] text-muted-foreground", isCompany && "flex-row-reverse")}>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 text-[11px] text-muted-foreground",
+                    isCompany && "flex-row-reverse",
+                  )}
+                >
                   <span className="font-semibold">{m.senderName}</span>
                   <span className="num">{m.ts}</span>
                 </div>

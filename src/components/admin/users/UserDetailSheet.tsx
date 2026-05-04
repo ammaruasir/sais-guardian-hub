@@ -1,4 +1,10 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/appStore";
@@ -44,19 +50,27 @@ export function UserDetailSheet({
           </div>
           <div className="space-y-2 rounded-lg border p-3 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground flex items-center gap-2"><Shield className="h-4 w-4" /> الدور</span>
+              <span className="text-muted-foreground flex items-center gap-2">
+                <Shield className="h-4 w-4" /> الدور
+              </span>
               <span className="font-medium">{role?.nameAr}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground flex items-center gap-2"><Building className="h-4 w-4" /> الإدارة</span>
+              <span className="text-muted-foreground flex items-center gap-2">
+                <Building className="h-4 w-4" /> الإدارة
+              </span>
               <span className="font-medium">{user.department}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground flex items-center gap-2"><Mail className="h-4 w-4" /> البريد</span>
+              <span className="text-muted-foreground flex items-center gap-2">
+                <Mail className="h-4 w-4" /> البريد
+              </span>
               <span className="font-medium">{user.email}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground flex items-center gap-2"><Activity className="h-4 w-4" /> الأحداث الأمنية</span>
+              <span className="text-muted-foreground flex items-center gap-2">
+                <Activity className="h-4 w-4" /> الأحداث الأمنية
+              </span>
               <span className="font-medium">{user.events}</span>
             </div>
           </div>
@@ -70,7 +84,9 @@ export function UserDetailSheet({
                   <li key={e.id} className="rounded-md border p-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{e.type}</span>
-                      <span className="text-muted-foreground">{new Date(e.ts).toLocaleString("ar-SA")}</span>
+                      <span className="text-muted-foreground">
+                        {new Date(e.ts).toLocaleString("ar-SA")}
+                      </span>
                     </div>
                     <div className="mt-1 text-muted-foreground">{e.description}</div>
                   </li>

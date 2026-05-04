@@ -77,7 +77,11 @@ type State = {
   // Submissions
   addSubmission: (s: Submission) => void;
   updateSubmission: (id: string, patch: Partial<Submission>) => void;
-  updateSubmissionDecision: (id: string, decision: "approved" | "additional_docs" | "rejected", comments?: string) => void;
+  updateSubmissionDecision: (
+    id: string,
+    decision: "approved" | "additional_docs" | "rejected",
+    comments?: string,
+  ) => void;
 
   // Notifications
   addNotification: (n: Omit<AppNotification, "id" | "read"> & { read?: boolean }) => void;
@@ -115,8 +119,10 @@ export const useAppStore = create<State>()(
       facilities: seedFacilities,
 
       // Admin
-      addUser: (u) => set((s) => ({ users: [{ ...u, id: `u${Date.now()}`, events: 0 }, ...s.users] })),
-      updateUser: (id, patch) => set((s) => ({ users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)) })),
+      addUser: (u) =>
+        set((s) => ({ users: [{ ...u, id: `u${Date.now()}`, events: 0 }, ...s.users] })),
+      updateUser: (id, patch) =>
+        set((s) => ({ users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)) })),
       deleteUser: (id) => set((s) => ({ users: s.users.filter((u) => u.id !== id) })),
 
       addRole: (r) =>
@@ -126,7 +132,8 @@ export const useAppStore = create<State>()(
           for (const k of Object.keys(perms)) perms[k] = { ...perms[k], [r.key]: false };
           return { roles: [...s.roles, newRole], permissions: perms };
         }),
-      updateRole: (key, patch) => set((s) => ({ roles: s.roles.map((r) => (r.key === key ? { ...r, ...patch } : r)) })),
+      updateRole: (key, patch) =>
+        set((s) => ({ roles: s.roles.map((r) => (r.key === key ? { ...r, ...patch } : r)) })),
       deleteRole: (key) =>
         set((s) => {
           const perms: PermMatrix = {};
@@ -137,11 +144,16 @@ export const useAppStore = create<State>()(
           return { roles: s.roles.filter((r) => r.key !== key), permissions: perms };
         }),
       setPermission: (perm, roleKey, value) =>
-        set((s) => ({ permissions: { ...s.permissions, [perm]: { ...s.permissions[perm], [roleKey]: value } } })),
+        set((s) => ({
+          permissions: { ...s.permissions, [perm]: { ...s.permissions[perm], [roleKey]: value } },
+        })),
 
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
 
-      addAudit: (e) => set((s) => ({ audit: [{ ...e, id: `ev${Date.now()}`, ts: new Date().toISOString() }, ...s.audit] })),
+      addAudit: (e) =>
+        set((s) => ({
+          audit: [{ ...e, id: `ev${Date.now()}`, ts: new Date().toISOString() }, ...s.audit],
+        })),
       deleteAudit: (id) => set((s) => ({ audit: s.audit.filter((e) => e.id !== id) })),
 
       // Projects
@@ -155,7 +167,13 @@ export const useAppStore = create<State>()(
             if (p.id !== id) return p;
             // Auto-advance on intermediate approval
             if (status === "approved" && p.stage < 4) {
-              return { ...p, stage: ((p.stage + 1) as Stage), status: "awaiting_submission", daysInStage: 0, overdue: false };
+              return {
+                ...p,
+                stage: (p.stage + 1) as Stage,
+                status: "awaiting_submission",
+                daysInStage: 0,
+                overdue: false,
+              };
             }
             return { ...p, status, ...(stage ? { stage } : {}) };
           }),
@@ -163,12 +181,14 @@ export const useAppStore = create<State>()(
 
       // Companies
       addCompany: (c) => set((s) => ({ companies: [c, ...s.companies] })),
-      updateCompany: (id, patch) => set((s) => ({ companies: s.companies.map((c) => (c.id === id ? { ...c, ...patch } : c)) })),
+      updateCompany: (id, patch) =>
+        set((s) => ({ companies: s.companies.map((c) => (c.id === id ? { ...c, ...patch } : c)) })),
       deleteCompany: (id) => set((s) => ({ companies: s.companies.filter((c) => c.id !== id) })),
 
       // Tasks
       addTask: (t) => set((s) => ({ tasks: [t, ...s.tasks] })),
-      updateTask: (id, patch) => set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
+      updateTask: (id, patch) =>
+        set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
       deleteTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
       updateTaskStatus: (id, status) =>
         set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, status } : t)) })),
@@ -176,12 +196,21 @@ export const useAppStore = create<State>()(
       // Submissions
       addSubmission: (sub) => set((s) => ({ submissions: [sub, ...s.submissions] })),
       updateSubmission: (id, patch) =>
-        set((s) => ({ submissions: s.submissions.map((x) => (x.id === id ? { ...x, ...patch } : x)) })),
+        set((s) => ({
+          submissions: s.submissions.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+        })),
       updateSubmissionDecision: (id, decision, comments) => {
         const sub = get().submissions.find((x) => x.id === id);
         set((s) => ({
           submissions: s.submissions.map((x) =>
-            x.id === id ? { ...x, decision, comments: comments ?? x.comments, reviewedAt: new Date().toISOString().slice(0, 10) } : x,
+            x.id === id
+              ? {
+                  ...x,
+                  decision,
+                  comments: comments ?? x.comments,
+                  reviewedAt: new Date().toISOString().slice(0, 10),
+                }
+              : x,
           ),
         }));
         if (sub) {
@@ -197,28 +226,39 @@ export const useAppStore = create<State>()(
       // Notifications
       addNotification: (n) =>
         set((s) => ({
-          notifications: [{ id: `n${Date.now()}`, read: false, ...n } as AppNotification, ...s.notifications],
+          notifications: [
+            { id: `n${Date.now()}`, read: false, ...n } as AppNotification,
+            ...s.notifications,
+          ],
         })),
       markAsRead: (id) =>
-        set((s) => ({ notifications: s.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)) })),
+        set((s) => ({
+          notifications: s.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
+        })),
       markAllAsRead: (role) =>
         set((s) => ({
           notifications: s.notifications.map((n) =>
             n.forRole === role || n.forRole === "both" ? { ...n, read: true } : n,
           ),
         })),
-      deleteNotification: (id) => set((s) => ({ notifications: s.notifications.filter((n) => n.id !== id) })),
+      deleteNotification: (id) =>
+        set((s) => ({ notifications: s.notifications.filter((n) => n.id !== id) })),
       getUnreadCount: (role) =>
-        get().notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
+        get().notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both"))
+          .length,
 
       // Activity
-      addActivity: (a) => set((s) => ({ activity: [{ ...a, id: `a${Date.now()}` }, ...s.activity] })),
+      addActivity: (a) =>
+        set((s) => ({ activity: [{ ...a, id: `a${Date.now()}` }, ...s.activity] })),
 
       // Consultants
       addConsultant: (c) => set((s) => ({ consultants: [c, ...s.consultants] })),
       updateConsultant: (id, patch) =>
-        set((s) => ({ consultants: s.consultants.map((c) => (c.id === id ? { ...c, ...patch } : c)) })),
-      deleteConsultant: (id) => set((s) => ({ consultants: s.consultants.filter((c) => c.id !== id) })),
+        set((s) => ({
+          consultants: s.consultants.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+        })),
+      deleteConsultant: (id) =>
+        set((s) => ({ consultants: s.consultants.filter((c) => c.id !== id) })),
 
       resetDemo: () =>
         set({

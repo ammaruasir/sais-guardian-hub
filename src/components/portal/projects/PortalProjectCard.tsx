@@ -13,7 +13,11 @@ function nextAction(p: Project) {
     case "approved":
       return p.stage === 4
         ? { tone: "success", icon: CheckCircle2, text: "المشروع مكتمل ✅" }
-        : { tone: "success", icon: CheckCircle2, text: "تم اعتماد المرحلة — يمكن الانتقال للمرحلة التالية" };
+        : {
+            tone: "success",
+            icon: CheckCircle2,
+            text: "تم اعتماد المرحلة — يمكن الانتقال للمرحلة التالية",
+          };
     case "pending_final":
       return { tone: "warning", icon: Clock, text: "بانتظار الاعتماد النهائي" };
     case "awaiting_submission":
@@ -54,7 +58,12 @@ export function PortalProjectCard({ p }: { p: Project }) {
         <PortalStageStepper current={p.stage} compact />
       </div>
 
-      <div className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium", toneClass[na.tone])}>
+      <div
+        className={cn(
+          "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium",
+          toneClass[na.tone],
+        )}
+      >
         <Icon className="h-4 w-4 shrink-0" />
         <span>{na.text}</span>
       </div>

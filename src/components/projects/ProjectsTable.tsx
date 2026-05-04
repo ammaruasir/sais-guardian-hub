@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ArrowLeft, ArrowUpDown } from "lucide-react";
@@ -23,17 +30,25 @@ export function ProjectsTable({ projects }: { projects: Project[] }) {
   }));
   const sorted = [...enrich].sort((a, b) => {
     const av: string | number =
-      sortKey === "company" ? a.company
-      : sortKey === "reviewer" ? a.reviewer?.nameAr ?? ""
-      : sortKey === "stage" ? a.p.stage
-      : sortKey === "sector" ? sectorLabel[a.p.sector].ar
-      : (a.p as any)[sortKey];
+      sortKey === "company"
+        ? a.company
+        : sortKey === "reviewer"
+          ? (a.reviewer?.nameAr ?? "")
+          : sortKey === "stage"
+            ? a.p.stage
+            : sortKey === "sector"
+              ? sectorLabel[a.p.sector].ar
+              : (a.p as unknown as Record<string, string | number>)[sortKey];
     const bv: string | number =
-      sortKey === "company" ? b.company
-      : sortKey === "reviewer" ? b.reviewer?.nameAr ?? ""
-      : sortKey === "stage" ? b.p.stage
-      : sortKey === "sector" ? sectorLabel[b.p.sector].ar
-      : (b.p as any)[sortKey];
+      sortKey === "company"
+        ? b.company
+        : sortKey === "reviewer"
+          ? (b.reviewer?.nameAr ?? "")
+          : sortKey === "stage"
+            ? b.p.stage
+            : sortKey === "sector"
+              ? sectorLabel[b.p.sector].ar
+              : (b.p as unknown as Record<string, string | number>)[sortKey];
     if (av === bv) return 0;
     return (av > bv ? 1 : -1) * (asc ? 1 : -1);
   });
@@ -45,7 +60,10 @@ export function ProjectsTable({ projects }: { projects: Project[] }) {
           className="inline-flex items-center gap-1 hover:text-foreground"
           onClick={() => {
             if (sortKey === key) setAsc(!asc);
-            else { setSortKey(key); setAsc(true); }
+            else {
+              setSortKey(key);
+              setAsc(true);
+            }
           }}
         >
           {label}
@@ -82,10 +100,16 @@ export function ProjectsTable({ projects }: { projects: Project[] }) {
                   <span className="text-xs">{stageLabel[p.stage].ar}</span>
                 </div>
               </TableCell>
-              <TableCell><StatusChip s={p.status} /></TableCell>
+              <TableCell>
+                <StatusChip s={p.status} />
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6"><AvatarFallback className="bg-primary text-[10px] text-primary-foreground">{reviewer?.initials}</AvatarFallback></Avatar>
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="bg-primary text-[10px] text-primary-foreground">
+                      {reviewer?.initials}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="text-xs">{reviewer?.nameAr}</span>
                 </div>
               </TableCell>

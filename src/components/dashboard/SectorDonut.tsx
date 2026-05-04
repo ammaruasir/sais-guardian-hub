@@ -20,7 +20,14 @@ export function SectorDonut() {
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" innerRadius={50} outerRadius={85} paddingAngle={2}>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={50}
+                outerRadius={85}
+                paddingAngle={2}
+              >
                 {data.map((d, i) => (
                   <Cell key={i} fill={d.color} stroke="var(--card)" strokeWidth={2} />
                 ))}

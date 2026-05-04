@@ -13,7 +13,9 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border/60 py-10 text-center text-muted-foreground ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border/60 py-10 text-center text-muted-foreground ${className}`}
+    >
       <Icon className="h-8 w-8 opacity-60" />
       <div className="text-sm font-medium text-foreground">{message}</div>
       {hint && <div className="text-xs">{hint}</div>}

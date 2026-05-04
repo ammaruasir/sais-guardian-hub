@@ -21,6 +21,14 @@ export const ncaControls: NcaControl[] = [
 
 export const ncaStatusLabel: Record<NcaStatus, { ar: string; cls: string; dot: string }> = {
   compliant: { ar: "مطبق", cls: "bg-success/15 text-success border-success/30", dot: "bg-success" },
-  partial: { ar: "مطبق جزئياً", cls: "bg-warning/20 text-warning-foreground border-warning/30", dot: "bg-warning" },
-  non_compliant: { ar: "غير مطبق", cls: "bg-destructive/10 text-destructive border-destructive/30", dot: "bg-destructive" },
+  partial: {
+    ar: "مطبق جزئياً",
+    cls: "bg-warning/20 text-warning-foreground border-warning/30",
+    dot: "bg-warning",
+  },
+  non_compliant: {
+    ar: "غير مطبق",
+    cls: "bg-destructive/10 text-destructive border-destructive/30",
+    dot: "bg-destructive",
+  },
 };

@@ -3,7 +3,13 @@ import { requirementsByStage } from "@/data/requirements";
 import type { Stage } from "@/data";
 import type { Submission } from "@/data/submissions";
 
-export function RequirementsChecklist({ stage, currentSubmission }: { stage: Stage; currentSubmission?: Submission }) {
+export function RequirementsChecklist({
+  stage,
+  currentSubmission,
+}: {
+  stage: Stage;
+  currentSubmission?: Submission;
+}) {
   const reqs = requirementsByStage[stage];
   const submittedDocs = currentSubmission?.documents.length ?? 0;
   return (
@@ -18,7 +24,10 @@ export function RequirementsChecklist({ stage, currentSubmission }: { stage: Sta
         {reqs.map((r, i) => {
           const ok = i < submittedDocs;
           return (
-            <li key={r.code} className="flex items-center gap-3 rounded-md border border-border/60 bg-background px-3 py-2">
+            <li
+              key={r.code}
+              className="flex items-center gap-3 rounded-md border border-border/60 bg-background px-3 py-2"
+            >
               {ok ? (
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />
               ) : (

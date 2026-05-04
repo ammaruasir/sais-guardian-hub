@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { UsersTable } from "@/components/admin/users/UsersTable";
+import { useRole } from "@/context/RoleContext";
+import { NoAccess } from "@/components/common/NoAccess";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsersPage,
 });
 
 function AdminUsersPage() {
+  const { hasPermission } = useRole();
+  if (!hasPermission("users.view")) return <NoAccess />;
   return (
     <div className="space-y-6">
       <Toaster position="top-center" />

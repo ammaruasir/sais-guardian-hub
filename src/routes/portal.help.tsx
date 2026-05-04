@@ -46,7 +46,9 @@ function HelpPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">المساعدة والدعم</h1>
-        <p className="text-sm text-muted-foreground">إجابات على الأسئلة الشائعة وقنوات التواصل مع فريق الهيئة</p>
+        <p className="text-sm text-muted-foreground">
+          إجابات على الأسئلة الشائعة وقنوات التواصل مع فريق الهيئة
+        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

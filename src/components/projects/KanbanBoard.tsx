@@ -17,8 +17,11 @@ export function KanbanBoard({ projects }: { projects: Project[] }) {
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain") || draggingId;
     if (id) {
-      updateProjectStatus(id, "under_review", s);
-      toast.success(`تم نقل المشروع إلى: ${stageLabel[s].ar}`);
+      const project = projects.find((p) => p.id === id);
+      if (project) {
+        updateProjectStatus(id, project.status, s);
+        toast.success(`تم نقل المشروع إلى: ${stageLabel[s].ar}`);
+      }
     }
     setDraggingId(null);
     setHoverStage(null);
@@ -32,7 +35,10 @@ export function KanbanBoard({ projects }: { projects: Project[] }) {
         return (
           <div
             key={s}
-            onDragOver={(e) => { e.preventDefault(); setHoverStage(s); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setHoverStage(s);
+            }}
             onDragLeave={() => setHoverStage((c) => (c === s ? null : c))}
             onDrop={(e) => onDrop(s, e)}
             className={`flex min-h-[200px] flex-col rounded-xl border border-border bg-muted/40 p-3 transition ${isHover ? "border-dashed border-primary bg-primary/5" : ""}`}
@@ -54,7 +60,10 @@ export function KanbanBoard({ projects }: { projects: Project[] }) {
                   <div
                     key={p.id}
                     draggable
-                    onDragStart={(e) => { e.dataTransfer.setData("text/plain", p.id); setDraggingId(p.id); }}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", p.id);
+                      setDraggingId(p.id);
+                    }}
                     onDragEnd={() => setDraggingId(null)}
                     style={{ opacity: draggingId === p.id ? 0.5 : 1 }}
                   >

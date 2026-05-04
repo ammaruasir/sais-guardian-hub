@@ -30,7 +30,11 @@ export function PermissionsMatrix() {
                 )}
               >
                 <div className="text-xs">{r.nameAr}</div>
-                {r.system && <Badge variant="secondary" className="mt-1 text-[10px]">نظام</Badge>}
+                {r.system && (
+                  <Badge variant="secondary" className="mt-1 text-[10px]">
+                    نظام
+                  </Badge>
+                )}
               </th>
             ))}
           </tr>
@@ -50,7 +54,9 @@ export function PermissionsMatrix() {
                 .filter((p) => p.module === mod.name)
                 .map((p, idx) => (
                   <tr key={p.key} className={cn(idx % 2 === 1 && "bg-muted/10")}>
-                    <td className="sticky end-0 px-4 py-2 text-end border-s bg-inherit">{p.labelAr}</td>
+                    <td className="sticky end-0 px-4 py-2 text-end border-s bg-inherit">
+                      {p.labelAr}
+                    </td>
                     {roles.map((r) => {
                       const v = perms[p.key]?.[r.key] ?? false;
                       return (

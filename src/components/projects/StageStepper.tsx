@@ -24,11 +24,15 @@ export function StageStepper({ current }: { current: Stage }) {
                 {done ? <Check className="h-4 w-4" /> : <span className="num">{s}</span>}
               </div>
               <div className="text-center text-[11px] font-medium leading-tight md:text-xs">
-                <div className={cn(active ? "text-foreground" : "text-muted-foreground")}>{stageLabel[s].ar}</div>
+                <div className={cn(active ? "text-foreground" : "text-muted-foreground")}>
+                  {stageLabel[s].ar}
+                </div>
               </div>
             </div>
             {i < stages.length - 1 && (
-              <div className={cn("h-0.5 flex-1 rounded", s < current ? "bg-success" : "bg-border")} />
+              <div
+                className={cn("h-0.5 flex-1 rounded", s < current ? "bg-success" : "bg-border")}
+              />
             )}
           </div>
         );

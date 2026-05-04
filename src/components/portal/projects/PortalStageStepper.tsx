@@ -37,11 +37,20 @@ export function PortalStageStepper({
                     !done && !active && "border-border bg-muted text-muted-foreground",
                   )}
                 >
-                  {done ? <Check className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} /> : <span className="num">{s}</span>}
+                  {done ? (
+                    <Check className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
+                  ) : (
+                    <span className="num">{s}</span>
+                  )}
                 </div>
               </div>
               <div className="text-center text-[11px] leading-tight">
-                <div className={cn("font-medium", active ? "text-foreground" : "text-muted-foreground")}>
+                <div
+                  className={cn(
+                    "font-medium",
+                    active ? "text-foreground" : "text-muted-foreground",
+                  )}
+                >
                   {stageLabel[s].ar}
                 </div>
                 {m?.approvedAt && (
@@ -53,7 +62,12 @@ export function PortalStageStepper({
               </div>
             </div>
             {i < stages.length - 1 && (
-              <div className={cn("mt-4 h-0.5 flex-1 rounded", s < current ? "bg-success" : "bg-border")} />
+              <div
+                className={cn(
+                  "mt-4 h-0.5 flex-1 rounded",
+                  s < current ? "bg-success" : "bg-border",
+                )}
+              />
             )}
           </div>
         );
