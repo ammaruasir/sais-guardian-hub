@@ -107,12 +107,12 @@ export function UserFormDialog({ open, onOpenChange, user }: Props) {
                 type={showPwd ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10"
+                className="ps-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPwd((v) => !v)}
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                className="absolute start-2 top-1/2 -translate-y-1/2 text-muted-foreground"
               >
                 {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

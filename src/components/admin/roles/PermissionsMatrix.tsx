@@ -15,7 +15,7 @@ export function PermissionsMatrix() {
       <table className="w-full min-w-[800px] text-sm" dir="rtl">
         <thead className="bg-muted/50">
           <tr>
-            <th className="sticky right-0 bg-muted/50 px-4 py-3 text-right border-l">
+            <th className="sticky end-0 bg-muted/50 px-4 py-3 text-right border-s">
               <div className="flex items-center gap-2 font-semibold">
                 <SettingsIcon className="h-4 w-4" />
                 الوحدة / الصلاحية
@@ -25,7 +25,7 @@ export function PermissionsMatrix() {
               <th
                 key={r.key}
                 className={cn(
-                  "px-3 py-3 text-center font-semibold border-l last:border-l-0 min-w-[120px]",
+                  "px-3 py-3 text-center font-semibold border-s last:border-s-0 min-w-[120px]",
                   r.key === "super_admin" && "bg-primary/10",
                 )}
               >
@@ -50,14 +50,14 @@ export function PermissionsMatrix() {
                 .filter((p) => p.module === mod.name)
                 .map((p, idx) => (
                   <tr key={p.key} className={cn(idx % 2 === 1 && "bg-muted/10")}>
-                    <td className="sticky right-0 px-4 py-2 text-right border-l bg-inherit">{p.labelAr}</td>
+                    <td className="sticky end-0 px-4 py-2 text-right border-s bg-inherit">{p.labelAr}</td>
                     {roles.map((r) => {
                       const v = perms[p.key]?.[r.key] ?? false;
                       return (
                         <td
                           key={r.key}
                           className={cn(
-                            "px-3 py-2 text-center border-l last:border-l-0",
+                            "px-3 py-2 text-center border-s last:border-s-0",
                             r.key === "super_admin" && "bg-primary/5",
                           )}
                         >

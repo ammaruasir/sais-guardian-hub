@@ -157,7 +157,7 @@ function RequirementRow({
           variant="outline"
           onClick={() => toast.success(state === "rejected" ? "تم فتح إعادة الرفع" : "تم فتح نافذة الرفع")}
         >
-          <Upload className="ml-1 h-3.5 w-3.5" /> {state === "rejected" ? "إعادة الرفع" : "رفع"}
+          <Upload className="ms-1 h-3.5 w-3.5" /> {state === "rejected" ? "إعادة الرفع" : "رفع"}
         </Button>
       )}
     </div>

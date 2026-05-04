@@ -74,7 +74,7 @@ function SettingsPage() {
         </Card>
       </div>
 
-      <div className="fixed bottom-6 left-6 z-30">
+      <div className="fixed bottom-6 start-6 z-30">
         <Button
           size="lg"
           className="shadow-xl gap-2"
@@ -184,9 +184,9 @@ function SecurityTab() {
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold">نسبة الامتثال: <span className="num">{compliancePct}%</span></span>
             <div className="flex gap-2">
-              <Badge className="bg-success/15 text-success border-success/30" variant="outline"><span className="num ml-1">{compliant}</span> مطبق</Badge>
-              <Badge className="bg-warning/20 text-warning-foreground border-warning/30" variant="outline"><span className="num ml-1">{partial}</span> مطبق جزئياً</Badge>
-              <Badge className="bg-destructive/10 text-destructive border-destructive/30" variant="outline"><span className="num ml-1">{nonCompliant}</span> غير مطبق</Badge>
+              <Badge className="bg-success/15 text-success border-success/30" variant="outline"><span className="num ms-1">{compliant}</span> مطبق</Badge>
+              <Badge className="bg-warning/20 text-warning-foreground border-warning/30" variant="outline"><span className="num ms-1">{partial}</span> مطبق جزئياً</Badge>
+              <Badge className="bg-destructive/10 text-destructive border-destructive/30" variant="outline"><span className="num ms-1">{nonCompliant}</span> غير مطبق</Badge>
             </div>
           </div>
           <Progress value={compliancePct} className="mt-3 h-2" />

@@ -44,7 +44,7 @@ export function ActionRequiredCards() {
       {items.map((it) => (
         <div
           key={it.key}
-          className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm border-r-4"
+          className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm border-e-4"
           style={{ borderRightColor: it.borderVar }}
         >
           <div className="flex items-start gap-3">

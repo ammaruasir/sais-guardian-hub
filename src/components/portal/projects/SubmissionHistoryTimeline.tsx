@@ -15,13 +15,13 @@ export function SubmissionHistoryTimeline({ items }: { items: Submission[] }) {
   const sorted = [...items].sort((a, b) => (a.submittedAt < b.submittedAt ? 1 : -1));
   return (
     <div className="relative">
-      <div className="absolute right-4 top-2 bottom-2 w-px bg-border" />
+      <div className="absolute end-4 top-2 bottom-2 w-px bg-border" />
       <ul className="space-y-5">
         {sorted.map((s) => {
           const reviewer = reviewers.find((r) => r.id === s.reviewerId);
           return (
-            <li key={s.id} className="relative pr-12">
-              <div className="absolute right-2 top-3 h-5 w-5 rounded-full border-2 border-primary bg-card" />
+            <li key={s.id} className="relative pe-12">
+              <div className="absolute end-2 top-3 h-5 w-5 rounded-full border-2 border-primary bg-card" />
               <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="font-semibold">المرحلة {s.stage} — {stageLabel[s.stage].ar}</div>
@@ -41,7 +41,7 @@ export function SubmissionHistoryTimeline({ items }: { items: Submission[] }) {
                   </ul>
                 </div>
                 {s.comments && (
-                  <div className="mt-3 rounded-md border-r-2 border-secondary bg-muted/40 px-3 py-2 text-xs">
+                  <div className="mt-3 rounded-md border-e-2 border-secondary bg-muted/40 px-3 py-2 text-xs">
                     <div className="font-semibold text-secondary">{reviewer?.nameAr ?? "المراجع"}</div>
                     <div className="mt-0.5 text-foreground/80">{s.comments}</div>
                   </div>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { projects, companies, type Stage } from "@/data";
-import { getSubmissionsByProject } from "@/data/submissions";
+import { type Stage } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClassificationBadge, SectorBadge, StatusChip } from "@/components/projects/Badges";
 import { PortalStageStepper } from "@/components/portal/projects/PortalStageStepper";
@@ -22,10 +22,13 @@ export const Route = createFileRoute("/portal/projects/$id")({
 
 function PortalProjectDetailPage() {
   const { id } = Route.useParams();
+  const projects = useAppStore((s) => s.projects);
+  const companies = useAppStore((s) => s.companies);
+  const submissions = useAppStore((s) => s.submissions);
   const project = projects.find((p) => p.id === id && p.companyId === "aramco");
   if (!project) throw notFound();
   const company = companies.find((c) => c.id === project.companyId);
-  const subs = getSubmissionsByProject(project.id);
+  const subs = submissions.filter((s) => s.projectId === project.id);
   const currentSub = subs.find((s) => s.stage === project.stage);
 
   const meta: Partial<Record<Stage, { approvedAt?: string; subLabel?: string }>> = {};

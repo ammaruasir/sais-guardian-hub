@@ -3,10 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { GripVertical, Clock } from "lucide-react";
 import type { Project } from "@/data";
-import { companies, reviewers } from "@/data";
+import { reviewers } from "@/data";
+import { useAppStore } from "@/store/appStore";
 import { ClassificationBadge, SectorBadge, StatusChip } from "./Badges";
 
 export function ProjectCard({ p }: { p: Project }) {
+  const companies = useAppStore((s) => s.companies);
   const company = companies.find((c) => c.id === p.companyId);
   const reviewer = reviewers.find((r) => r.id === p.reviewerId);
   return (

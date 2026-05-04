@@ -28,7 +28,7 @@ export function RequirementCard({ item }: { item: PortalRequirement }) {
           <div className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{item.descriptionAr}</div>
         )}
         <Button variant="outline" size="sm" className="mt-3 h-8 text-xs">
-          <Download className="ml-1 h-3.5 w-3.5" /> تحميل النموذج
+          <Download className="ms-1 h-3.5 w-3.5" /> تحميل النموذج
         </Button>
       </div>
     </div>

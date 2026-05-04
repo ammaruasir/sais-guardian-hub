@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ClassificationBadge, SectorBadge, StatusChip } from "@/components/projects/Badges";
 import { ComplianceGauge, complianceBadgeFor } from "@/components/companies/ComplianceGauge";
 import { FacilityCard } from "@/components/companies/FacilityCard";
-import { companies, projects, stageLabel } from "@/data";
+import { stageLabel } from "@/data";
 import { facilities, companyComplianceScore, companyAssignedConsultant } from "@/data/facilities";
-import { consultants } from "@/data/consultants";
+import { useAppStore } from "@/store/appStore";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/companies/$id")({
@@ -16,6 +16,9 @@ export const Route = createFileRoute("/companies/$id")({
 
 function CompanyDetailPage() {
   const { id } = Route.useParams();
+  const companies = useAppStore((s) => s.companies);
+  const projects = useAppStore((s) => s.projects);
+  const consultants = useAppStore((s) => s.consultants);
   const company = companies.find((c) => c.id === id);
   if (!company) {
     return (

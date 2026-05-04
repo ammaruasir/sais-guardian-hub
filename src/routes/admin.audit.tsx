@@ -97,7 +97,7 @@ function AuditPage() {
           size="sm"
           onClick={() => { setBump((x) => x + 1); toast.success("تم تحديث السجل"); }}
         >
-          <RefreshCw className="ml-1 h-4 w-4" />
+          <RefreshCw className="ms-1 h-4 w-4" />
           تحديث
         </Button>
       </header>
@@ -152,8 +152,8 @@ function AuditPage() {
       {/* Filter bar */}
       <div className="flex flex-wrap gap-2">
         <div className="relative max-w-xs flex-1">
-          <Search className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="بحث في الأحداث..." className="pr-8" />
+          <Search className="absolute end-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} placeholder="بحث في الأحداث..." className="pe-8" />
         </div>
         <Select value={user} onValueChange={(v) => { setUser(v); setPage(1); }}>
           <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>

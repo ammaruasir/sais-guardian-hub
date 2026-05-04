@@ -5,7 +5,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Pencil, Trash2 } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
-import { getSubmissionsByProject } from "@/data/submissions";
 import { getActivitiesByProject, getNotesByProject } from "@/data/notes";
 import { StageStepper } from "@/components/projects/StageStepper";
 import { SubmissionList } from "@/components/projects/SubmissionList";
@@ -43,8 +42,9 @@ function ProjectDetailPage() {
   const [confirmDel, setConfirmDel] = useState(false);
   const [reviewing, setReviewing] = useState<Submission | null>(null);
 
+  const allSubs = useAppStore((s) => s.submissions);
   if (!project) throw notFound();
-  const subs = getSubmissionsByProject(id);
+  const subs = allSubs.filter((s) => s.projectId === id);
   const currentSub = subs.find((s) => s.stage === project.stage);
   const history = subs.filter((s) => s.id !== currentSub?.id);
 
@@ -73,8 +73,8 @@ function ProjectDetailPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="ml-1 h-4 w-4" />تعديل</Button>
-              <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10" onClick={() => setConfirmDel(true)}><Trash2 className="ml-1 h-4 w-4" />حذف</Button>
+              <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}><Pencil className="ms-1 h-4 w-4" />تعديل</Button>
+              <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10" onClick={() => setConfirmDel(true)}><Trash2 className="ms-1 h-4 w-4" />حذف</Button>
               <Button variant="outline" size="sm">تصدير ملف المشروع</Button>
             </div>
           </div>

@@ -85,13 +85,13 @@ export function TopBar() {
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur md:px-6">
       <SidebarTrigger className="shrink-0" />
       <Breadcrumbs />
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ms-auto flex items-center gap-3">
         <RoleSwitcher />
         <Button variant="ghost" size="icon" className="relative" asChild>
           <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
             <Bell className="h-5 w-5" />
             {unread > 0 && (
-              <Badge className="absolute -right-1 -top-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
+              <Badge className="absolute -end-1 -top-1 h-5 min-w-5 rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
                 {unread}
               </Badge>
             )}
