@@ -13,7 +13,7 @@ export function ProjectCard({ p }: { p: Project }) {
     <Link
       to="/projects/$id"
       params={{ id: p.id }}
-      draggable
+      draggable={false}
       className="group block"
     >
       <Card className="cursor-grab gap-2 p-3 transition-all hover:shadow-md active:cursor-grabbing">
