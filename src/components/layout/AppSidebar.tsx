@@ -28,6 +28,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
+import logoUrl from "@/assets/logo.svg";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
@@ -61,11 +62,17 @@ export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <Sidebar side="right" collapsible="icon">
+    <Sidebar side="left" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
-            {role === "sais" ? "SA" : <Building2 className="h-5 w-5" />}
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${role === "sais" ? "bg-white p-1" : "bg-sidebar-primary text-sidebar-primary-foreground font-bold"}`}
+          >
+            {role === "sais" ? (
+              <img src={logoUrl} alt="SAIS" className="h-full w-full object-contain" />
+            ) : (
+              <Building2 className="h-5 w-5" />
+            )}
           </div>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <div className="truncate text-sm font-bold text-sidebar-foreground">
@@ -125,7 +132,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-3 text-[11px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-        © 2026 SAIS — نموذج توضيحي
+        © 2026 SAIS
       </SidebarFooter>
     </Sidebar>
   );

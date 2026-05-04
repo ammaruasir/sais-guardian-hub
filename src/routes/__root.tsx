@@ -25,8 +25,33 @@ export const Route = createRootRoute({
         name: "description",
         content: "منصة الهيئة العليا للأمن الصناعي لإدارة المشاريع والامتثال.",
       },
+      { property: "og:title", content: "منصة SAIS — الهيئة العليا للأمن الصناعي" },
+      { name: "twitter:title", content: "منصة SAIS — الهيئة العليا للأمن الصناعي" },
+      {
+        property: "og:description",
+        content: "منصة الهيئة العليا للأمن الصناعي لإدارة المشاريع والامتثال.",
+      },
+      {
+        name: "twitter:description",
+        content: "منصة الهيئة العليا للأمن الصناعي لإدارة المشاريع والامتثال.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5bb895dd-a962-4319-b689-74ea2f1a07b6/id-preview-8e7eff3d--d34eef2c-9d24-4646-bb2f-3fd4839aecc4.lovable.app-1777930412438.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5bb895dd-a962-4319-b689-74ea2f1a07b6/id-preview-8e7eff3d--d34eef2c-9d24-4646-bb2f-3fd4839aecc4.lovable.app-1777930412438.png",
+      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

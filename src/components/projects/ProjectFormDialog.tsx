@@ -37,8 +37,9 @@ type Props = {
 export function ProjectFormDialog({ open, onOpenChange, initial }: Props) {
   const { currentUser } = useRole();
   const companies = useAppStore((s) => s.companies);
-  const reviewersFromUsers = useAppStore((s) =>
-    s.users.filter((u) => u.department.includes("المراجعات") || u.department.includes("السلامة")),
+  const users = useAppStore((s) => s.users);
+  const reviewersFromUsers = users.filter(
+    (u) => u.department.includes("المراجعات") || u.department.includes("السلامة"),
   );
   const addProject = useAppStore((s) => s.addProject);
   const updateProject = useAppStore((s) => s.updateProject);
