@@ -3,11 +3,15 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopBar } from "./TopBar";
 import { useRole } from "@/context/RoleContext";
+import { useAppStore } from "@/store/appStore";
+import { useApplySettings } from "@/hooks/useApplySettings";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { role } = useRole();
+  const sidebarMode = useAppStore((s) => s.settings.sidebarMode);
+  useApplySettings();
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={sidebarMode !== "collapsed"}>
       <div className="flex min-h-screen w-full bg-background" dir="rtl">
         <AppSidebar />
         <SidebarInset className="flex flex-1 flex-col">
