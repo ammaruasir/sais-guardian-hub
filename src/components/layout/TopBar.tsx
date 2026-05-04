@@ -1,12 +1,14 @@
-import { Bell, ChevronLeft, Shield, Building2 } from "lucide-react";
+import { Bell, ChevronLeft, Shield, Building2, LogOut } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useRole } from "@/context/RoleContext";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAppStore } from "@/store/appStore";
+import { toast } from "sonner";
 
 function RoleSwitcher() {
   const { role, setRole } = useRole();
@@ -84,10 +86,17 @@ function Breadcrumbs() {
 
 export function TopBar() {
   const { role } = useRole();
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
   const unread = useAppStore(
     (s) =>
       s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
   );
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("تم تسجيل الخروج");
+    navigate({ to: "/landing" });
+  };
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur md:px-6">
       <SidebarTrigger className="shrink-0" />
@@ -115,10 +124,18 @@ export function TopBar() {
               {role === "sais" ? "م. خالد الحربي" : "أرامكو السعودية"}
             </div>
             <div className="text-[11px] text-muted-foreground">
-              {role === "sais" ? "مراجع أمني أول" : "مدير الامتثال"}
+              {user?.email ?? (role === "sais" ? "مراجع أمني أول" : "مدير الامتثال")}
             </div>
           </div>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleSignOut}
+          title="تسجيل الخروج"
+        >
+          <LogOut className="h-5 w-5" />
+        </Button>
       </div>
     </header>
   );
