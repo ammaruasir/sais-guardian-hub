@@ -123,7 +123,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-3 text-[11px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-        © 2026 SAIS — نموذج توضيحي
+        © 2026 SAIS
       </SidebarFooter>
     </Sidebar>
   );
