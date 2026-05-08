@@ -150,4 +150,36 @@
     font-variant-numeric: tabular-nums;
     font-family: "Inter", system-ui, sans-serif;
   }
+
+  /* Letter print area — hidden in normal view, shown only when printing */
+  .print-only-letter {
+    display: none;
+  }
 }
+
+@media print {
+  body.print-letter-mode * {
+    visibility: hidden !important;
+  }
+  body.print-letter-mode #letter-print-area,
+  body.print-letter-mode #letter-print-area * {
+    visibility: visible !important;
+  }
+  body.print-letter-mode .print-only-letter {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: white;
+  }
+  body.print-letter-mode #letter-print-area {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    box-shadow: none !important;
+  }
+  @page {
+    size: A4;
+    margin: 0;
+  }
+}
+
