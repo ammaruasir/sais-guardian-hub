@@ -10,15 +10,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AssignmentChain } from "@/components/requests/AssignmentChain";
+import { LetterTemplate } from "@/components/letters/LetterTemplate";
+import { LetterComposerDialog } from "@/components/letters/LetterComposerDialog";
 import {
   requestStatusLabel, requestTypeLabel, priorityLabel,
   type DepartmentKey,
 } from "@/data/requests";
+import { letterTypeLabel, letterStatusLabel, type LetterType } from "@/data/letters";
 import {
   ArrowRight, Send, FileText, MessageSquare, History, FileWarning,
-  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine,
+  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 
