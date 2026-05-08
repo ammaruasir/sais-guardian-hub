@@ -47,11 +47,16 @@ function RequestDetailPage() {
   const rejectRequest = useAppStore((s) => s.rejectRequest);
   const requestAdditionalDocs = useAppStore((s) => s.requestAdditionalDocs);
   const addRequestComment = useAppStore((s) => s.addRequestComment);
+  const allLetters = useAppStore((s) => s.letters);
 
   const [assignDept, setAssignDept] = useState<DepartmentKey | "">("");
   const [actionNote, setActionNote] = useState("");
   const [commentBody, setCommentBody] = useState("");
   const [commentVis, setCommentVis] = useState<"internal" | "external">("internal");
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [composerType, setComposerType] = useState<LetterType>("additional_docs");
+  const [editLetterId, setEditLetterId] = useState<string | undefined>();
+  const [viewLetterId, setViewLetterId] = useState<string | undefined>();
 
   if (!request) throw notFound();
 
