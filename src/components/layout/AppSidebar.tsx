@@ -14,6 +14,8 @@ import {
   Shield,
   ShieldAlert,
   Settings,
+  Inbox,
+  FileStack,
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,6 +34,7 @@ import logoUrl from "@/assets/logo.svg";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
+  { to: "/requests", icon: Inbox, ar: "الطلبات", en: "Requests" },
   { to: "/projects", icon: FolderKanban, ar: "المشاريع", en: "Projects" },
   { to: "/tasks", icon: ListTodo, ar: "المهام", en: "Tasks" },
   { to: "/companies", icon: Building2, ar: "المنشآت", en: "Companies" },
@@ -49,6 +52,7 @@ const adminNav = [
 
 const companyNav = [
   { to: "/portal", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
+  { to: "/portal/requests", icon: FileStack, ar: "طلباتي", en: "My Requests" },
   { to: "/portal/projects", icon: FolderKanban, ar: "مشاريعنا", en: "Our Projects" },
   { to: "/portal/submissions/new", icon: PlusSquare, ar: "تقديم جديد", en: "New Submission" },
   { to: "/portal/requirements", icon: FileText, ar: "المتطلبات", en: "Requirements" },
