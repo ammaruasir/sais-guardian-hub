@@ -39,7 +39,7 @@ import {
   type RequestComment,
   type RequestDocument,
 } from "@/data/requests";
-import { letters as seedLetters, toHijri, type Letter, type LetterType } from "@/data/letters";
+import { letters as seedLetters, toHijri, type Letter } from "@/data/letters";
 
 export type MockAuth = {
   isAuthenticated: boolean;
