@@ -27,6 +27,18 @@ import { submissions as seedSubmissions, type Submission } from "@/data/submissi
 import { notifications as seedNotifications, type AppNotification } from "@/data/notifications";
 import { consultants as seedConsultants, type Consultant } from "@/data/consultants";
 import { facilities as seedFacilities, type Facility } from "@/data/facilities";
+import {
+  requests as seedRequests,
+  departments as seedDepartments,
+  type SaisRequest,
+  type Department,
+  type DepartmentKey,
+  type RequestStatus,
+  type AssignmentEntry,
+  type AssignmentAction,
+  type RequestComment,
+  type RequestDocument,
+} from "@/data/requests";
 
 export type MockAuth = {
   isAuthenticated: boolean;
