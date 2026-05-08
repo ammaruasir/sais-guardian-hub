@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as ConsultantsRouteImport } from './routes/consultants'
 import { Route as CompaniesRouteImport } from './routes/companies'
@@ -45,6 +47,11 @@ const ReportsRoute = ReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
@@ -53,6 +60,11 @@ const PortalRoute = PortalRouteImport.update({
 const NotificationsRoute = NotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LandingRoute = LandingRouteImport.update({
@@ -168,8 +180,10 @@ export interface FileRoutesByFullPath {
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -194,7 +208,9 @@ export interface FileRoutesByTo {
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -221,8 +237,10 @@ export interface FileRoutesById {
   '/companies': typeof CompaniesRouteWithChildren
   '/consultants': typeof ConsultantsRoute
   '/landing': typeof LandingRoute
+  '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
   '/portal': typeof PortalRouteWithChildren
+  '/register': typeof RegisterRoute
   '/reports': typeof ReportsRoute
   '/tasks': typeof TasksRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -250,8 +268,10 @@ export interface FileRouteTypes {
     | '/companies'
     | '/consultants'
     | '/landing'
+    | '/login'
     | '/notifications'
     | '/portal'
+    | '/register'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -276,7 +296,9 @@ export interface FileRouteTypes {
     | '/companies'
     | '/consultants'
     | '/landing'
+    | '/login'
     | '/notifications'
+    | '/register'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -302,8 +324,10 @@ export interface FileRouteTypes {
     | '/companies'
     | '/consultants'
     | '/landing'
+    | '/login'
     | '/notifications'
     | '/portal'
+    | '/register'
     | '/reports'
     | '/tasks'
     | '/admin/audit'
@@ -330,8 +354,10 @@ export interface RootRouteChildren {
   CompaniesRoute: typeof CompaniesRouteWithChildren
   ConsultantsRoute: typeof ConsultantsRoute
   LandingRoute: typeof LandingRoute
+  LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
   PortalRoute: typeof PortalRouteWithChildren
+  RegisterRoute: typeof RegisterRoute
   ReportsRoute: typeof ReportsRoute
   TasksRoute: typeof TasksRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
@@ -354,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
@@ -366,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/notifications'
       fullPath: '/notifications'
       preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/landing': {
@@ -578,8 +618,10 @@ const rootRouteChildren: RootRouteChildren = {
   CompaniesRoute: CompaniesRouteWithChildren,
   ConsultantsRoute: ConsultantsRoute,
   LandingRoute: LandingRoute,
+  LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
   PortalRoute: PortalRouteWithChildren,
+  RegisterRoute: RegisterRoute,
   ReportsRoute: ReportsRoute,
   TasksRoute: TasksRoute,
   ProjectsIdRoute: ProjectsIdRoute,
@@ -588,12 +630,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
