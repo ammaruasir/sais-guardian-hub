@@ -128,6 +128,21 @@ export const useAppStore = create<State>()(
       activity: seedActivity,
       consultants: seedConsultants,
       facilities: seedFacilities,
+      mockAuth: { isAuthenticated: false, mockRole: null, identifier: null, method: null },
+      loginMock: (a) =>
+        set({
+          mockAuth: {
+            isAuthenticated: a.isAuthenticated ?? true,
+            mockRole: a.mockRole,
+            identifier: a.identifier,
+            method: a.method,
+          },
+        }),
+      logoutMock: () =>
+        set({
+          mockAuth: { isAuthenticated: false, mockRole: null, identifier: null, method: null },
+        }),
+
 
       // Admin
       addUser: (u) =>
