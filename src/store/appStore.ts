@@ -67,6 +67,19 @@ type State = {
   activity: ActivityItem[];
   consultants: Consultant[];
   facilities: Facility[];
+  requests: SaisRequest[];
+  departments: Department[];
+
+  // Request actions
+  createRequest: (r: Omit<SaisRequest, "id" | "ref" | "chain" | "comments" | "documents" | "lastUpdate" | "status" | "currentDepartment"> & { initialAssigneeAr?: string }) => string;
+  assignRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
+  escalateRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
+  returnRequest: (id: string, noteAr?: string) => void;
+  approveRequest: (id: string, noteAr?: string) => void;
+  rejectRequest: (id: string, noteAr?: string) => void;
+  requestAdditionalDocs: (id: string, noteAr: string) => void;
+  addRequestComment: (id: string, c: Omit<RequestComment, "id" | "ts">) => void;
+  addRequestDocument: (id: string, d: Omit<RequestDocument, "id" | "ts">) => void;
 
   // Admin mutators
   addUser: (u: Omit<AdminUser, "id" | "events">) => void;
