@@ -182,10 +182,12 @@ export const useAppStore = create<State>()(
         set((s) => ({ requests: [req, ...s.requests] }));
         get().addNotification({
           forRole: "sais",
-          ar: `طلب جديد ${ref}: ${req.titleAr}`,
+          type: "submission",
+          titleAr: `طلب جديد ${ref}`,
+          descriptionAr: req.titleAr,
           ts: today,
-          link: `/requests/${id}`,
-        } as Omit<AppNotification, "id" | "read">);
+          linkTo: `/requests/${id}`,
+        });
         return ref;
       },
 
