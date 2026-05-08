@@ -39,6 +39,7 @@ import {
   type RequestComment,
   type RequestDocument,
 } from "@/data/requests";
+import { letters as seedLetters, toHijri, type Letter, type LetterType } from "@/data/letters";
 
 export type MockAuth = {
   isAuthenticated: boolean;
@@ -69,6 +70,13 @@ type State = {
   facilities: Facility[];
   requests: SaisRequest[];
   departments: Department[];
+  letters: Letter[];
+
+  // Letter actions
+  createLetterDraft: (l: Omit<Letter, "id" | "ref" | "status" | "createdAt" | "hijriDate" | "gregorianDate">) => string;
+  updateLetter: (id: string, patch: Partial<Letter>) => void;
+  sendLetter: (id: string) => void;
+  deleteLetter: (id: string) => void;
 
   // Request actions
   createRequest: (r: Omit<SaisRequest, "id" | "ref" | "chain" | "comments" | "documents" | "lastUpdate" | "status" | "currentDepartment"> & { initialAssigneeAr?: string }) => string;
@@ -155,6 +163,71 @@ export const useAppStore = create<State>()(
       facilities: seedFacilities,
       requests: seedRequests,
       departments: seedDepartments,
+      letters: seedLetters,
+
+      createLetterDraft: (l) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const id = `L-${Date.now()}`;
+        const ref = `SAIS/${new Date().getFullYear()}/${String(get().letters.length + 1).padStart(4, "0")}`;
+        const letter: Letter = {
+          ...l,
+          id,
+          ref,
+          status: "draft",
+          createdAt: today,
+          gregorianDate: today,
+          hijriDate: toHijri(today),
+        };
+        set((s) => ({ letters: [letter, ...s.letters] }));
+        return id;
+      },
+      updateLetter: (id, patch) =>
+        set((s) => ({ letters: s.letters.map((l) => (l.id === id ? { ...l, ...patch } : l)) })),
+      deleteLetter: (id) => set((s) => ({ letters: s.letters.filter((l) => l.id !== id) })),
+      sendLetter: (id) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const letter = get().letters.find((l) => l.id === id);
+        if (!letter) return;
+        set((s) => ({
+          letters: s.letters.map((l) =>
+            l.id === id ? { ...l, status: "sent", sentAt: today } : l,
+          ),
+          requests: s.requests.map((r) => {
+            if (r.id !== letter.requestId) return r;
+            const refs = r.letterRefs ?? [];
+            let nextStatus: RequestStatus = r.status;
+            if (letter.type === "additional_docs") nextStatus = "additional_docs";
+            else if (letter.type === "approval") nextStatus = "approved";
+            else if (letter.type === "rejection") nextStatus = "rejected";
+            const lastIdx = r.chain.length - 1;
+            const chain = r.chain.map((e, i) =>
+              i === lastIdx
+                ? {
+                    ...e,
+                    action:
+                      letter.type === "additional_docs"
+                        ? ("additional_docs" as AssignmentAction)
+                        : letter.type === "approval"
+                          ? ("approved" as AssignmentAction)
+                          : letter.type === "rejection"
+                            ? ("rejected" as AssignmentAction)
+                            : ("commented" as AssignmentAction),
+                    noteAr: `إصدار خطاب ${letter.ref}`,
+                  }
+                : e,
+            );
+            return { ...r, status: nextStatus, lastUpdate: today, letterRefs: [...refs, letter.ref], chain };
+          }),
+        }));
+        get().addNotification({
+          forRole: "company",
+          type: "approval",
+          titleAr: `خطاب رسمي بخصوص ${letter.ref}`,
+          descriptionAr: letter.subjectAr,
+          ts: today,
+          linkTo: `/portal/requests/${letter.requestId}`,
+        });
+      },
 
       createRequest: (r) => {
         const today = new Date().toISOString().slice(0, 10);
