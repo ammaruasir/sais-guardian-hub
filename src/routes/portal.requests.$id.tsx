@@ -6,9 +6,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import { AssignmentChain } from "@/components/requests/AssignmentChain";
+import { LetterTemplate } from "@/components/letters/LetterTemplate";
 import { requestStatusLabel, requestTypeLabel, priorityLabel } from "@/data/requests";
-import { FileWarning, Upload } from "lucide-react";
+import { letterTypeLabel } from "@/data/letters";
+import { FileWarning, Upload, Mail, Eye, Printer, Reply } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/requests/$id")({
