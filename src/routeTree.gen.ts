@@ -21,6 +21,7 @@ import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RequestsIndexRouteImport } from './routes/requests.index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -95,6 +96,11 @@ const AdminRoute = AdminRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsIndexRoute = RequestsIndexRouteImport.update({
+  id: '/requests/',
+  path: '/requests/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/requests/': typeof RequestsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
   '/portal/projects/': typeof PortalProjectsIndexRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/portal': typeof PortalIndexRoute
   '/projects': typeof ProjectsIndexRoute
+  '/requests': typeof RequestsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
   '/portal/projects': typeof PortalProjectsIndexRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/requests/': typeof RequestsIndexRoute
   '/portal/projects/$id': typeof PortalProjectsIdRoute
   '/portal/submissions/new': typeof PortalSubmissionsNewRoute
   '/portal/projects/': typeof PortalProjectsIndexRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/portal/'
     | '/projects/'
+    | '/requests/'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
     | '/portal/projects/'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/portal'
     | '/projects'
+    | '/requests'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
     | '/portal/projects'
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/portal/'
     | '/projects/'
+    | '/requests/'
     | '/portal/projects/$id'
     | '/portal/submissions/new'
     | '/portal/projects/'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   TasksRoute: typeof TasksRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
+  RequestsIndexRoute: typeof RequestsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests/': {
+      id: '/requests/'
+      path: '/requests'
+      fullPath: '/requests/'
+      preLoaderRoute: typeof RequestsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/': {
@@ -626,7 +646,17 @@ const rootRouteChildren: RootRouteChildren = {
   TasksRoute: TasksRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
+  RequestsIndexRoute: RequestsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
