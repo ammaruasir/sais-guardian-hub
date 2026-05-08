@@ -28,7 +28,18 @@ import { notifications as seedNotifications, type AppNotification } from "@/data
 import { consultants as seedConsultants, type Consultant } from "@/data/consultants";
 import { facilities as seedFacilities, type Facility } from "@/data/facilities";
 
+export type MockAuth = {
+  isAuthenticated: boolean;
+  mockRole: "sais" | "company" | null;
+  identifier: string | null;
+  method: "nafath_business" | "nafath_gov" | "nafath_individual" | "username" | null;
+};
+
 type State = {
+  mockAuth: MockAuth;
+  loginMock: (a: Omit<MockAuth, "isAuthenticated"> & { isAuthenticated?: boolean }) => void;
+  logoutMock: () => void;
+
   // Admin
   users: AdminUser[];
   roles: Role[];
