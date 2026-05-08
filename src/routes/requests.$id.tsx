@@ -344,23 +344,64 @@ function RequestDetailPage() {
                 <ArrowUpFromLine className="h-3 w-3 me-1" /> تصعيد
               </Button>
               {currentDept?.canFinalApprove && (
-                <Button size="sm" className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => {
+                <Button size="sm" className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => openComposer("approval")}>
+                  <CheckCircle2 className="h-3 w-3 me-1" /> اعتماد نهائي بخطاب
+                </Button>
+              )}
+              {currentDept?.canFinalApprove && (
+                <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                   approveRequest(request.id, actionNote || undefined); setActionNote("");
                   toast.success("تم الاعتماد النهائي");
                 }}>
-                  <CheckCircle2 className="h-3 w-3 me-1" /> اعتماد نهائي
+                  اعتماد سريع بدون خطاب
                 </Button>
               )}
-              <Button size="sm" variant="destructive" className="w-full" onClick={() => {
+              <Button size="sm" variant="destructive" className="w-full" onClick={() => openComposer("rejection")}>
+                <XCircle className="h-3 w-3 me-1" /> رفض بخطاب
+              </Button>
+              <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                 rejectRequest(request.id, actionNote || undefined); setActionNote("");
                 toast.success("تم رفض الطلب");
               }}>
-                <XCircle className="h-3 w-3 me-1" /> رفض
+                رفض سريع بدون خطاب
               </Button>
             </div>
           </Card>
         </div>
       </div>
+
+      {composerOpen && (
+        <LetterComposerDialog
+          open={composerOpen}
+          onOpenChange={setComposerOpen}
+          requestId={request.id}
+          type={composerType}
+          addresseeAr={company?.nameAr ?? ""}
+          requestRef={request.ref}
+          existingLetterId={editLetterId}
+        />
+      )}
+
+      <Dialog open={!!viewLetterId} onOpenChange={(v) => !v && setViewLetterId(undefined)}>
+        <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>معاينة خطاب — {viewedLetter?.ref}</DialogTitle>
+          </DialogHeader>
+          {viewedLetter && (
+            <div className="overflow-auto rounded border bg-muted/40 p-4">
+              <LetterTemplate letter={viewedLetter} />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={printLetter}><Printer className="h-4 w-4 me-1" /> طباعة</Button>
+          </DialogFooter>
+          {viewedLetter && (
+            <div className="print-only-letter">
+              <LetterTemplate letter={viewedLetter} idForPrint="letter-print-area" />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
