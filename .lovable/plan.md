@@ -1,102 +1,118 @@
-# Phase 8 — Implementation Plan (3 Sub-Phases)
+# Sub-Phase 8C — قوالب الخطابات الرسمية
 
-I'll implement this in three reviewable chunks, stopping after each. All UI is RTL with logical Tailwind properties (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`).
+## 1. نموذج البيانات (`src/store/appStore.ts` + `src/data/requests.ts`)
 
----
+إضافة نوع `Letter`:
+```ts
+type LetterType = "additional_docs" | "approval" | "rejection" | "comments";
+type LetterStatus = "draft" | "sent";
 
-## Sub-Phase 8A — Government Landing Page + Login (4 methods)
+type Letter = {
+  id: string;            // L-0001
+  ref: string;           // SAIS/2026/0001
+  requestId: string;
+  type: LetterType;
+  status: LetterStatus;
+  subjectAr: string;
+  addresseeAr: string;   // اسم المنشأة
+  bodyIntroAr: string;
+  items: string[];       // bullets للوثائق المطلوبة / شروط / أسباب
+  commentsTable?: { doc: string; comment: string; status: string }[];
+  closingAr: string;
+  signatoryAr: string;   // اسم + المنصب
+  signatoryTitleAr: string;
+  hijriDate: string;
+  gregorianDate: string;
+  attachmentsCount: number;
+  classified: boolean;   // شارة "سري"
+  createdAt: string;
+  sentAt?: string;
+};
+```
 
-### Routing & Auth state
-- Replace current `landing.tsx` design with a Saudi-government-style portal at `/landing` (existing route stays public).
-- Keep the existing Supabase `AuthProvider`. Layer a **mock login mode** on top via Zustand:
-  - `appStore.auth = { isAuthenticated, mockRole: 'sais' | 'company' | null }`
-  - `RequireAuth` accepts either a real Supabase session OR `isAuthenticated === true` (mock), so the 4 mock buttons in the brief work without breaking the real `wakeb@admin.com` account.
-- New `/login` route (the existing `/auth` stays as the real email/password form, linked from tab 4).
-- `RequireAuth` redirects unauthenticated users to `/landing` (already does); landing CTAs go to `/login`.
-- TopBar logout already exists — extend it to clear mock auth too.
+Actions: `createLetterDraft`, `updateLetter`, `sendLetter(id)` — يحدث حالة الطلب، يضيف `letterRef` للـ AssignmentEntry الحالي، يطلق Notification للشركة، ويحفظ سجل في الـ audit log الخاص بالطلب.
 
-### `/landing` page (rebuild)
-Sections, Saudi-gov aesthetic (deep navy + white + subtle green accents, Vision 2030 placeholder badge):
-1. **Top utility bar** — flag stripe, "المملكة العربية السعودية", language switcher (visual only).
-2. **Header** — SAIS shield + name, Vision 2030 placeholder, "تسجيل الدخول" button.
-3. **Hero** — title "منصة الخدمات الرقمية", subtitle, description, primary CTA → `/login`, secondary scrolls to services.
-4. **Services** — 4 cards (FolderPlus, Search, ClipboardList, Users) with the exact Arabic copy from the brief.
-5. **Stats** — 4 counters (2,500+ / 350+ / 94% / 7 أيام).
-6. **Footer** — logo, quick links, contact, social placeholders, copyright, "مبادرة من وزارة الداخلية".
+بيانات تجريبية: 3 خطابات حسب الموجز (additional_docs لـ REQ-0002، approval لـ REQ-0005، comments draft لـ REQ-0001).
 
-### `/login` page
-Centered card on a soft gov-style background. Tabs (default = Nafath Business):
-- **نفاذ أعمال** — green Nafath placeholder button → sets mock `company` role → `/portal`.
-- **نفاذ حكومي** — button → mock `sais` → `/`.
-- **نفاذ أفراد** — 10-digit ID input → mock `company` → `/portal`.
-- **اسم المستخدم** — username + password (show/hide), remember-me, forgot-password link. Special rule: typing `admin` → `sais`/`/`; anything else → `company`/`/portal`. Link "استخدم حسابك الحقيقي" → existing `/auth`.
-- Below card: "تسجيل منشأة جديدة" (placeholder route `/register`), trust badges (lock + NCA compliance text).
+## 2. مكوّن `LetterTemplate` المشترك
 
-**⏸ Stop for review.**
+ملف: `src/components/letters/LetterTemplate.tsx`
 
----
+تخطيط A4 جاهز للطباعة (`w-[210mm] min-h-[297mm]`)، خلفية بيضاء، خط عربي رسمي:
 
-## Sub-Phase 8B — Dynamic Request Routing
+```text
+┌──────────────────────────────────────────────┐
+│  [شعار SAIS]   الهيئة السعودية للخدمات       │
+│                وزارة الداخلية                 │  [سري] (شرطي)
+├──────────────────────────────────────────────┤
+│  الرقم: SAIS/2026/0001                       │
+│  التاريخ: 1447/05/12 هـ                      │
+│  المرفقات: 0                                 │
+├──────────────────────────────────────────────┤
+│  المكرم/ شركة …                              │
+│  السلام عليكم ورحمة الله وبركاته،             │
+│  الموضوع: …                                  │
+│                                              │
+│  [Body — حسب النوع]                          │
+│                                              │
+│  وتقبلوا تحياتنا،                             │
+│         [ختم دائري]                          │
+│         الاسم / المنصب / التوقيع              │
+├──────────────────────────────────────────────┤
+│  الرياض - المملكة العربية السعودية | sais.gov │
+└──────────────────────────────────────────────┘
+```
 
-### Store additions (`src/store/appStore.ts`)
-- `Department[]` (7 seeded as in brief, with `canFinalApprove` flags).
-- `Request[]` (6 seeded exactly as in brief with full assignment chains).
-- Actions: `assignRequest`, `reassignRequest`, `escalateRequest`, `returnRequest`, `approveRequest`, `rejectRequest`, `addRequestComment`, `addRequestDocument`, `createRequest`. Each pushes an `AssignmentEntry` and updates `currentDepartment` + `status`, writes audit log, fires notification.
+تبديل الـ body حسب `type`:
+- **additional_docs**: مقدمة + قائمة نقطية بالمستندات الناقصة + بند مهلة 30 يوماً.
+- **approval**: نص الموافقة + قائمة شروط اختيارية.
+- **rejection**: عبارة اعتذار + قائمة الأسباب + بند إعادة التقديم.
+- **comments**: مقدمة + جدول 4 أعمدة (م / المستند / التعليق / الحالة).
 
-### SAIS side
-- **`/requests`** — Inbox (default), All, Assigned-to-me toggle. Table: ref no, title, type badge, company, priority, status, received date, action.
-- **`/requests/$id`** — Header summary + **Assignment Chain Visualizer** (horizontal stepper with department nodes, person, dates, action; current node pulses; completed nodes get checkmarks; arrow connectors).
-- **Action panel** (only enabled for current-department holder): Assign, Request Additional Docs (opens 8C composer), Return to Company, Escalate, Final Approval (gated by `canFinalApprove`), Reject.
-- **Tabs**: Documents · Comments (internal vs external clearly distinguished) · Assignment Log (table) · Letters.
-- Sidebar: add "الطلبات" entry above existing "المشاريع" for SAIS role; keep Projects intact.
+CSS طباعة مخصّص: `@media print` يخفي كل شيء عدا `#letter-print-area` ويزيل الهوامش الافتراضية.
 
-### Company side
-- **`/portal`** dashboard — add "الطلبات النشطة" section with cards (ref, title, status, current department, last update).
-- **`/portal/requests/new`** — 4-step wizard (type → details → documents → review) → success screen with reference number.
-- **`/portal/requests/$id`** — simplified chain (no internal comments), letters list, response/upload area when status is `additional_docs`.
+## 3. `LetterComposerDialog`
 
-Existing projects/tasks/companies/consultants/admin all stay. `Request.relatedProjectId` optional link.
+ملف: `src/components/letters/LetterComposerDialog.tsx`
 
-**⏸ Stop for review.**
+- يُفتح من Action Panel في `/requests/$id` عبر أزرار جديدة:
+  - "طلب مستندات إضافية" → `additional_docs`
+  - "إصدار قرار الموافقة" → `approval` (مفعّل فقط لقسم له `canFinalApprove`)
+  - "إصدار قرار الرفض" → `rejection`
+  - "إصدار خطاب ملاحظات" → `comments`
+- Dialog واسع (`max-w-5xl`) مع Tabs:
+  - **تحرير**: نموذج (موضوع، مقدمة، عناصر قائمة قابلة للإضافة/الحذف، خاتمة، اسم الموقّع، شارة "سري"). للنوع `comments` محرر صفوف الجدول.
+  - **معاينة**: يعرض `LetterTemplate` بالقيم الحالية.
+- الترويسة تُملأ تلقائياً (الرقم، التاريخ الهجري/الميلادي، المنشأة، الطلب).
+- أزرار: **حفظ كمسودة** / **إرسال** / **طباعة** (يستدعي `window.print()` بعد عزل المعاينة).
+- عند الإرسال: تحديث الطلب (للـ `additional_docs` يصبح الحالة `additional_docs`، للـ approval/rejection حالات نهائية)، إنشاء Notification للشركة، تسجيل دخول في Assignment Log.
 
----
+## 4. تبويب الخطابات في صفحة الطلب (SAIS)
 
-## Sub-Phase 8C — Formal Letter Templates
+في `src/routes/requests.$id.tsx`:
+- إضافة تبويب رابع **"الخطابات"** بجانب الموجودين.
+- جدول: الرقم المرجعي، النوع (Badge ملوّن)، الموضوع، الحالة (مسودة/مُرسل)، التاريخ، إجراءات (عرض/طباعة، استئناف التحرير لو draft).
+- زر "إنشاء خطاب جديد" يفتح قائمة منسدلة بالأنواع الأربعة.
 
-### Store additions
-- `Letter[]` with the exact shape from the brief; actions `createLetterDraft`, `sendLetter`.
-- 3 seeded letters as specified (additional_docs for REQ-0002, approval for REQ-0005, comments draft for REQ-0001).
+## 5. تكامل بوابة الشركات
 
-### `LetterTemplate` component (shared)
-Renders official SAIS letterhead in print-friendly A4 layout:
-- Header: SAIS shield + bilingual authority name + "وزارة الداخلية"; "سري" red badge (conditional).
-- Reference block: الرقم / التاريخ (Hijri) / المرفقات.
-- Addressee + salutation + subject.
-- Body switches by `type`:
-  - `additional_docs` — intro + editable bulleted missing-docs list + 30-day deadline clause.
-  - `approval` — approval text + optional conditions.
-  - `rejection` — apology + editable reasons list + reapply clause.
-  - `comments` — intro + editable 4-column table (م / المستند / التعليق / الحالة).
-- Closing + signature block + circular SAIS seal placeholder + footer line.
+في `src/routes/portal.requests.$id.tsx`:
+- تبويب **"الخطابات الرسمية"** يعرض قائمة الخطابات المُرسلة فقط (status === "sent").
+- النقر يفتح Dialog قراءة فقط بـ `LetterTemplate` + زر طباعة.
+- إذا كان الخطاب `additional_docs`: زر بارز **"الرد وإرفاق المستندات"** → يفتح نموذج رفع متعدد + تعليق → يضيف المستندات للطلب، يضيف تعليق خارجي تلقائي ("تم الرد على خطاب رقم …")، ويعيد حالة الطلب من `additional_docs` إلى `in_review`.
 
-### `LetterComposerDialog`
-- Opened from request action panel.
-- Pre-fills template; lets user edit body items (add/remove rows in lists/table); auto-fills ref/date/company/request.
-- Preview tab shows formal layout; Edit tab shows form.
-- Buttons: حفظ كمسودة / إرسال / طباعة (uses `window.print()` with print CSS isolating the letter).
-- On send: status → `sent`, notification to company, request gets `letterRef`.
+## 6. الإشعارات
 
-### Company portal integration
-- `Letters` tab on `/portal/requests/$id` lists letters; clicking opens read-only `LetterTemplate`.
-- Notification: "تم إصدار خطاب بخصوص الطلب [ref]".
-- `additional_docs` letter view shows "الرد وإرفاق المستندات" button → upload + auto-comment back to request.
+استخدام نظام الإشعارات الموجود (`appStore.notifications`) لإطلاق:
+- "تم إصدار خطاب رسمي بخصوص الطلب [ref]" عند الإرسال.
+- "تم استلام رد الشركة على الخطاب [letterRef]" عند رد المنشأة.
 
-**⏸ Stop for final review.**
+## ملاحظات تقنية
 
----
+- الكتابة بأسلوب RTL مع `ms-/me-/ps-/pe-/start-/end-` فقط.
+- التاريخ الهجري: استخدام `Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura")`.
+- ختم SAIS الدائري: SVG inline داخل `LetterTemplate` (دائرة بحدود مزدوجة + نص دائري + شعار صغير) لتجنب صور خارجية.
+- الطباعة: `print:` utilities في Tailwind لإخفاء الـ AppShell والـ Dialog chrome وعرض الخطاب فقط على A4.
+- لا تغييرات في قاعدة البيانات — كل البيانات داخل Zustand لتطابق نمط 8B.
 
-## Technical notes
-- All new data is client-side (Zustand) — matches existing app pattern. No DB migrations needed for 8B/8C.
-- Mock auth coexists with real Supabase auth; `wakeb@admin.com` flow keeps working.
-- RTL logical properties throughout; reuse existing shadcn primitives + lucide icons.
-- Print CSS scoped to letter component for clean PDF/print output.
+⏸ سأتوقف بعد 8C لمراجعتك النهائية.

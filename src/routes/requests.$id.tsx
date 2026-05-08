@@ -10,15 +10,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AssignmentChain } from "@/components/requests/AssignmentChain";
+import { LetterTemplate } from "@/components/letters/LetterTemplate";
+import { LetterComposerDialog } from "@/components/letters/LetterComposerDialog";
 import {
   requestStatusLabel, requestTypeLabel, priorityLabel,
   type DepartmentKey,
 } from "@/data/requests";
+import { letterTypeLabel, letterStatusLabel, type LetterType } from "@/data/letters";
 import {
   ArrowRight, Send, FileText, MessageSquare, History, FileWarning,
-  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine,
+  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -38,11 +47,16 @@ function RequestDetailPage() {
   const rejectRequest = useAppStore((s) => s.rejectRequest);
   const requestAdditionalDocs = useAppStore((s) => s.requestAdditionalDocs);
   const addRequestComment = useAppStore((s) => s.addRequestComment);
+  const allLetters = useAppStore((s) => s.letters);
 
   const [assignDept, setAssignDept] = useState<DepartmentKey | "">("");
   const [actionNote, setActionNote] = useState("");
   const [commentBody, setCommentBody] = useState("");
   const [commentVis, setCommentVis] = useState<"internal" | "external">("internal");
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [composerType, setComposerType] = useState<LetterType>("additional_docs");
+  const [editLetterId, setEditLetterId] = useState<string | undefined>();
+  const [viewLetterId, setViewLetterId] = useState<string | undefined>();
 
   if (!request) throw notFound();
 
@@ -63,6 +77,23 @@ function RequestDetailPage() {
   const onEscalate = () => {
     escalateRequest(request.id, "executive", "أ. ماجد الزهراني", actionNote || "تم التصعيد");
     setActionNote(""); toast.success("تم التصعيد للمكتب التنفيذي");
+  };
+
+  const requestLetters = allLetters.filter((l) => l.requestId === request.id);
+  const viewedLetter = viewLetterId ? allLetters.find((l) => l.id === viewLetterId) : undefined;
+
+  const openComposer = (type: LetterType, letterId?: string) => {
+    setComposerType(type);
+    setEditLetterId(letterId);
+    setComposerOpen(true);
+  };
+
+  const printLetter = () => {
+    document.body.classList.add("print-letter-mode");
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove("print-letter-mode");
+    }, 50);
   };
 
   return (
@@ -120,6 +151,7 @@ function RequestDetailPage() {
                 <TabsTrigger value="documents"><FileText className="h-4 w-4 me-1" />المستندات</TabsTrigger>
                 <TabsTrigger value="comments"><MessageSquare className="h-4 w-4 me-1" />التعليقات</TabsTrigger>
                 <TabsTrigger value="log"><History className="h-4 w-4 me-1" />سجل التحويل</TabsTrigger>
+                <TabsTrigger value="letters"><Mail className="h-4 w-4 me-1" />الخطابات</TabsTrigger>
               </TabsList>
               <TabsContent value="documents">
                 <Card className="p-0 overflow-hidden">
@@ -213,6 +245,62 @@ function RequestDetailPage() {
                   </Table>
                 </Card>
               </TabsContent>
+              <TabsContent value="letters">
+                <Card className="p-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 border-b border-border p-3">
+                    <h3 className="text-sm font-bold">الخطابات الرسمية</h3>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm"><Plus className="h-3 w-3 me-1" /> إنشاء خطاب</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => openComposer("additional_docs")}>طلب مستندات إضافية</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openComposer("comments")}>خطاب ملاحظات</DropdownMenuItem>
+                        {currentDept?.canFinalApprove && (
+                          <DropdownMenuItem onClick={() => openComposer("approval")}>قرار اعتماد</DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => openComposer("rejection")}>قرار رفض</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الرقم</TableHead>
+                        <TableHead>النوع</TableHead>
+                        <TableHead>الموضوع</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>التاريخ</TableHead>
+                        <TableHead className="text-end">إجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requestLetters.map((l) => {
+                        const lt = letterTypeLabel[l.type];
+                        const ls = letterStatusLabel[l.status];
+                        return (
+                          <TableRow key={l.id}>
+                            <TableCell className="num text-xs">{l.ref}</TableCell>
+                            <TableCell><Badge variant="outline" className={`border-${lt.tone}/40 text-${lt.tone}`}>{lt.ar}</Badge></TableCell>
+                            <TableCell className="text-sm">{l.subjectAr}</TableCell>
+                            <TableCell><Badge variant="outline" className={`border-${ls.tone}/40 text-${ls.tone}`}>{ls.ar}</Badge></TableCell>
+                            <TableCell className="text-xs text-muted-foreground num">{l.gregorianDate}</TableCell>
+                            <TableCell className="text-end">
+                              <Button size="icon" variant="ghost" onClick={() => setViewLetterId(l.id)}><Eye className="h-4 w-4" /></Button>
+                              {l.status === "draft" && (
+                                <Button size="icon" variant="ghost" onClick={() => openComposer(l.type, l.id)}><Pencil className="h-4 w-4" /></Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                      {requestLetters.length === 0 && (
+                        <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">لا توجد خطابات بعد</TableCell></TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </TabsContent>
             </Tabs>
           </div>
 
@@ -233,12 +321,18 @@ function RequestDetailPage() {
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
+              <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("additional_docs")}>
+                <FileWarning className="h-3 w-3 me-1" /> خطاب مستندات إضافية
+              </Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("comments")}>
+                <Mail className="h-3 w-3 me-1" /> خطاب ملاحظات
+              </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
-                if (!actionNote.trim()) return toast.error("اكتب نص الطلب");
+                if (!actionNote.trim()) return toast.error("اكتب سبب الإرجاع");
                 requestAdditionalDocs(request.id, actionNote);
-                setActionNote(""); toast.success("تم طلب مستندات إضافية");
+                setActionNote(""); toast.success("تم طلب مستندات إضافية (بدون خطاب)");
               }}>
-                <FileWarning className="h-3 w-3 me-1" /> طلب مستندات إضافية
+                <FileWarning className="h-3 w-3 me-1" /> طلب سريع بدون خطاب
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
                 returnRequest(request.id, actionNote || undefined); setActionNote("");
@@ -250,23 +344,64 @@ function RequestDetailPage() {
                 <ArrowUpFromLine className="h-3 w-3 me-1" /> تصعيد
               </Button>
               {currentDept?.canFinalApprove && (
-                <Button size="sm" className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => {
+                <Button size="sm" className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => openComposer("approval")}>
+                  <CheckCircle2 className="h-3 w-3 me-1" /> اعتماد نهائي بخطاب
+                </Button>
+              )}
+              {currentDept?.canFinalApprove && (
+                <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                   approveRequest(request.id, actionNote || undefined); setActionNote("");
                   toast.success("تم الاعتماد النهائي");
                 }}>
-                  <CheckCircle2 className="h-3 w-3 me-1" /> اعتماد نهائي
+                  اعتماد سريع بدون خطاب
                 </Button>
               )}
-              <Button size="sm" variant="destructive" className="w-full" onClick={() => {
+              <Button size="sm" variant="destructive" className="w-full" onClick={() => openComposer("rejection")}>
+                <XCircle className="h-3 w-3 me-1" /> رفض بخطاب
+              </Button>
+              <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                 rejectRequest(request.id, actionNote || undefined); setActionNote("");
                 toast.success("تم رفض الطلب");
               }}>
-                <XCircle className="h-3 w-3 me-1" /> رفض
+                رفض سريع بدون خطاب
               </Button>
             </div>
           </Card>
         </div>
       </div>
+
+      {composerOpen && (
+        <LetterComposerDialog
+          open={composerOpen}
+          onOpenChange={setComposerOpen}
+          requestId={request.id}
+          type={composerType}
+          addresseeAr={company?.nameAr ?? ""}
+          requestRef={request.ref}
+          existingLetterId={editLetterId}
+        />
+      )}
+
+      <Dialog open={!!viewLetterId} onOpenChange={(v) => !v && setViewLetterId(undefined)}>
+        <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>معاينة خطاب — {viewedLetter?.ref}</DialogTitle>
+          </DialogHeader>
+          {viewedLetter && (
+            <div className="overflow-auto rounded border bg-muted/40 p-4">
+              <LetterTemplate letter={viewedLetter} />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={printLetter}><Printer className="h-4 w-4 me-1" /> طباعة</Button>
+          </DialogFooter>
+          {viewedLetter && (
+            <div className="print-only-letter">
+              <LetterTemplate letter={viewedLetter} idForPrint="letter-print-area" />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
