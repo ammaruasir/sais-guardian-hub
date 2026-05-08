@@ -151,6 +151,7 @@ function RequestDetailPage() {
                 <TabsTrigger value="documents"><FileText className="h-4 w-4 me-1" />المستندات</TabsTrigger>
                 <TabsTrigger value="comments"><MessageSquare className="h-4 w-4 me-1" />التعليقات</TabsTrigger>
                 <TabsTrigger value="log"><History className="h-4 w-4 me-1" />سجل التحويل</TabsTrigger>
+                <TabsTrigger value="letters"><Mail className="h-4 w-4 me-1" />الخطابات</TabsTrigger>
               </TabsList>
               <TabsContent value="documents">
                 <Card className="p-0 overflow-hidden">
@@ -244,6 +245,62 @@ function RequestDetailPage() {
                   </Table>
                 </Card>
               </TabsContent>
+              <TabsContent value="letters">
+                <Card className="p-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 border-b border-border p-3">
+                    <h3 className="text-sm font-bold">الخطابات الرسمية</h3>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm"><Plus className="h-3 w-3 me-1" /> إنشاء خطاب</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => openComposer("additional_docs")}>طلب مستندات إضافية</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openComposer("comments")}>خطاب ملاحظات</DropdownMenuItem>
+                        {currentDept?.canFinalApprove && (
+                          <DropdownMenuItem onClick={() => openComposer("approval")}>قرار اعتماد</DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => openComposer("rejection")}>قرار رفض</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الرقم</TableHead>
+                        <TableHead>النوع</TableHead>
+                        <TableHead>الموضوع</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>التاريخ</TableHead>
+                        <TableHead className="text-end">إجراءات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requestLetters.map((l) => {
+                        const lt = letterTypeLabel[l.type];
+                        const ls = letterStatusLabel[l.status];
+                        return (
+                          <TableRow key={l.id}>
+                            <TableCell className="num text-xs">{l.ref}</TableCell>
+                            <TableCell><Badge variant="outline" className={`border-${lt.tone}/40 text-${lt.tone}`}>{lt.ar}</Badge></TableCell>
+                            <TableCell className="text-sm">{l.subjectAr}</TableCell>
+                            <TableCell><Badge variant="outline" className={`border-${ls.tone}/40 text-${ls.tone}`}>{ls.ar}</Badge></TableCell>
+                            <TableCell className="text-xs text-muted-foreground num">{l.gregorianDate}</TableCell>
+                            <TableCell className="text-end">
+                              <Button size="icon" variant="ghost" onClick={() => setViewLetterId(l.id)}><Eye className="h-4 w-4" /></Button>
+                              {l.status === "draft" && (
+                                <Button size="icon" variant="ghost" onClick={() => openComposer(l.type, l.id)}><Pencil className="h-4 w-4" /></Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                      {requestLetters.length === 0 && (
+                        <TableRow><TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">لا توجد خطابات بعد</TableCell></TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </TabsContent>
             </Tabs>
           </div>
 
@@ -264,12 +321,18 @@ function RequestDetailPage() {
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
+              <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("additional_docs")}>
+                <FileWarning className="h-3 w-3 me-1" /> خطاب مستندات إضافية
+              </Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("comments")}>
+                <Mail className="h-3 w-3 me-1" /> خطاب ملاحظات
+              </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
-                if (!actionNote.trim()) return toast.error("اكتب نص الطلب");
+                if (!actionNote.trim()) return toast.error("اكتب سبب الإرجاع");
                 requestAdditionalDocs(request.id, actionNote);
-                setActionNote(""); toast.success("تم طلب مستندات إضافية");
+                setActionNote(""); toast.success("تم طلب مستندات إضافية (بدون خطاب)");
               }}>
-                <FileWarning className="h-3 w-3 me-1" /> طلب مستندات إضافية
+                <FileWarning className="h-3 w-3 me-1" /> طلب سريع بدون خطاب
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
                 returnRequest(request.id, actionNote || undefined); setActionNote("");
