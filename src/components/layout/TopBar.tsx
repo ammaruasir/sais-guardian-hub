@@ -92,10 +92,12 @@ export function TopBar() {
     (s) =>
       s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
   );
+  const logoutMock = useAppStore((s) => s.logoutMock);
   const handleSignOut = async () => {
     await signOut();
+    logoutMock();
     toast.success("تم تسجيل الخروج");
-    navigate({ to: "/landing" });
+    navigate({ to: "/login" });
   };
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card/80 px-4 backdrop-blur md:px-6">
