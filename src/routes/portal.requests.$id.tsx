@@ -26,7 +26,11 @@ function PortalRequestDetail() {
   const departments = useAppStore((s) => s.departments);
   const addRequestDocument = useAppStore((s) => s.addRequestDocument);
   const addRequestComment = useAppStore((s) => s.addRequestComment);
+  const allLetters = useAppStore((s) => s.letters);
+  const updateRequestStatus = useAppStore((s) => s.requests);
+  const setRequests = useAppStore.setState;
   const [response, setResponse] = useState("");
+  const [viewLetterId, setViewLetterId] = useState<string | undefined>();
 
   if (!request) throw notFound();
 
@@ -35,16 +39,39 @@ function PortalRequestDetail() {
   const st = requestStatusLabel[request.status];
   const p = priorityLabel[request.priority];
 
-  // hide internal comments for company view
   const externalComments = request.comments.filter((c) => c.visibility === "external");
+  const sentLetters = allLetters.filter((l) => l.requestId === request.id && l.status === "sent");
+  const viewedLetter = viewLetterId ? allLetters.find((l) => l.id === viewLetterId) : undefined;
+  const additionalDocsLetter = sentLetters.find((l) => l.type === "additional_docs");
 
-  const submitResponse = () => {
-    if (!response.trim()) return;
-    addRequestDocument(request.id, { nameAr: "رد المنشأة على طلب المستندات.pdf", uploadedBy: "أرامكو", sizeKb: 850 });
-    addRequestComment(request.id, { authorAr: "أرامكو السعودية", visibility: "external", body: response });
+  const submitResponse = (linkedLetterRef?: string) => {
+    if (!response.trim() && !linkedLetterRef) return;
+    addRequestDocument(request.id, { nameAr: "رد المنشأة على طلب المستندات.pdf", uploadedBy: request.companyId, sizeKb: 850 });
+    addRequestComment(request.id, {
+      authorAr: "المنشأة",
+      visibility: "external",
+      body: linkedLetterRef ? `تم الرد على الخطاب رقم ${linkedLetterRef}. ${response}` : response,
+    });
+    // flip request back to in_review
+    setRequests((s) => ({
+      requests: s.requests.map((r) =>
+        r.id === request.id ? { ...r, status: "in_review", lastUpdate: new Date().toISOString().slice(0, 10) } : r,
+      ),
+    }));
     setResponse("");
     toast.success("تم إرسال الرد والمستندات");
   };
+
+  const printLetter = () => {
+    document.body.classList.add("print-letter-mode");
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove("print-letter-mode");
+    }, 50);
+  };
+
+  // suppress unused warn
+  void updateRequestStatus;
 
   return (
     <AppShell>
