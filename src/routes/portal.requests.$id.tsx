@@ -119,7 +119,7 @@ function PortalRequestDetail() {
               {request.chain[request.chain.length - 1]?.noteAr ?? "يرجى إرفاق المستندات الإضافية المطلوبة."}
             </p>
             <Textarea placeholder="اكتب ملاحظتك مع الرد..." value={response} onChange={(e) => setResponse(e.target.value)} rows={3} />
-            <Button size="sm" className="mt-2" onClick={submitResponse}>
+            <Button size="sm" className="mt-2" onClick={() => submitResponse(additionalDocsLetter?.ref)}>
               <Upload className="h-3 w-3 me-1" /> إرفاق مستندات وإرسال الرد
             </Button>
           </Card>
@@ -157,7 +157,64 @@ function PortalRequestDetail() {
             </div>
           </Card>
         </div>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Mail className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-bold">الخطابات الرسمية</h3>
+          </div>
+          <div className="space-y-2">
+            {sentLetters.map((l) => {
+              const lt = letterTypeLabel[l.type];
+              return (
+                <div key={l.id} className="flex items-center justify-between rounded border border-border p-3">
+                  <div>
+                    <div className="text-sm font-medium">{l.subjectAr}</div>
+                    <div className="text-xs text-muted-foreground num">{l.ref} • {l.gregorianDate}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={`border-${lt.tone}/40 text-${lt.tone}`}>{lt.ar}</Badge>
+                    <Button size="sm" variant="outline" onClick={() => setViewLetterId(l.id)}>
+                      <Eye className="h-3 w-3 me-1" /> عرض
+                    </Button>
+                    {l.type === "additional_docs" && request.status === "additional_docs" && (
+                      <Button size="sm" onClick={() => submitResponse(l.ref)}>
+                        <Reply className="h-3 w-3 me-1" /> الرد وإرفاق المستندات
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            {sentLetters.length === 0 && (
+              <div className="text-sm text-muted-foreground text-center py-4">لا توجد خطابات</div>
+            )}
+          </div>
+        </Card>
       </div>
+
+      <Dialog open={!!viewLetterId} onOpenChange={(v) => !v && setViewLetterId(undefined)}>
+        <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{viewedLetter?.subjectAr}</DialogTitle>
+          </DialogHeader>
+          {viewedLetter && (
+            <div className="overflow-auto rounded border bg-muted/40 p-4">
+              <LetterTemplate letter={viewedLetter} />
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={printLetter}>
+              <Printer className="h-4 w-4 me-1" /> طباعة
+            </Button>
+          </DialogFooter>
+          {viewedLetter && (
+            <div className="print-only-letter">
+              <LetterTemplate letter={viewedLetter} idForPrint="letter-print-area" />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
