@@ -153,6 +153,133 @@ export const useAppStore = create<State>()(
       activity: seedActivity,
       consultants: seedConsultants,
       facilities: seedFacilities,
+      requests: seedRequests,
+      departments: seedDepartments,
+
+      createRequest: (r) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const id = `r${Date.now()}`;
+        const ref = `REQ-${String(get().requests.length + 1).padStart(4, "0")}`;
+        const entry: AssignmentEntry = {
+          id: `c${Date.now()}`,
+          department: "reception",
+          assigneeAr: r.initialAssigneeAr ?? "م. سارة العتيبي",
+          action: "submitted",
+          startedAt: today,
+        };
+        const { initialAssigneeAr: _ia, ...rest } = r;
+        const req: SaisRequest = {
+          ...rest,
+          id,
+          ref,
+          status: "submitted",
+          currentDepartment: "reception",
+          lastUpdate: today,
+          chain: [entry],
+          comments: [],
+          documents: [],
+        };
+        set((s) => ({ requests: [req, ...s.requests] }));
+        get().addNotification({
+          forRole: "sais",
+          ar: `طلب جديد ${ref}: ${req.titleAr}`,
+          ts: today,
+          link: `/requests/${id}`,
+        } as Omit<AppNotification, "id" | "read">);
+        return ref;
+      },
+
+      assignRequest: (id, dept, assigneeAr, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const lastIdx = r.chain.length - 1;
+            const closed = r.chain.map((e, i) => (i === lastIdx && !e.endedAt ? { ...e, endedAt: today } : e));
+            const entry: AssignmentEntry = {
+              id: `c${Date.now()}`, department: dept, assigneeAr, action: "assigned", noteAr, startedAt: today,
+            };
+            return { ...r, chain: [...closed, entry], currentDepartment: dept, status: "in_review", lastUpdate: today };
+          }),
+        }));
+      },
+
+      escalateRequest: (id, dept, assigneeAr, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const lastIdx = r.chain.length - 1;
+            const closed = r.chain.map((e, i) => (i === lastIdx && !e.endedAt ? { ...e, endedAt: today, action: "escalated" as AssignmentAction } : e));
+            const entry: AssignmentEntry = {
+              id: `c${Date.now()}`, department: dept, assigneeAr, action: "assigned", noteAr, startedAt: today,
+            };
+            return { ...r, chain: [...closed, entry], currentDepartment: dept, status: "escalated", lastUpdate: today };
+          }),
+        }));
+      },
+
+      returnRequest: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id
+              ? { ...r, status: "returned" as RequestStatus, lastUpdate: today, chain: [...r.chain, { id: `c${Date.now()}`, department: r.currentDepartment, assigneeAr: "النظام", action: "returned" as AssignmentAction, noteAr, startedAt: today, endedAt: today }] }
+              : r,
+          ),
+        }));
+      },
+
+      approveRequest: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id
+              ? { ...r, status: "approved" as RequestStatus, lastUpdate: today, chain: r.chain.map((e, i) => i === r.chain.length - 1 ? { ...e, action: "approved" as AssignmentAction, noteAr: noteAr ?? e.noteAr, endedAt: today } : e) }
+              : r,
+          ),
+        }));
+      },
+
+      rejectRequest: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id
+              ? { ...r, status: "rejected" as RequestStatus, lastUpdate: today, chain: r.chain.map((e, i) => i === r.chain.length - 1 ? { ...e, action: "rejected" as AssignmentAction, noteAr: noteAr ?? e.noteAr, endedAt: today } : e) }
+              : r,
+          ),
+        }));
+      },
+
+      requestAdditionalDocs: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id
+              ? { ...r, status: "additional_docs" as RequestStatus, lastUpdate: today, chain: r.chain.map((e, i) => i === r.chain.length - 1 ? { ...e, action: "additional_docs" as AssignmentAction, noteAr } : e) }
+              : r,
+          ),
+        }));
+      },
+
+      addRequestComment: (id, c) => {
+        const ts = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id ? { ...r, comments: [...r.comments, { ...c, id: `cm${Date.now()}`, ts }], lastUpdate: ts } : r,
+          ),
+        }));
+      },
+
+      addRequestDocument: (id, d) => {
+        const ts = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) =>
+            r.id === id ? { ...r, documents: [...r.documents, { ...d, id: `d${Date.now()}`, ts }], lastUpdate: ts } : r,
+          ),
+        }));
+      },
       mockAuth: { isAuthenticated: false, mockRole: null, identifier: null, method: null },
       loginMock: (a) =>
         set({
