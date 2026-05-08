@@ -79,6 +79,23 @@ function RequestDetailPage() {
     setActionNote(""); toast.success("تم التصعيد للمكتب التنفيذي");
   };
 
+  const requestLetters = allLetters.filter((l) => l.requestId === request.id);
+  const viewedLetter = viewLetterId ? allLetters.find((l) => l.id === viewLetterId) : undefined;
+
+  const openComposer = (type: LetterType, letterId?: string) => {
+    setComposerType(type);
+    setEditLetterId(letterId);
+    setComposerOpen(true);
+  };
+
+  const printLetter = () => {
+    document.body.classList.add("print-letter-mode");
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove("print-letter-mode");
+    }, 50);
+  };
+
   return (
     <AppShell>
       <div className="space-y-6">
