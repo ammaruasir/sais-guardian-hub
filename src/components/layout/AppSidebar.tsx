@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
 import logoUrl from "@/assets/logo.svg";
+import saisLogo from "@/assets/sais-logo.png";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
@@ -68,25 +69,34 @@ export function AppSidebar() {
   return (
     <Sidebar side="left" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${role === "sais" ? "bg-white p-1" : "bg-sidebar-primary text-sidebar-primary-foreground font-bold"}`}
-          >
-            {role === "sais" ? (
+        {role === "sais" ? (
+          <>
+            <div className="flex w-full items-center justify-center rounded-lg bg-white p-2 group-data-[collapsible=icon]:hidden">
+              <img
+                src={saisLogo}
+                alt="الهيئة العليا للأمن الصناعي - SAIS"
+                className="h-12 w-full object-contain"
+              />
+            </div>
+            <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1 group-data-[collapsible=icon]:flex">
               <img src={logoUrl} alt="SAIS" className="h-full w-full object-contain" />
-            ) : (
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
               <Building2 className="h-5 w-5" />
-            )}
-          </div>
-          <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <div className="truncate text-sm font-bold text-sidebar-foreground">
-              {role === "sais" ? "الهيئة العليا للأمن الصناعي" : "أرامكو السعودية"}
             </div>
-            <div className="truncate text-[11px] text-sidebar-foreground/60">
-              {role === "sais" ? "SAIS Platform" : "بوابة المنشآت"}
+            <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+              <div className="truncate text-sm font-bold text-sidebar-foreground">
+                أرامكو السعودية
+              </div>
+              <div className="truncate text-[11px] text-sidebar-foreground/60">
+                بوابة المنشآت
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
