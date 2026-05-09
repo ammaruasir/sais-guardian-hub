@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
 import logoUrl from "@/assets/logo.svg";
+import saisLogo from "@/assets/sais-logo.png";
 
 const saisNav = [
   { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
