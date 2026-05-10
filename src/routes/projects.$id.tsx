@@ -48,6 +48,7 @@ function ProjectDetailPage() {
   const [reviewing, setReviewing] = useState<Submission | null>(null);
 
   const allSubs = useAppStore((s) => s.submissions);
+  const relatedRequest = useAppStore((s) => s.requests.find((r) => r.relatedProjectId === id));
   if (!project) throw notFound();
   const subs = allSubs.filter((s) => s.projectId === id);
   const currentSub = subs.find((s) => s.stage === project.stage);
