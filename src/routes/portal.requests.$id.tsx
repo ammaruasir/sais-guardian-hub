@@ -17,6 +17,7 @@ import { letterTypeLabel, type Letter } from "@/data/letters";
 import { FileWarning, Mail, Eye, Printer, Reply, FileText, MessageSquare, CheckCircle2, XCircle, Info, ChevronLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/portal/requests/$id")({
   component: PortalRequestDetail,
