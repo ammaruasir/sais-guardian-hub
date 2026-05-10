@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { useAppStore } from "@/store/appStore";
 import { requestStatusLabel, type RequestStatus } from "@/data/requests";
+import { useT } from "@/hooks/useT";
 
 const colors: Record<RequestStatus, string> = {
   submitted: "var(--chart-2)",
@@ -15,10 +16,11 @@ const colors: Record<RequestStatus, string> = {
 
 export function RequestsByStatusDonut() {
   const requests = useAppStore((s) => s.requests);
+  const { t, lang } = useT();
   const counts: Record<string, number> = {};
   for (const r of requests) counts[r.status] = (counts[r.status] ?? 0) + 1;
   const data = (Object.keys(counts) as RequestStatus[]).map((k) => ({
-    name: requestStatusLabel[k].ar,
+    name: requestStatusLabel[k][lang],
     value: counts[k],
     color: colors[k],
   }));
@@ -26,8 +28,7 @@ export function RequestsByStatusDonut() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">الطلبات حسب الحالة</CardTitle>
-        <p className="text-xs text-muted-foreground">Requests by Status</p>
+        <CardTitle className="text-base">{t("requests_by_status")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-64 w-full">
