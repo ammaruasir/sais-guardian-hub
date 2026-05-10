@@ -8,8 +8,9 @@ import { ArrowLeft, ArrowRight, Inbox } from "lucide-react";
 import { useT } from "@/hooks/useT";
 
 export function RequestsNeedingAction() {
-  const requests = useAppStore((s) => s.requests.filter((r) => r.status === "submitted"));
+  const allRequests = useAppStore((s) => s.requests);
   const companies = useAppStore((s) => s.companies);
+  const requests = allRequests.filter((r) => r.status === "submitted");
   const { t, lang, name, isAr } = useT();
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
