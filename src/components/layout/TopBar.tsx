@@ -107,6 +107,7 @@ export function TopBar() {
       <Breadcrumbs />
       <div className="ms-auto flex items-center gap-3">
         <RoleSwitcher />
+        <ThemeToggleButton />
         <Button variant="ghost" size="icon" className="relative" asChild>
           <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
             <Bell className="h-5 w-5" />
