@@ -21,7 +21,7 @@ import {
   ArrowRight,
   ChevronDown,
 } from "lucide-react";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/sais-logo-full.svg";
 import vision2030 from "@/assets/vision-2030.png";
 import heroBg from "@/assets/hero-industrial.png";
 import type { TKey } from "@/i18n/translations";
