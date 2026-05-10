@@ -96,6 +96,11 @@ function PortalRequestDetail() {
           </Card>
         </div>
 
+        <StatusBanner
+          status={request.status}
+          requestId={request.id}
+        />
+
         {pendingActionLetter && (
           <Card className="border-warning/40 bg-warning/5 p-4">
             <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -271,4 +276,112 @@ function PortalRequestDetail() {
       )}
     </AppShell>
   );
+}
+
+function StatusBanner({ status, requestId }: { status: string; requestId: string }) {
+  const respond = useAppStore((s) => s.respondToAdditionalDocs);
+  const addDoc = useAppStore((s) => s.addRequestDocument);
+  const [files, setFiles] = useState<string[]>([]);
+  const [note, setNote] = useState("");
+
+  if (status === "submitted" || status === "in_review" || status === "escalated") {
+    return (
+      <Card className="border-secondary/40 bg-secondary/5 p-4">
+        <div className="flex items-start gap-3">
+          <Info className="h-5 w-5 text-secondary mt-0.5" />
+          <div>
+            <h2 className="font-bold text-sm">التقديم قيد المراجعة لدى الهيئة</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              سيتم إشعاركم عند صدور أي تحديث على الطلب.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (status === "additional_docs" || status === "returned") {
+    const send = () => {
+      if (files.length === 0) return toast.error("أرفق مستنداً واحداً على الأقل");
+      const today = new Date().toISOString().slice(0, 10);
+      for (const f of files) {
+        addDoc(requestId, { nameAr: f, uploadedBy: "المنشأة", sizeKb: 1024 });
+      }
+      respond(requestId, note || `تم إرفاق ${files.length} مستند`);
+      setFiles([]); setNote("");
+      toast.success("تم إرسال الرد بنجاح");
+    };
+    return (
+      <Card className="border-warning/40 bg-warning/5 p-4 space-y-3">
+        <div className="flex items-start gap-3">
+          <FileWarning className="h-5 w-5 text-warning mt-0.5" />
+          <div>
+            <h2 className="font-bold text-sm">إجراء مطلوب — إرفاق المستندات والرد</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              {status === "returned" ? "تم إرجاع الطلب لاستكمال البيانات." : "بانتظار رد المنشأة على ملاحظات الهيئة."}
+            </p>
+          </div>
+        </div>
+        <div
+          className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-warning bg-card"
+          onClick={() => setFiles((f) => [...f, `مستند-رد-${f.length + 1}.pdf`])}
+        >
+          <Upload className="h-6 w-6 mx-auto text-muted-foreground" />
+          <p className="text-sm mt-2">اضغط لإرفاق المستندات المطلوبة</p>
+        </div>
+        {files.length > 0 && (
+          <ul className="text-xs space-y-1">
+            {files.map((f, i) => <li key={i} className="rounded bg-card border border-border px-2 py-1">{f}</li>)}
+          </ul>
+        )}
+        <textarea
+          className="w-full rounded border border-border bg-card p-2 text-sm"
+          placeholder="ملاحظة (اختياري)"
+          rows={2}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+        <Button onClick={send}><Reply className="h-4 w-4 me-1" /> إرسال الرد</Button>
+      </Card>
+    );
+  }
+
+  if (status === "approved") {
+    return (
+      <Card className="border-success/40 bg-success/5 p-4">
+        <div className="flex items-start gap-3">
+          <CheckCircle2 className="h-5 w-5 text-success mt-0.5" />
+          <div>
+            <h2 className="font-bold text-sm">تم اعتماد الطلب ✓</h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              يمكنكم الاطلاع على خطاب الموافقة من تبويب الخطابات الرسمية أدناه.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (status === "rejected") {
+    return (
+      <Card className="border-destructive/40 bg-destructive/5 p-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex items-start gap-3">
+            <XCircle className="h-5 w-5 text-destructive mt-0.5" />
+            <div>
+              <h2 className="font-bold text-sm">تم رفض الطلب</h2>
+              <p className="text-xs text-muted-foreground mt-1">
+                راجعوا خطاب الرفض من تبويب الخطابات للاطلاع على الأسباب.
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm">
+            <Link to="/portal/requests/new">تقديم طلب جديد</Link>
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
+  return null;
 }
