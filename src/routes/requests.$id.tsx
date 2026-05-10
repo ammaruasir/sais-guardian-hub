@@ -30,6 +30,7 @@ import {
   CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/requests/$id")({
   component: RequestDetailPage,
@@ -60,23 +61,24 @@ function RequestDetailPage() {
 
   if (!request) throw notFound();
 
+  const { t: tr, isAr, name } = useT();
   const company = companies.find((c) => c.id === request.companyId);
   const currentDept = departments.find((d) => d.key === request.currentDepartment);
-  const t = requestTypeLabel[request.type];
+  const tp = requestTypeLabel[request.type];
   const st = requestStatusLabel[request.status];
   const p = priorityLabel[request.priority];
 
   const onAssign = () => {
-    if (!assignDept) return toast.error("اختر إدارة");
+    if (!assignDept) return toast.error(isAr ? "اختر إدارة" : "Select a department");
     const dept = departments.find((d) => d.key === assignDept)!;
     assignRequest(request.id, assignDept as DepartmentKey, `مسؤول ${dept.nameAr}`, actionNote || undefined);
     setAssignDept(""); setActionNote("");
-    toast.success(`تم التحويل إلى ${dept.nameAr}`);
+    toast.success(tr("toast_assigned"));
   };
 
   const onEscalate = () => {
     escalateRequest(request.id, "executive", "أ. ماجد الزهراني", actionNote || "تم التصعيد");
-    setActionNote(""); toast.success("تم التصعيد للمكتب التنفيذي");
+    setActionNote(""); toast.success(isAr ? "تم التصعيد للمكتب التنفيذي" : "Escalated to executive office");
   };
 
   const requestLetters = allLetters.filter((l) => l.requestId === request.id);
