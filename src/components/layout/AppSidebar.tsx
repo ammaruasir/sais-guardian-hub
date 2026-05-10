@@ -54,8 +54,6 @@ const adminNav = [
 const companyNav = [
   { to: "/portal", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
   { to: "/portal/requests", icon: FileStack, ar: "طلباتي", en: "My Requests" },
-  { to: "/portal/projects", icon: FolderKanban, ar: "مشاريعنا", en: "Our Projects" },
-  { to: "/portal/submissions/new", icon: PlusSquare, ar: "تقديم جديد", en: "New Submission" },
   { to: "/portal/requirements", icon: FileText, ar: "المتطلبات", en: "Requirements" },
   { to: "/portal/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
   { to: "/portal/help", icon: HelpCircle, ar: "المساعدة", en: "Help" },
