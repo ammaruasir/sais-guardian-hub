@@ -1,53 +1,81 @@
-# المرحلة E — الفحص النهائي (Final Audit)
+## 1. كروت KPI قابلة للضغط (Dashboard)
 
-هذه مرحلة فحص + إصلاح، لا بناء. الخطة تحدد ترتيب التحقق وكيفية التعامل مع المشاكل.
+تحويل كل كرت في `KpiCards.tsx` إلى `<Link>` يوجّه إلى صفحة الطلبات مع فلتر مسبق:
 
-## النهج
+| الكرت | الوجهة |
+|---|---|
+| الطلبات النشطة | `/requests?filter=active` |
+| طلبات جديدة | `/requests?filter=new` (status=submitted) |
+| قيد المراجعة | `/requests?filter=in_review` |
+| بانتظار الرد | `/requests?filter=waiting` (additional_docs) |
+| معتمدة | `/requests?filter=approved` |
+| نسبة الإنجاز | `/reports` |
 
-أمشي على القوائم الست بالترتيب، وكل خانة تفشل أوقف وأصلح فوراً ثم أكمل. الإصلاحات تكون موضعية (لا إعادة هيكلة). التقرير النهائي يلخّص ما مرّ بدون تغيير وما تم إصلاحه.
+التعديلات:
+- `KpiCards.tsx`: الـ `Card` يصير `<Link>` مع `hover:shadow-md`, `hover:border-primary/40`, `transition`, و focus ring للوصولية.
+- `requests.index.tsx`: قراءة `search.filter` عبر `Route.useSearch()` وتطبيقه كقيمة افتراضية للفلتر، مع إظهار chip "تم الفلترة من اللوحة — مسح" أعلى الجدول.
 
-## 1) فحص workflow كامل (٢٧ خطوة) — Browser
-- أفتح Browser على `/landing` بحجم 1280×720، وأنفّذ السلسلة كاملة (login → portal → new request → submit → portal/requests/$id → portal/requests → portal dashboard → logout → admin login → /requests/$id → assign → letter → portal upload → approve).
-- بعد كل خطوة محورية: screenshot أو observe للتأكد، وقراءة console logs.
-- الإصلاحات المتوقعة:
-  - مسارات روابط مكسورة (Link to/params)
-  - أسماء action في store ناقصة
-  - placeholder بدل صفحات حقيقية
-  - role switcher لا يحدّث الـ navigation
+## 2. تحليلات وشارتات إضافية بألوان الهيئة
 
-## 2) Navigation Completeness
-- أتحقق من وجود كل route ملف في `src/routes/`، ومن sidebar entries في `AppSidebar.tsx` (أنا قد فحصته).
-- خانات Auth Protection: المشروع POC بدون حماية فعلية. سأضيف guard خفيف في `portal.tsx` و `admin.tsx` و `requests.index.tsx` يستخدم `useRole().role`؛ إن كانت `null/guest` → `<Navigate to="/login" />`. لا يلزم `_authenticated` layout (تجنّب إعادة هيكلة المسارات).
-- سجلّ روابط dashboard/breadcrumbs/notifications: مراجعة بصرية + click-through في المتصفح على عينات.
+اللوحة حالياً فيها: KPIs، Donut حسب الحالة، Bar حسب الإدارة، Activity Feed، (قسم كلاسيكي مطوي).
+نضيف **قسم تحليلات** جديد بين الـ Donut/Bar و Activity Feed باسم "نظرة تحليلية" يحتوي:
 
-## 3) Dark Mode
-- أبدّل `themeMode` لـ `dark` عبر store أو الإعدادات، وأمر على ١٧ صفحة.
-- إصلاحات شائعة محتملة: ألوان hex مباشرة في landing (`#005528`, `#83bf3f`, `slate-900` …) — أتركها كما هي إن كانت مقصودة للـ government brand، لكن أتأكد من قراءة النصوص في dark.
-- Letter preview: يجب أن يبقى الورق أبيض في dark (تحقق من `LetterTemplate`).
+أ) **Area Chart — تدفق الطلبات (آخر 6 أشهر)**: stacked area لـ (مُقدَّمة / معتمدة / مرفوضة) — ألوان `--chart-1` navy, `--chart-3` green, `--chart-5` red.
 
-## 4) Language Switch
-- أبدّل لـ EN، أمر على نفس الصفحات، أتحقق من `dir="ltr"` و sidebar يساراً (موجود في `useApplySettings`).
-- نقاط حساسة: عناوين `usePageTitle` في صفحات إنجليزية تستخدم `t()` فعلاً (تحقق)، ونصوص hardcoded عربية متبقّية في landing/login/components → استبدال بـ `isAr ? ... : ...` عند اللزوم.
+ب) **Radial/Gauge — متوسط زمن الإغلاق**: `RadialBarChart` يعرض متوسط الأيام مقابل SLA المستهدف، بلون teal.
 
-## 5) Visual Consistency
-- ألوان البادج: مراجعة `requestStatusLabel`, `priorityLabel` في `src/data/requests.ts` — toned مرة واحدة، تنطبق في كل مكان.
-- Empty states: فحص Kanban/Tasks/Notifications/Search results.
-- Confirm dialogs على destructive: تحقق من `delete user`, `reject request`.
-- Demo badge: قراءة `DemoBadge.tsx` في dark mode.
+ج) **Horizontal Bar — أعلى 5 منشآت بعدد الطلبات**: ألوان متدرجة من navy إلى teal.
 
-## 6) Data Consistency
-- ربط KPI ↔ store: تتبّع selectors في `KpiCards.tsx` لتأكيد أنها تقرأ `requests` مباشرة.
-- Notification bell: `topbar` يقرأ `notifications.filter(n => !n.read && n.audience matches role)`.
-- Company portal scoping: تحقق من فلترة `companyId === "aramco"` في `portal.requests.index.tsx` و `ActiveRequestsSection`.
-- Audit log: تأكد أن actions في store تضيف `auditEvents`.
+د) **Heatmap-style Bar — توزّع الطلبات حسب أيام الأسبوع**: bar chart بسيط بلون secondary.
 
-## 7) Performance & Polish
-- قراءة `code--read_console_logs` و `code--read_runtime_errors`.
-- التحقق من أن `RoleSwitcher` لا يعيد mount كامل التطبيق (transition في `AppShell`).
-- لا blank screens: tested via workflow.
+هـ) **Line Chart — مقارنة الواردة vs المغلقة شهرياً**: خطّان (navy + green) لإظهار الاتجاه.
 
-## مخرجات
-بعد التنفيذ، تقرير منظّم:
-- ✅ مرّ بدون تغيير: قائمة
-- 🔧 تم إصلاحه: قائمة + الملف المعدّل + سطر مختصر
-- ⚠️ ملاحظات (POC limitations): قائمة
+كلها تُحسب من `useAppStore().requests` بدوال `useMemo` (لا بيانات وهمية مكررة، نشتق من نفس المخزن مع إضافة بسيطة لتاريخ افتراضي عند الحاجة).
+
+**القالب اللوني المعتمد** (موجود في `styles.css`):
+- chart-1 = navy `#1B3A5C` (الأساسي)
+- chart-2 = teal `#0E918C`
+- chart-3 = saudi green `#006C35`
+- chart-4 = amber
+- chart-5 = red
+- + إضافة تدرّجين في `styles.css`: `--gradient-primary` (navy→teal) و `--gradient-success` (teal→green) لاستخدامها في خلفيات الكروت التحليلية ورؤوس الشارتات.
+
+كل ChartCard موحّد الشكل (عنوان عربي + subtitle إنجليزي صغير، ارتفاع 280-300px، responsive grid `lg:grid-cols-2`).
+
+## 3. السايدبار أبيض ليُظهر اللوقو كـ PNG شفاف
+
+تحديث توكنات الـ sidebar في `src/styles.css`:
+
+```css
+:root {
+  --sidebar: oklch(1 0 0);                          /* أبيض */
+  --sidebar-foreground: oklch(0.25 0.04 250);       /* navy نص */
+  --sidebar-primary: oklch(0.32 0.06 250);          /* navy */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.01 250);           /* hover رمادي فاتح */
+  --sidebar-accent-foreground: oklch(0.32 0.06 250);
+  --sidebar-border: oklch(0.91 0.01 270);           /* border رمادي */
+  --sidebar-ring: oklch(0.58 0.09 195);
+}
+```
+مع نسخة dark تبقى داكنة كما هي.
+
+تعديلات `AppSidebar.tsx`:
+- إزالة الخلفية البيضاء حول اللوقو (`bg-white p-2`) — السايدبار نفسه أبيض الآن، فاللوقو الـ PNG يظهر طبيعي.
+- تعديل لون الـ company portal logo placeholder ليتناسب (navy bg مع نص أبيض يبقى مناسب على أبيض).
+- footer (© 2026 SAIS) يصير لونه `text-muted-foreground` بدل أبيض شفاف.
+
+## 4. تنفيذ مرتب
+
+1. تحديث `styles.css` (sidebar tokens + gradients).
+2. تعديل `AppSidebar.tsx` (إزالة الخلفية البيضاء حول اللوقو).
+3. تعديل `KpiCards.tsx` (Link wrapping + hover).
+4. تعديل `requests.index.tsx` (قراءة search param + chip).
+5. إنشاء `src/components/dashboard/AnalyticsSection.tsx` يحوي الشارتات الخمسة الجديدة.
+6. إدراج `<AnalyticsSection />` في `src/routes/index.tsx` بعد قسم Donut/Bar.
+
+## ملاحظات
+
+- ما نلمس صفحة `/reports` (لها شارتات مستقلة).
+- شارت dark mode مدعوم تلقائياً عبر `var(--chart-*)`.
+- السايدبار الأبيض راح يحتاج تأكد بصري للحالة active (ستبقى navy bg مع نص أبيض — متوفّر في `sidebar-primary`).
