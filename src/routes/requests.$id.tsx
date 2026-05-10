@@ -423,6 +423,48 @@ function RequestDetailPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={staffOpen} onOpenChange={setStaffOpen}>
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isAr ? "إسناد لموظف في الإدارة" : "Assign to Staff Member"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(() => {
+              const deptName = currentDept?.nameAr ?? "";
+              const filtered = users.filter((u) => u.active && (deptName ? u.department.includes(deptName.replace(/^إدارة\s*/, "")) : true));
+              const list = filtered.length > 0 ? filtered : users.filter((u) => u.active);
+              return (
+                <>
+                  <Label className="text-xs">{isAr ? "الموظف" : "Staff member"}</Label>
+                  <Select value={staffUserId} onValueChange={setStaffUserId}>
+                    <SelectTrigger><SelectValue placeholder={isAr ? "اختر موظفاً" : "Select a staff member"} /></SelectTrigger>
+                    <SelectContent>
+                      {list.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>{u.nameAr} — <span className="text-muted-foreground text-xs">{u.department}</span></SelectItem>
+                      ))}
+                      {list.length === 0 && <div className="px-3 py-2 text-xs text-muted-foreground">{isAr ? "لا يوجد موظفون" : "No staff"}</div>}
+                    </SelectContent>
+                  </Select>
+                </>
+              );
+            })()}
+            <Label className="text-xs">{isAr ? "ملاحظات (اختياري)" : "Notes (optional)"}</Label>
+            <Textarea rows={3} value={staffNote} onChange={(e) => setStaffNote(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStaffOpen(false)}>{tr("cancel")}</Button>
+            <Button onClick={() => {
+              if (!staffUserId) return toast.error(isAr ? "اختر موظفاً" : "Select a staff member");
+              const u = users.find((x) => x.id === staffUserId);
+              if (!u) return;
+              assignToStaff(request.id, u.id, u.nameAr, staffNote || undefined);
+              setStaffOpen(false); setStaffUserId(""); setStaffNote("");
+              toast.success(tr("toast_assigned"));
+            }}>{tr("assign")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
