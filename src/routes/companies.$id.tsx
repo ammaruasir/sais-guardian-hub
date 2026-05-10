@@ -8,6 +8,7 @@ import { FacilityCard } from "@/components/companies/FacilityCard";
 import { stageLabel } from "@/data";
 import { facilities, companyComplianceScore, companyAssignedConsultant } from "@/data/facilities";
 import { useAppStore } from "@/store/appStore";
+import { departments, requestStatusLabel, requestTypeLabel } from "@/data/requests";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/companies/$id")({
