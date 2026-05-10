@@ -14,7 +14,8 @@ import { LetterTemplate } from "@/components/letters/LetterTemplate";
 import { LetterReplyDialog } from "@/components/letters/LetterReplyDialog";
 import { requestStatusLabel, requestTypeLabel, priorityLabel } from "@/data/requests";
 import { letterTypeLabel, type Letter } from "@/data/letters";
-import { FileWarning, Mail, Eye, Printer, Reply, FileText, MessageSquare } from "lucide-react";
+import { FileWarning, Mail, Eye, Printer, Reply, FileText, MessageSquare, CheckCircle2, XCircle, Info, ChevronLeft, Upload } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/requests/$id")({
   component: PortalRequestDetail,
@@ -55,9 +56,16 @@ function PortalRequestDetail() {
   return (
     <AppShell>
       <div className="space-y-6">
+        <nav className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
+          <Link to="/portal" className="hover:text-foreground">الرئيسية</Link>
+          <ChevronLeft className="h-3 w-3" />
+          <Link to="/portal/requests" className="hover:text-foreground">طلباتي</Link>
+          <ChevronLeft className="h-3 w-3" />
+          <span className="text-foreground font-mono">{request.ref}</span>
+        </nav>
         <div>
           <Link to="/portal/requests" className="text-xs text-muted-foreground hover:text-primary">
-            ← طلباتي
+            ← العودة لقائمة الطلبات
           </Link>
           <div className="mt-2 flex items-end justify-between gap-3 flex-wrap">
             <div>
