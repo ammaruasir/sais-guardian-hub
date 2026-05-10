@@ -87,6 +87,8 @@ export type AssignmentEntry = {
   noteAr?: string;
   startedAt: string;
   endedAt?: string;
+  assignedToUserId?: string;
+  assignedToUserName?: string;
 };
 
 export type RequestComment = {
