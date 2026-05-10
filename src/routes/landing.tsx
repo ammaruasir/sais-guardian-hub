@@ -113,7 +113,7 @@ function LandingPage() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex">
+          <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex dark:text-foreground/85">
             <a href="#services" className="hover:text-[#006c35]">الخدمات</a>
             <a href="#stats" className="hover:text-[#006c35]">إحصائيات</a>
             <a href="#about" className="hover:text-[#006c35]">عن الهيئة</a>
