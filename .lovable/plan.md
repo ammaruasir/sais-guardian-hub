@@ -1,60 +1,104 @@
-# Phase C — Bilingual AR/EN Support
+# المرحلة C — تكملة: تصحيح سلوك اللغة + ترجمة الصفحات المتبقية
 
-Wire a full Arabic ↔ English translation system to existing `appStore.settings`, plus an HTML `dir`/font switcher and translation rollout across UI chrome.
+## الجزء 1 — تصحيح سلوك التبديل (Layout يبقى RTL دائماً)
 
-## 1. Foundations (new + store)
+### 1. تعديل `src/hooks/useApplySettings.ts`
+- إزالة `root.dir = ...` (لا نلمس `dir` على `<html>` أبداً — يبقى `rtl`).
+- إبقاء `root.lang = language`.
+- استبدال منطق الـ class:
+  ```ts
+  root.classList.toggle("font-en", language === "en");
+  root.classList.toggle("font-ar", language === "ar");
+  document.body.classList.toggle("lang-en", language === "en");
+  document.body.classList.toggle("lang-ar", language === "ar");
+  ```
 
-- **Create `src/i18n/translations.ts`** — full dictionary from spec (`{ar, en}` per key) and `TKey` type.
-- **Create `src/hooks/useT.ts`** — returns `{ t, lang, dir, isAr, name(entity) }`. Reads `useAppStore(s => s.settings.language ?? "ar")`.
-- **Update `src/data/admin.ts`** — add `language: "ar" | "en"` to `AppSettings`; default `"ar"` in `seedSettings`.
-- **Update `src/store/appStore.ts`** — add `setLanguage(lang)` action (thin wrapper over `updateSettings({ language })`); bump persist version to migrate old persisted state (default missing `language` → `"ar"`).
+### 2. تعديل `src/components/layout/AppShell.tsx`
+- إبقاء `dir="rtl"` على الـ wrapper (موجود حالياً — لا تغيير).
+- إضافة `className="content-area"` على `<main>`.
 
-## 2. Apply language globally
+### 3. تعديل `src/components/layout/AppSidebar.tsx`
+- استبدال `side={isAr ? "right" : "left"}` بـ `side="right"` ثابت.
+- النصوص تبقى تتبع `t()`.
 
-- **Extend `src/hooks/useTheme.ts`** (or add side-effect in existing `useApplySettings.ts` — already imported in root) to also apply on every `language` change:
-  - `document.documentElement.dir = lang === "ar" ? "rtl" : "ltr"`
-  - `document.documentElement.lang = lang`
-  - Toggle a `font-en` class on `<html>` (or set `--app-font` CSS var) — Arabic stays default `IBM Plex Sans Arabic, Inter, system-ui`; English becomes `Inter, IBM Plex Sans Arabic, system-ui`.
-- **`src/styles.css`** — define `html { font-family: var(--app-font, "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif); }` and `html.font-en { --app-font: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif; }`. Add `transition` already exists.
+### 4. تعديل `src/styles.css`
+- استبدال كتلة `html.font-en` الحالية وإضافة `html.font-ar` صراحةً:
+  ```css
+  html.font-en { font-family: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif; }
+  html.font-ar { font-family: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif; }
+  ```
+- إضافة قواعد الـ content-area:
+  ```css
+  body.lang-ar .content-area { text-align: right; }
+  body.lang-en .content-area { text-align: left; }
+  body.lang-en .content-area :is(h1,h2,h3,h4,p,span,label,li,td,th,dt,dd) { text-align: left; direction: ltr; }
+  body.lang-en .content-area table { direction: ltr; }
+  /* استثناءات: الأرقام والعناصر اللي عندها dir صريح ما تتأثر */
+  body.lang-en .content-area [dir="rtl"] { direction: rtl; text-align: right; }
+  ```
+- ملاحظة: السايدبار و TopBar خارج `.content-area` فما يتأثرون.
 
-## 3. Language toggles (UI controls)
+### 5. صفحات بدون AppShell (Landing, Login, Register, Auth)
+- لفّ المحتوى الرئيسي بـ `<div className="content-area">` لتطبيق نفس قاعدة المحاذاة.
+- Layout يبقى RTL (الـ root `<html dir="rtl">` لا يتغير).
 
-- **`src/components/layout/TopBar.tsx`** — add `LanguageToggleButton` next to `ThemeToggleButton`. Shows `EN` when AR active, `عربي` when EN active. Click → `setLanguage(other)`.
-- **`src/routes/landing.tsx`** — add the same toggle in the top nav header (text variant: "عربي | English").
-- **Appearance settings** (`src/routes/admin.settings.tsx` appearance tab) — add language radio (عربي / English) bound to `settings.language`, switches immediately on change.
+### 6. سلوك TopBar
+- لا تغيير على الـ layout (يبقى RTL — `ms-auto`, `-end-1` تعمل صح).
+- النصوص فقط تتغير عبر `t()`.
 
-## 4. Translation rollout (replace hardcoded AR strings)
+---
 
-Apply `const { t, name } = useT()` and replace literals in (priority order):
+## الجزء 2 — ترجمة الصفحات المتبقية
 
-1. **Layout**: `AppSidebar.tsx`, `TopBar.tsx`, `DemoBadge.tsx`.
-2. **Dashboards**: `KpiCards.tsx`, `RequestsByStatusDonut.tsx`, `RequestsByDepartmentBar.tsx`, `RequestsNeedingAction.tsx`, `ActionRequiredCards.tsx`, `ActiveRequestsSection.tsx`, `RecentUpdatesTimeline.tsx`, dashboard route titles.
-3. **Requests**: `routes/requests.index.tsx`, `requests.$id.tsx`, `requests.new.tsx`, `portal.requests.*`, related card / table / tab components.
-4. **Landing & Login**: `routes/landing.tsx`, `routes/login.tsx`.
-5. **Admin**: `routes/admin.users.tsx`, `admin.roles.tsx`, `admin.settings.tsx`, `admin.audit.tsx`.
-6. **Other**: projects, tasks, companies, consultants, reports, notifications, help, requirements pages — table headers, filter placeholders, primary buttons.
+سيتم استبدال السلاسل العربية المباشرة بـ `t("key")` من `useT()`. كل المفاتيح موجودة في `src/i18n/translations.ts`.
 
-For toasts: replace `toast.success("تم …")` literals with `t("toast_*")` keys.
+### Routes (SAIS)
+- `src/routes/requests.$id.tsx` — العنوان، breadcrumb، أزرار الإجراءات (assign_to_dept, request_docs, return_to_company, escalate, final_approval, reject)، التبويبات (tab_documents, tab_comments, tab_assignment_log, tab_letters)، رابط back_to_list، badges الحالة.
+- `src/routes/projects.index.tsx` + `projects.$id.tsx` — العنوان، أعمدة، add_project, edit, delete_action, related_request.
+- `src/routes/tasks.tsx` — أعمدة الكانبان والأزرار.
+- `src/routes/companies.tsx` + `companies.$id.tsx` — العنوان، أعمدة، add_company, active_requests.
+- `src/routes/consultants.tsx` — العنوان، أعمدة، add_consultant.
+- `src/routes/reports.tsx` — عناوين الشارتات.
+- `src/routes/notifications.tsx` — mark_all_read, notifications.
+- `src/routes/admin.users.tsx` — أعمدة (col_user, col_role, col_dept), add_user, search_placeholder.
+- `src/routes/admin.roles.tsx` — تبويبات (permissions_matrix, roles_tab), add_role.
+- `src/routes/admin.audit.tsx` — العنوان، أعمدة، فلاتر، refresh.
+- `src/routes/admin.settings.tsx` — عناوين التبويبات (settings_general/security/...), save_changes.
 
-For entity names with `nameAr`/`nameEn` (companies, departments, consultants, facilities), use `name(entity)`. Where code currently passes raw `nameAr`, swap to `name()`. Helpers in `src/data/requests.ts` like `requestStatusLabel` / `requestTypeLabel` will be replaced at call sites with `t("status_*")` / `t("type_*")` (keep helpers for non-React usage but prefer `t` in components).
+### Routes (Portal)
+- `src/routes/portal.index.tsx` — action_required, no_actions, active_requests, view_all, new_request_short, recent_updates.
+- `src/routes/portal.requests.index.tsx` — تبويبات (tab_all/active/waiting/completed/rejected)، أعمدة، new_request_short, search_placeholder.
+- `src/routes/portal.requests.$id.tsx` — breadcrumb، respond_attach, send_response, download_letter, submit_new، تبويبات، back_to_list.
+- `src/routes/portal.requests.new.tsx` — wizard buttons (next, previous, submit, cancel)، شاشة النجاح (toast_submitted, track_request, back_to_home).
+- `src/routes/portal.notifications.tsx` — mark_all_read.
+- `src/routes/portal.help.tsx` — العنوان.
+- `src/routes/portal.requirements.tsx` — العنوان + CTA `ready_submit`.
 
-**Do NOT translate**: seeded demo content (activity feed text, comments, letter bodies).
+### Components مشتركة
+- `src/components/common/ConfirmDialog.tsx` — confirm_delete_title, confirm_delete, confirm, cancel.
+- `src/components/common/EmptyState.tsx` — يبقى يستلم `message` كـ prop؛ المسؤولية على الـ callers لتمرير `t("no_data")` إلخ.
+- `src/components/layout/DemoBadge.tsx` — `t("poc_demo")`.
+- جميع `toast.success("...")` المكتوبة بالعربي → `toast.success(t("toast_..."))`.
 
-## 5. Verification checklist
+### أسماء الكيانات
+استخدام `name(entity)` من `useT()` بدل `entity.nameAr` المباشر في:
+- جدول `companies` + تفاصيل المنشأة.
+- dropdown إدارات الإسناد في `requests.$id`.
+- جدول الاستشاريين.
+- اسم المنشأة في `requests.$id`, `requests.index`, `portal.requests.*`.
 
-- Toggle EN → sidebar labels, topbar, KPIs, tables, buttons all in English; `<html dir="ltr" lang="en">`; sidebar flips to left; font switches to Inter.
-- Toggle AR → reverts; RTL restored; font reverts.
-- Company names + department names follow language.
-- Toasts in current language.
-- Landing + Login fully switch.
-- Settings appearance radio reflects current and switches live.
+### المحتوى التجريبي (لا يُترجم)
+- نصوص التعليقات، نصوص الخطابات (letter bodies)، أسماء الموظفين، notes في `chain` — تبقى بالعربي (محتوى تجريبي).
 
-## Technical notes
+---
 
-- `useT` is the single read path; never read translations dictionary directly in components.
-- `dir` is applied via root effect, NOT per-component, so the existing logical-property classes (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) flip automatically.
-- Persist migration: increment `persist({ version })` and supply a `migrate` that injects `language: "ar"` if absent — avoids blank UI for returning users.
-- Recharts tick/legend labels that come from data also need `name(...)` translation where the data has bilingual fields (e.g., department breakdown chart).
+## الجزء 3 — التحقق
+بعد التطبيق:
+1. التبديل للإنجليزي: السايدبار يبقى يمين، نصوصه تصير EN.
+2. المحتوى (جداول/بطاقات/عناوين) يصير محاذاته يسار.
+3. الجداول تُقرأ من اليسار لليمين.
+4. التوست يطلع EN.
+5. Landing/Login النص يتمحاذى يسار، اللوقو والتخطيط ما يتقلب.
+6. الرجوع للعربي: كل شيء يعود + محاذاة يمين.
 
-Files created: `src/i18n/translations.ts`, `src/hooks/useT.ts`.
-Files edited (core): `src/data/admin.ts`, `src/store/appStore.ts`, `src/hooks/useApplySettings.ts` (or `useTheme.ts`), `src/styles.css`, `src/components/layout/TopBar.tsx`, `src/components/layout/AppSidebar.tsx`, `src/routes/landing.tsx`, `src/routes/login.tsx`, `src/routes/admin.settings.tsx`, plus the dashboards, request, admin, and listing pages enumerated above.
+⏸️ سأتوقف بعد التنفيذ وأعرض النتيجة قبل المرحلة D.
