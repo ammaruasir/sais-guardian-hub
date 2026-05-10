@@ -128,6 +128,7 @@ function LandingPage() {
                 <div className="text-[8px] text-slate-400">Vision 2030</div>
               </div>
             </div>
+            <ThemeToggleButton />
             <Link to="/login">
               <Button className="gap-2 bg-[#006c35] text-white hover:bg-[#005528]">
                 تسجيل الدخول
