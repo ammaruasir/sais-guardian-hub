@@ -3,6 +3,7 @@ import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-r
 import appCss from "../styles.css?url";
 import { RoleProvider } from "@/context/RoleContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { useTheme } from "@/hooks/useTheme";
 
 function NotFoundComponent() {
   return (
