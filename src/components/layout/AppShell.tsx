@@ -6,6 +6,7 @@ import { useRole } from "@/context/RoleContext";
 import { useAppStore } from "@/store/appStore";
 import { useApplySettings } from "@/hooks/useApplySettings";
 import { RequireAuth } from "@/components/auth/RequireAuth";
+import { CommandPalette } from "@/components/common/CommandPalette";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { role } = useRole();
@@ -23,6 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </main>
           </SidebarInset>
         </div>
+        <CommandPalette />
       </SidebarProvider>
     </RequireAuth>
   );
