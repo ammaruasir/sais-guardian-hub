@@ -291,7 +291,30 @@ export const useAppStore = create<State>()(
         }
       },
 
-      escalateRequest: (id, dept, assigneeAr, noteAr) => {
+      assignToStaff: (id, userId, userName, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const lastIdx = r.chain.length - 1;
+            const chain = r.chain.map((e, i) =>
+              i === lastIdx && !e.endedAt
+                ? { ...e, assignedToUserId: userId, assignedToUserName: userName, noteAr: noteAr ?? e.noteAr }
+                : e,
+            );
+            return { ...r, chain, lastUpdate: today };
+          }),
+        }));
+        get().addAudit({
+          user: "م. خالد الحربي",
+          type: "assignment",
+          description: `إسناد طلب ${id} إلى ${userName}`,
+          page: `/requests/${id}`,
+          level: "info",
+        });
+      },
+
+
         const today = new Date().toISOString().slice(0, 10);
         set((s) => ({
           requests: s.requests.map((r) => {
