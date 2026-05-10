@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
+import { ThemeToggleButton } from "@/components/layout/TopBar";
 import {
   Shield,
   FolderPlus,
