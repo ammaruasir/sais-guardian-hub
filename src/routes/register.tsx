@@ -14,7 +14,7 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPlaceholder() {
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
+    <div className="content-area min-h-screen bg-slate-50" dir="rtl">
       <div className="bg-[#006c35] py-1.5 text-center text-[11px] text-white">
         المملكة العربية السعودية — موقع حكومي رسمي
       </div>
