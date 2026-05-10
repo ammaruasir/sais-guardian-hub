@@ -121,6 +121,8 @@ export function LetterComposerDialog({
   }, [open, existingLetterId, type]);
 
   const set = <K extends keyof Letter>(k: K, v: Letter[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const reqClass = (v: string) =>
+    !v || !v.trim() ? "border-destructive bg-destructive/5 text-destructive placeholder:text-destructive/60" : "";
 
   const addItem = () => set("items", [...draft.items, ""]);
   const updateItem = (i: number, v: string) =>
