@@ -23,6 +23,7 @@ export type Letter = {
   status: LetterStatus;
   subjectAr: string;
   addresseeAr: string;
+  referenceAr?: string;
   bodyIntroAr: string;
   items: string[];
   commentsTable?: LetterCommentRow[];
