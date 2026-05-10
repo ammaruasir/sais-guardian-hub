@@ -58,6 +58,7 @@ const companyNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
   { to: "/portal/requests", icon: FileStack, key: "my_requests" },
   { to: "/portal/requirements", icon: FileText, key: "requirements" },
   { to: "/portal/notifications", icon: Bell, key: "notifications" },
+  { to: "/portal/settings", icon: Settings, key: "account_settings" },
   { to: "/portal/help", icon: HelpCircle, key: "help" },
 ];
 
