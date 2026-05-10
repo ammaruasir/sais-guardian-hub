@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { NotificationType } from "@/data/notifications";
 import { useAppStore } from "@/store/appStore";
+import { useT } from "@/hooks/useT";
 
 const typeMeta: Record<NotificationType, { icon: typeof CircleCheck; cls: string }> = {
   approval: { icon: CircleCheck, cls: "bg-success/15 text-success" },
@@ -28,12 +29,9 @@ const typeMeta: Record<NotificationType, { icon: typeof CircleCheck; cls: string
 
 type Filter = "all" | "unread" | "approval" | "request" | "deadline";
 
-const filterLabels: Record<Filter, string> = {
-  all: "الكل",
-  unread: "غير مقروءة",
-  approval: "اعتمادات",
-  request: "طلبات",
-  deadline: "مواعيد",
+const filterLabelsByLang: Record<"ar" | "en", Record<Filter, string>> = {
+  ar: { all: "الكل", unread: "غير مقروءة", approval: "اعتمادات", request: "طلبات", deadline: "مواعيد" },
+  en: { all: "All", unread: "Unread", approval: "Approvals", request: "Requests", deadline: "Deadlines" },
 };
 
 export function NotificationsList({ role }: { role: "sais" | "company" }) {
@@ -43,6 +41,8 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
   const deleteNotification = useAppStore((s) => s.deleteNotification);
   const items = allNotifications.filter((n) => n.forRole === role || n.forRole === "both");
   const [filter, setFilter] = useState<Filter>("all");
+  const { t, isAr, lang } = useT();
+  const filterLabels = filterLabelsByLang[lang];
 
   const filtered = items.filter((n) => {
     if (filter === "all") return true;
@@ -59,14 +59,16 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">الإشعارات</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("notifications")}</h1>
           <p className="text-sm text-muted-foreground">
-            {unreadTotal > 0 ? `لديك ${unreadTotal} إشعار غير مقروء` : "لا يوجد إشعارات غير مقروءة"}
+            {unreadTotal > 0
+              ? isAr ? `لديك ${unreadTotal} إشعار غير مقروء` : `You have ${unreadTotal} unread notification(s)`
+              : isAr ? "لا يوجد إشعارات غير مقروءة" : "No unread notifications"}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={markAll} disabled={unreadTotal === 0}>
           <CheckCheck className="ms-1 h-4 w-4" />
-          تحديد الكل كمقروء
+          {t("mark_all_read")}
         </Button>
       </div>
 
@@ -84,8 +86,10 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <BellOff className="h-8 w-8 text-muted-foreground" />
-            <div className="text-sm font-medium">لا يوجد إشعارات</div>
-            <p className="text-xs text-muted-foreground">لا توجد عناصر مطابقة للفلتر الحالي.</p>
+            <div className="text-sm font-medium">{isAr ? "لا يوجد إشعارات" : "No notifications"}</div>
+            <p className="text-xs text-muted-foreground">
+              {isAr ? "لا توجد عناصر مطابقة للفلتر الحالي." : "No items match the current filter."}
+            </p>
           </div>
         ) : (
           filtered.map((n) => {
@@ -134,7 +138,7 @@ export function NotificationsList({ role }: { role: "sais" | "company" }) {
                     deleteNotification(n.id);
                   }}
                   className="relative z-10 rounded p-1 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-                  aria-label="حذف"
+                  aria-label={isAr ? "حذف" : "Delete"}
                 >
                   <X className="h-4 w-4" />
                 </button>
