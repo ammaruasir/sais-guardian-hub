@@ -20,6 +20,7 @@ function CompanyDetailPage() {
   const companies = useAppStore((s) => s.companies);
   const projects = useAppStore((s) => s.projects);
   const consultants = useAppStore((s) => s.consultants);
+  const requests = useAppStore((s) => s.requests);
   const company = companies.find((c) => c.id === id);
   if (!company) {
     return (
