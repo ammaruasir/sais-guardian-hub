@@ -50,6 +50,12 @@ function RequestDetailPage() {
   const requestAdditionalDocs = useAppStore((s) => s.requestAdditionalDocs);
   const addRequestComment = useAppStore((s) => s.addRequestComment);
   const allLetters = useAppStore((s) => s.letters);
+  const users = useAppStore((s) => s.users);
+  const assignToStaff = useAppStore((s) => s.assignToStaff);
+
+  const [staffOpen, setStaffOpen] = useState(false);
+  const [staffUserId, setStaffUserId] = useState("");
+  const [staffNote, setStaffNote] = useState("");
 
   const [assignDept, setAssignDept] = useState<DepartmentKey | "">("");
   const [actionNote, setActionNote] = useState("");
