@@ -31,6 +31,7 @@ function PortalProjectDetailPage() {
   const company = companies.find((c) => c.id === project.companyId);
   const subs = submissions.filter((s) => s.projectId === project.id);
   const currentSub = subs.find((s) => s.stage === project.stage);
+  const relatedRequest = useAppStore((s) => s.requests.find((r) => r.relatedProjectId === project.id));
 
   const meta: Partial<Record<Stage, { approvedAt?: string; subLabel?: string }>> = {};
   for (const s of subs) {
