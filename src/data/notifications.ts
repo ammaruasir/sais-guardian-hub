@@ -87,7 +87,7 @@ export const notifications: AppNotification[] = [
     descriptionAr: "يرجى رفع مخططات الحماية المحدّثة خلال 5 أيام.",
     ts: "قبل 3 أيام",
     read: false,
-    linkTo: "/portal/projects/p1",
+    linkTo: "/portal/requests/r1",
     forRole: "company",
   },
   {
