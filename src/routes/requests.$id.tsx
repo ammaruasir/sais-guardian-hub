@@ -62,6 +62,7 @@ function RequestDetailPage() {
   if (!request) throw notFound();
 
   const { t: tr, isAr, name } = useT();
+  usePageTitle((isAr ? "طلب " : "Request ") + request.ref + " — SAIS");
   const company = companies.find((c) => c.id === request.companyId);
   const currentDept = departments.find((d) => d.key === request.currentDepartment);
   const tp = requestTypeLabel[request.type];
