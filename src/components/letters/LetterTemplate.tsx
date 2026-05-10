@@ -6,84 +6,79 @@ export function LetterTemplate({ letter, idForPrint }: { letter: Letter; idForPr
     <div
       id={idForPrint ?? "letter-print-area"}
       dir="rtl"
-      className="letter-sheet mx-auto bg-white text-[#1a1a1a] shadow-md"
+      className="letter-sheet mx-auto bg-white text-[#1a1a1a] shadow-md flex flex-col"
       style={{
         width: "210mm",
-        minHeight: "297mm",
-        padding: "16mm 14mm",
+        height: "297mm",
+        padding: "10mm 10mm",
         fontFamily: "'IBM Plex Sans Arabic', 'Tajawal', serif",
-        fontSize: "12pt",
-        lineHeight: 1.9,
+        fontSize: "11pt",
+        lineHeight: 1.7,
+        boxSizing: "border-box",
       }}
     >
-      {/* ===== Header ===== */}
-      <div className="grid grid-cols-3 items-start gap-4">
-        {/* Right: official authority titles */}
-        <div className="text-end">
-          <div
-            className="text-[#0E5A3A] font-bold leading-tight"
-            style={{ fontSize: "16pt", letterSpacing: "0.5px" }}
-          >
-            المملكة العربية السعودية
-          </div>
-          <div
-            className="text-[#0E5A3A] font-bold leading-tight mt-1"
-            style={{ fontSize: "15pt" }}
-          >
-            الهيئة العليا للأمن الصناعي
-          </div>
-          <div className="mt-1 text-[10pt] text-[#0E5A3A]">(١٨٩)</div>
-        </div>
-
-        {/* Center: SAIS emblem */}
-        <div className="flex flex-col items-center">
-          <img src={saisEmblem} alt="SAIS" className="h-24 w-auto object-contain" />
-          <div className="mt-1 text-center text-[8pt] text-[#0E5A3A] font-semibold">
-            الهيئة العليا للأمن الصناعي
-            <div className="text-[7pt] text-[#0E5A3A]/70">
-              Supreme Authority For Industrial Security
-            </div>
-          </div>
-        </div>
-
-        {/* Left: ref / date / attachments */}
-        <div className="text-[10pt] space-y-2 pt-2">
-          <FieldLine label="الرقم" value={letter.ref} />
-          <FieldLine label="التاريخ" value={letter.hijriDate} />
-          <FieldLine label="التوابع" value={letter.attachmentsCount ? String(letter.attachmentsCount) : ""} />
-        </div>
-      </div>
-
-      {/* ===== Bordered body ===== */}
-      <div
-        className="relative mt-6 rounded-[28px] border-2 border-[#0E5A3A] px-8 pt-10 pb-8"
-        style={{ minHeight: "200mm" }}
-      >
+      {/* Full-page bordered container */}
+      <div className="relative flex flex-col flex-1 rounded-[24px] border-2 border-[#0E5A3A] p-6">
         {/* Confidential badge */}
         {letter.classified && (
-          <div className="absolute -top-3 right-10 bg-white px-3 text-[11pt] font-bold text-[#0E5A3A]">
+          <div className="absolute -top-3 right-10 bg-white px-3 text-[10pt] font-bold text-[#0E5A3A]">
             برقية سرية
           </div>
         )}
 
-        {/* Addressee */}
-        <div className="text-[12pt] leading-loose">
-          <div>
-            <span className="font-bold">سعادة </span>
-            <span>{letter.addresseeAr}</span>
-            <span className="float-start font-bold">سلمه الله</span>
+        {/* ===== Header inside border ===== */}
+        <div className="grid grid-cols-3 items-start gap-4 pb-3 border-b border-[#0E5A3A]/30">
+          {/* Right: titles */}
+          <div className="text-end">
+            <div className="text-[#0E5A3A] font-bold leading-tight" style={{ fontSize: "14pt" }}>
+              المملكة العربية السعودية
+            </div>
+            <div className="text-[#0E5A3A] font-bold leading-tight mt-0.5" style={{ fontSize: "13pt" }}>
+              الهيئة العليا للأمن الصناعي
+            </div>
+            <div className="mt-0.5 text-[9pt] text-[#0E5A3A]">(١٨٩)</div>
           </div>
-          <div className="mt-3 font-bold">السلام عليكم ورحمة الله وبركاته،</div>
+
+          {/* Center: emblem */}
+          <div className="flex flex-col items-center">
+            <img src={saisEmblem} alt="SAIS" className="h-20 w-auto object-contain" />
+            <div className="mt-1 text-center text-[7pt] text-[#0E5A3A] font-semibold leading-tight">
+              الهيئة العليا للأمن الصناعي
+              <div className="text-[6pt] text-[#0E5A3A]/70">
+                Supreme Authority For Industrial Security
+              </div>
+            </div>
+          </div>
+
+          {/* Left: meta */}
+          <div className="text-[9pt] space-y-1.5 pt-1">
+            <FieldLine label="الرقم" value={letter.ref} />
+            <FieldLine label="التاريخ" value={letter.hijriDate} />
+            <FieldLine
+              label="التوابع"
+              value={letter.attachmentsCount ? String(letter.attachmentsCount) : ""}
+            />
+          </div>
         </div>
 
-        {/* Reference / Subject / Body labels */}
-        <div className="mt-5 space-y-4 text-justify">
+        {/* Addressee */}
+        <div className="mt-4 text-[11pt] leading-loose">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="font-bold">سعادة </span>
+              <span>{letter.addresseeAr || "____________"}</span>
+            </div>
+            <span className="font-bold">سلمه الله</span>
+          </div>
+          <div className="mt-2 font-bold">السلام عليكم ورحمة الله وبركاته،</div>
+        </div>
+
+        {/* Sections */}
+        <div className="mt-3 space-y-3 text-justify flex-1">
           <LabeledBlock label="الإشارة">
             <span>
-              بالإشارة إلى الطلب رقم{" "}
-              <span className="font-bold">{letter.requestId}</span>{" "}
-              المقدّم من{" "}
-              <span className="font-bold">{letter.addresseeAr}</span>.
+              {letter.referenceAr?.trim() ||
+                `بالإشارة إلى الطلب رقم ${letter.requestId} المقدّم من ${letter.addresseeAr}.`}
             </span>
           </LabeledBlock>
 
@@ -96,7 +91,7 @@ export function LetterTemplate({ letter, idForPrint }: { letter: Letter; idForPr
               <p>{letter.bodyIntroAr}</p>
 
               {letter.type !== "comments" && letter.items.length > 0 && (
-                <ol className="mt-3 list-decimal space-y-1 ps-6">
+                <ol className="mt-2 list-decimal space-y-0.5 ps-6">
                   {letter.items.map((it, i) => (
                     <li key={i}>{it}</li>
                   ))}
@@ -104,22 +99,22 @@ export function LetterTemplate({ letter, idForPrint }: { letter: Letter; idForPr
               )}
 
               {letter.type === "comments" && letter.commentsTable && (
-                <table className="mt-4 w-full border-collapse text-[11pt]">
+                <table className="mt-3 w-full border-collapse text-[10pt]">
                   <thead>
                     <tr className="bg-[#0E5A3A] text-white">
-                      <th className="border border-[#0E5A3A] p-2 text-center w-12">م</th>
-                      <th className="border border-[#0E5A3A] p-2 text-start">المستند</th>
-                      <th className="border border-[#0E5A3A] p-2 text-start">التعليق</th>
-                      <th className="border border-[#0E5A3A] p-2 text-center w-32">الحالة</th>
+                      <th className="border border-[#0E5A3A] p-1.5 text-center w-10">م</th>
+                      <th className="border border-[#0E5A3A] p-1.5 text-start">المستند</th>
+                      <th className="border border-[#0E5A3A] p-1.5 text-start">التعليق</th>
+                      <th className="border border-[#0E5A3A] p-1.5 text-center w-28">الحالة</th>
                     </tr>
                   </thead>
                   <tbody>
                     {letter.commentsTable.map((row, i) => (
                       <tr key={i}>
-                        <td className="border border-[#0E5A3A]/60 p-2 text-center">{i + 1}</td>
-                        <td className="border border-[#0E5A3A]/60 p-2">{row.doc}</td>
-                        <td className="border border-[#0E5A3A]/60 p-2">{row.comment}</td>
-                        <td className="border border-[#0E5A3A]/60 p-2 text-center">{row.status}</td>
+                        <td className="border border-[#0E5A3A]/60 p-1.5 text-center">{i + 1}</td>
+                        <td className="border border-[#0E5A3A]/60 p-1.5">{row.doc}</td>
+                        <td className="border border-[#0E5A3A]/60 p-1.5">{row.comment}</td>
+                        <td className="border border-[#0E5A3A]/60 p-1.5 text-center">{row.status}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -132,23 +127,23 @@ export function LetterTemplate({ letter, idForPrint }: { letter: Letter; idForPr
             <span>{letter.closingAr}</span>
           </LabeledBlock>
 
-          <p className="pt-2">والسلام عليكم ورحمة الله وبركاته،،،</p>
+          <p className="pt-1">والسلام عليكم ورحمة الله وبركاته،،،</p>
         </div>
 
         {/* Signature */}
-        <div className="mt-12 flex items-end justify-start">
+        <div className="mt-6 flex items-end justify-start">
           <div className="text-center">
-            <div className="border-b-2 border-dotted border-[#0E5A3A]/70 px-16 pb-1 text-[11pt] font-bold text-[#0E5A3A]">
+            <div className="border-b-2 border-dotted border-[#0E5A3A]/70 px-12 pb-1 text-[10pt] font-bold text-[#0E5A3A]">
               {letter.signatoryAr}
             </div>
-            <div className="mt-1 text-[10pt] text-[#444]">{letter.signatoryTitleAr}</div>
+            <div className="mt-1 text-[9pt] text-[#444]">{letter.signatoryTitleAr}</div>
           </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <div className="mt-4 text-center text-[8pt] text-[#666]">
-        الرياض — المملكة العربية السعودية | sais.gov.sa
+        {/* Footer */}
+        <div className="mt-3 pt-2 border-t border-[#0E5A3A]/30 text-center text-[8pt] text-[#666]">
+          الرياض — المملكة العربية السعودية | sais.gov.sa
+        </div>
       </div>
     </div>
   );

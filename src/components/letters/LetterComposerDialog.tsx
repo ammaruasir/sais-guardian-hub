@@ -97,6 +97,7 @@ export function LetterComposerDialog({
       type,
       status: "draft",
       addresseeAr,
+      referenceAr: "",
       subjectAr: `${d.subjectAr} — ${requestRef}`,
       bodyIntroAr: d.bodyIntroAr,
       items: [...d.items],
@@ -120,6 +121,8 @@ export function LetterComposerDialog({
   }, [open, existingLetterId, type]);
 
   const set = <K extends keyof Letter>(k: K, v: Letter[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const reqClass = (v: string) =>
+    !v || !v.trim() ? "border-destructive bg-destructive/5 text-destructive placeholder:text-destructive/60" : "";
 
   const addItem = () => set("items", [...draft.items, ""]);
   const updateItem = (i: number, v: string) =>
@@ -182,26 +185,46 @@ export function LetterComposerDialog({
           </TabsList>
 
           <TabsContent value="edit" className="space-y-4">
+            <p className="text-xs text-muted-foreground">
+              الحقول المعلّمة <span className="text-destructive font-bold">باللون الأحمر</span> مطلوبة قبل الإصدار.
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>الموضوع</Label>
-                <Input value={draft.subjectAr} onChange={(e) => set("subjectAr", e.target.value)} />
+                <Label>الموضوع <span className="text-destructive">*</span></Label>
+                <Input
+                  value={draft.subjectAr}
+                  onChange={(e) => set("subjectAr", e.target.value)}
+                  className={reqClass(draft.subjectAr)}
+                />
               </div>
               <div>
-                <Label>المُرسل إليه</Label>
+                <Label>المُرسل إليه <span className="text-destructive">*</span></Label>
                 <Input
                   value={draft.addresseeAr}
                   onChange={(e) => set("addresseeAr", e.target.value)}
+                  className={reqClass(draft.addresseeAr)}
                 />
               </div>
             </div>
 
             <div>
-              <Label>مقدمة الخطاب</Label>
+              <Label>الإشارة <span className="text-destructive">*</span></Label>
+              <Textarea
+                rows={2}
+                placeholder="مثال: بالإشارة إلى الطلب رقم REQ-0001 المقدّم من ..."
+                value={draft.referenceAr ?? ""}
+                onChange={(e) => set("referenceAr", e.target.value)}
+                className={reqClass(draft.referenceAr ?? "")}
+              />
+            </div>
+
+            <div>
+              <Label>مقدمة الخطاب (الإفادة) <span className="text-destructive">*</span></Label>
               <Textarea
                 rows={3}
                 value={draft.bodyIntroAr}
                 onChange={(e) => set("bodyIntroAr", e.target.value)}
+                className={reqClass(draft.bodyIntroAr)}
               />
             </div>
 
@@ -213,7 +236,8 @@ export function LetterComposerDialog({
                       ? "المستندات المطلوبة"
                       : type === "approval"
                         ? "الشروط"
-                        : "الأسباب"}
+                        : "الأسباب"}{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Button size="sm" variant="outline" onClick={addItem}>
                     <Plus className="h-3 w-3 me-1" /> إضافة بند
@@ -221,7 +245,11 @@ export function LetterComposerDialog({
                 </div>
                 {draft.items.map((it, i) => (
                   <div key={i} className="flex gap-2">
-                    <Input value={it} onChange={(e) => updateItem(i, e.target.value)} />
+                    <Input
+                      value={it}
+                      onChange={(e) => updateItem(i, e.target.value)}
+                      className={reqClass(it)}
+                    />
                     <Button size="icon" variant="ghost" onClick={() => removeItem(i)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -241,19 +269,19 @@ export function LetterComposerDialog({
                 {(draft.commentsTable ?? []).map((row, i) => (
                   <div key={i} className="grid grid-cols-12 gap-2">
                     <Input
-                      className="col-span-4"
+                      className={`col-span-4 ${reqClass(row.doc)}`}
                       placeholder="المستند"
                       value={row.doc}
                       onChange={(e) => updateRow(i, { doc: e.target.value })}
                     />
                     <Input
-                      className="col-span-5"
+                      className={`col-span-5 ${reqClass(row.comment)}`}
                       placeholder="التعليق"
                       value={row.comment}
                       onChange={(e) => updateRow(i, { comment: e.target.value })}
                     />
                     <Input
-                      className="col-span-2"
+                      className={`col-span-2 ${reqClass(row.status)}`}
                       placeholder="الحالة"
                       value={row.status}
                       onChange={(e) => updateRow(i, { status: e.target.value })}
@@ -272,11 +300,12 @@ export function LetterComposerDialog({
             )}
 
             <div>
-              <Label>الخاتمة</Label>
+              <Label>الخاتمة / المطلوب <span className="text-destructive">*</span></Label>
               <Textarea
                 rows={2}
                 value={draft.closingAr}
                 onChange={(e) => set("closingAr", e.target.value)}
+                className={reqClass(draft.closingAr)}
               />
             </div>
 
