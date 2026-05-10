@@ -98,6 +98,20 @@ export function TaskDetailSheet({
             </div>
           )}
 
+          {relatedRequest && (
+            <div className="text-sm">
+              <span className="text-muted-foreground">الطلب المرتبط: </span>
+              <Link
+                to="/requests/$id"
+                params={{ id: relatedRequest.id }}
+                className="inline-flex items-center gap-1 text-secondary hover:underline"
+              >
+                {relatedRequest.ref}
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted-foreground">الحالة</label>
