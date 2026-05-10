@@ -134,7 +134,15 @@ function RequestDetailPage() {
           </Card>
           <Card className="p-4">
             <div className="text-xs text-muted-foreground">{tr("col_department")}</div>
-            <div className="text-sm font-medium mt-1">{name(currentDept ?? null)}</div>
+            <div className="text-sm font-medium mt-1 flex items-center gap-2 flex-wrap">
+              <span>{name(currentDept ?? null)}</span>
+              {(() => {
+                const last = request.chain[request.chain.length - 1];
+                return last?.assignedToUserName ? (
+                  <Badge variant="outline" className="text-xs">{(isAr ? "المسؤول: " : "Assignee: ") + last.assignedToUserName}</Badge>
+                ) : null;
+              })()}
+            </div>
           </Card>
           <Card className="p-4">
             <div className="text-xs text-muted-foreground">{tr("col_received")}</div>
