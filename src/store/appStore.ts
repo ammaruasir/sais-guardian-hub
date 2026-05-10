@@ -81,6 +81,7 @@ type State = {
   // Request actions
   createRequest: (r: Omit<SaisRequest, "id" | "ref" | "chain" | "comments" | "documents" | "lastUpdate" | "status" | "currentDepartment"> & { initialAssigneeAr?: string }) => { id: string; ref: string };
   assignRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
+  assignToStaff: (id: string, userId: string, userName: string, noteAr?: string) => void;
   escalateRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
   returnRequest: (id: string, noteAr?: string) => void;
   approveRequest: (id: string, noteAr?: string) => void;
@@ -290,6 +291,28 @@ export const useAppStore = create<State>()(
         }
       },
 
+      assignToStaff: (id, userId, userName, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const lastIdx = r.chain.length - 1;
+            const chain = r.chain.map((e, i) =>
+              i === lastIdx && !e.endedAt
+                ? { ...e, assignedToUserId: userId, assignedToUserName: userName, noteAr: noteAr ?? e.noteAr }
+                : e,
+            );
+            return { ...r, chain, lastUpdate: today };
+          }),
+        }));
+        get().addAudit({
+          user: "م. خالد الحربي",
+          type: "assignment",
+          description: `إسناد طلب ${id} إلى ${userName}`,
+          page: `/requests/${id}`,
+          level: "info",
+        });
+      },
       escalateRequest: (id, dept, assigneeAr, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
         set((s) => ({

@@ -1,104 +1,112 @@
-# المرحلة C — تكملة: تصحيح سلوك اللغة + ترجمة الصفحات المتبقية
+# Phase D — Platform Polish
 
-## الجزء 1 — تصحيح سلوك التبديل (Layout يبقى RTL دائماً)
+Seven independent improvements. All new strings go through `useT()`; new keys added to `src/i18n/translations.ts`.
 
-### 1. تعديل `src/hooks/useApplySettings.ts`
-- إزالة `root.dir = ...` (لا نلمس `dir` على `<html>` أبداً — يبقى `rtl`).
-- إبقاء `root.lang = language`.
-- استبدال منطق الـ class:
-  ```ts
-  root.classList.toggle("font-en", language === "en");
-  root.classList.toggle("font-ar", language === "ar");
-  document.body.classList.toggle("lang-en", language === "en");
-  document.body.classList.toggle("lang-ar", language === "ar");
-  ```
+## 1. Profile Dropdown (TopBar)
 
-### 2. تعديل `src/components/layout/AppShell.tsx`
-- إبقاء `dir="rtl"` على الـ wrapper (موجود حالياً — لا تغيير).
-- إضافة `className="content-area"` على `<main>`.
+Replace the avatar block + standalone Logout button in `TopBar.tsx` with a `DropdownMenu` triggered by clicking the avatar.
 
-### 3. تعديل `src/components/layout/AppSidebar.tsx`
-- استبدال `side={isAr ? "right" : "left"}` بـ `side="right"` ثابت.
-- النصوص تبقى تتبع `t()`.
+**SAIS variant:**
+- Header: name (bold) + role (muted)
+- `DropdownMenuSeparator`
+- Item "Profile" → opens a `Sheet` with name, email, role, department, last login (mock)
+- Item "Settings" → `/admin/settings`
+- Separator
+- Inline row: Moon/Sun icon + Dark Mode label + `Switch` (calls `useTheme().setTheme`)
+- Inline row: Globe icon + language label + `Switch` (calls `setLanguage`)
+- Separator
+- Item "Logout" (red, LogOut icon) → existing `handleSignOut`
 
-### 4. تعديل `src/styles.css`
-- استبدال كتلة `html.font-en` الحالية وإضافة `html.font-ar` صراحةً:
-  ```css
-  html.font-en { font-family: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif; }
-  html.font-ar { font-family: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif; }
-  ```
-- إضافة قواعد الـ content-area:
-  ```css
-  body.lang-ar .content-area { text-align: right; }
-  body.lang-en .content-area { text-align: left; }
-  body.lang-en .content-area :is(h1,h2,h3,h4,p,span,label,li,td,th,dt,dd) { text-align: left; direction: ltr; }
-  body.lang-en .content-area table { direction: ltr; }
-  /* استثناءات: الأرقام والعناصر اللي عندها dir صريح ما تتأثر */
-  body.lang-en .content-area [dir="rtl"] { direction: rtl; text-align: right; }
-  ```
-- ملاحظة: السايدبار و TopBar خارج `.content-area` فما يتأثرون.
+**Company variant:** same shape; header shows company name + "مدير الامتثال"; "Settings" goes to `/portal/settings`.
 
-### 5. صفحات بدون AppShell (Landing, Login, Register, Auth)
-- لفّ المحتوى الرئيسي بـ `<div className="content-area">` لتطبيق نفس قاعدة المحاذاة.
-- Layout يبقى RTL (الـ root `<html dir="rtl">` لا يتغير).
+Uses existing `dropdown-menu`, `sheet`, `switch` shadcn primitives. The two inline toggle rows use `<DropdownMenuItem onSelect={(e) => e.preventDefault()}>` so the menu stays open.
 
-### 6. سلوك TopBar
-- لا تغيير على الـ layout (يبقى RTL — `ms-auto`, `-end-1` تعمل صح).
-- النصوص فقط تتغير عبر `t()`.
+## 2. Company Account Settings — `/portal/settings`
 
----
+New file `src/routes/portal.settings.tsx` (child of existing `portal.tsx` layout — no `<AppShell>` wrapping).
 
-## الجزء 2 — ترجمة الصفحات المتبقية
+Four `Card` sections:
+1. **Company Info** — read-only fields with "Edit" → enables inputs → "Save"/"Cancel". State held locally; mock save shows toast.
+2. **Contacts** — `Table` with mock rows; "Add contact" opens a `Dialog`; row actions Edit/Delete (mock state).
+3. **Preferences** — radio groups for language (wired to `setLanguage`) and theme (wired to `setTheme`); 3 `Switch` items for email/new-request/weekly notifications (local state).
+4. **Security** — change password form (3 inputs + button, mock submit); active sessions list (2 mock rows: browser, device, IP, last active).
 
-سيتم استبدال السلاسل العربية المباشرة بـ `t("key")` من `useT()`. كل المفاتيح موجودة في `src/i18n/translations.ts`.
+Add nav entry `{ to: "/portal/settings", icon: Settings, key: "account_settings" }` to `companyNav` in `AppSidebar.tsx` (last item).
 
-### Routes (SAIS)
-- `src/routes/requests.$id.tsx` — العنوان، breadcrumb، أزرار الإجراءات (assign_to_dept, request_docs, return_to_company, escalate, final_approval, reject)، التبويبات (tab_documents, tab_comments, tab_assignment_log, tab_letters)، رابط back_to_list، badges الحالة.
-- `src/routes/projects.index.tsx` + `projects.$id.tsx` — العنوان، أعمدة، add_project, edit, delete_action, related_request.
-- `src/routes/tasks.tsx` — أعمدة الكانبان والأزرار.
-- `src/routes/companies.tsx` + `companies.$id.tsx` — العنوان، أعمدة، add_company, active_requests.
-- `src/routes/consultants.tsx` — العنوان، أعمدة، add_consultant.
-- `src/routes/reports.tsx` — عناوين الشارتات.
-- `src/routes/notifications.tsx` — mark_all_read, notifications.
-- `src/routes/admin.users.tsx` — أعمدة (col_user, col_role, col_dept), add_user, search_placeholder.
-- `src/routes/admin.roles.tsx` — تبويبات (permissions_matrix, roles_tab), add_role.
-- `src/routes/admin.audit.tsx` — العنوان، أعمدة، فلاتر، refresh.
-- `src/routes/admin.settings.tsx` — عناوين التبويبات (settings_general/security/...), save_changes.
+## 3. Intra-Department Staff Assignment
 
-### Routes (Portal)
-- `src/routes/portal.index.tsx` — action_required, no_actions, active_requests, view_all, new_request_short, recent_updates.
-- `src/routes/portal.requests.index.tsx` — تبويبات (tab_all/active/waiting/completed/rejected)، أعمدة، new_request_short, search_placeholder.
-- `src/routes/portal.requests.$id.tsx` — breadcrumb، respond_attach, send_response, download_letter, submit_new، تبويبات، back_to_list.
-- `src/routes/portal.requests.new.tsx` — wizard buttons (next, previous, submit, cancel)، شاشة النجاح (toast_submitted, track_request, back_to_home).
-- `src/routes/portal.notifications.tsx` — mark_all_read.
-- `src/routes/portal.help.tsx` — العنوان.
-- `src/routes/portal.requirements.tsx` — العنوان + CTA `ready_submit`.
+**Type change** in `src/data/requests.ts`:
+```ts
+export type AssignmentEntry = {
+  ...
+  assignedToUserId?: string;
+  assignedToUserName?: string;
+};
+```
 
-### Components مشتركة
-- `src/components/common/ConfirmDialog.tsx` — confirm_delete_title, confirm_delete, confirm, cancel.
-- `src/components/common/EmptyState.tsx` — يبقى يستلم `message` كـ prop؛ المسؤولية على الـ callers لتمرير `t("no_data")` إلخ.
-- `src/components/layout/DemoBadge.tsx` — `t("poc_demo")`.
-- جميع `toast.success("...")` المكتوبة بالعربي → `toast.success(t("toast_..."))`.
+**Store action** in `src/store/appStore.ts`:
+`assignToStaff(requestId, userId, userName, note?)` → mutates the open chain entry (the one with no `endedAt`) of the request, sets `assignedToUserId`/`assignedToUserName`, appends an audit-log + activity entry.
 
-### أسماء الكيانات
-استخدام `name(entity)` من `useT()` بدل `entity.nameAr` المباشر في:
-- جدول `companies` + تفاصيل المنشأة.
-- dropdown إدارات الإسناد في `requests.$id`.
-- جدول الاستشاريين.
-- اسم المنشأة في `requests.$id`, `requests.index`, `portal.requests.*`.
+**UI** in `src/routes/requests.$id.tsx` action panel:
+- New button "Assign to staff member"
+- Opens a `Dialog` with a `Select` of users where `user.department === currentDepartment`, optional notes textarea, Confirm button
+- Header card shows "المسؤول: {assignedToUserName}" when set on the active chain entry
 
-### المحتوى التجريبي (لا يُترجم)
-- نصوص التعليقات، نصوص الخطابات (letter bodies)، أسماء الموظفين، notes في `chain` — تبقى بالعربي (محتوى تجريبي).
+## 4. Command Palette (Ctrl/⌘+K)
 
----
+New `src/components/common/CommandPalette.tsx` using shadcn `CommandDialog`.
 
-## الجزء 3 — التحقق
-بعد التطبيق:
-1. التبديل للإنجليزي: السايدبار يبقى يمين، نصوصه تصير EN.
-2. المحتوى (جداول/بطاقات/عناوين) يصير محاذاته يسار.
-3. الجداول تُقرأ من اليسار لليمين.
-4. التوست يطلع EN.
-5. Landing/Login النص يتمحاذى يسار، اللوقو والتخطيط ما يتقلب.
-6. الرجوع للعربي: كل شيء يعود + محاذاة يمين.
+- Mounted in `AppShell.tsx` (always present for authenticated users)
+- Global `keydown` listener (in palette component) for `(metaKey||ctrlKey) && key === "k"` toggles `open`
+- TopBar gets a `Search` icon button that also opens it
+- Reads `requests`, `projects`, `companies`, `users` from `useAppStore`
+- For role `company`, filter requests/projects to `companyId === "aramco"`; hide Users group
+- Search filter: case-insensitive substring on `ref`, `titleAr`, `titleEn`, `nameAr`, `nameEn`
+- `CommandGroup` per type with icon + primary text + subtitle; `onSelect` → `navigate({ to, params })` then close
+- Empty state via `CommandEmpty`
 
-⏸️ سأتوقف بعد التنفيذ وأعرض النتيجة قبل المرحلة D.
+## 5. Browser Tab Titles
+
+Add a tiny hook `src/hooks/usePageTitle.ts`:
+```ts
+useEffect(() => { document.title = title; }, [title]);
+```
+
+Call it at the top of each page component with the localized title (using `useT`). Dynamic routes (`/requests/$id`, `/portal/requests/$id`) compute from the loaded request's `ref`.
+
+Pages updated: index, requests.index, requests.$id, projects.index, tasks, companies, consultants, reports, notifications, admin.users, admin.roles, admin.audit, admin.settings, portal.index, portal.requests.index, portal.requests.$id, portal.requests.new, portal.requirements, portal.settings, landing, login.
+
+## 6. Mobile Responsiveness (≤ 375 px)
+
+Targeted fixes only — most layouts already use Tailwind responsive utils:
+- `requests.index.tsx`: wrap the table in `hidden md:block`; add a card list (`grid gap-3 md:hidden`) duplicating the same data per row.
+- `requests.$id.tsx` chain visualizer: switch container to `flex-col md:flex-row`; arrows rotate to point down on mobile.
+- `landing.tsx`: verify hero stacks (`flex-col md:flex-row`) and stats grid is `grid-cols-2 md:grid-cols-4`; add classes if missing.
+- TopBar: hide RoleSwitcher text labels under `sm` (`hidden sm:inline` on the labels), keep icons.
+- Dialogs: confirm `max-w-[95vw]` on the largest ones (CommandDialog, assignment dialog).
+- KPI grids on dashboards: ensure `grid-cols-2 md:grid-cols-4` (already mostly correct — verify and fix).
+
+No changes to business logic; pure className/layout tweaks.
+
+## 7. Footer
+
+- `AppSidebar.tsx` `SidebarFooter`: change to two lines — "© 2026 SAIS" + small muted "v1.0.0-poc" badge.
+- Landing page: scan existing footer; if any of {logo+name, quick links, contact, copyright, "مبادرة من وزارة الداخلية"} is missing, add it. No restructure.
+
+## Translation keys to add
+
+`account_settings`, `profile`, `dark_mode`, `light_mode`, `language`, `company_info`, `contacts`, `preferences`, `security`, `edit`, `save`, `cancel`, `add_contact`, `change_password`, `old_password`, `new_password`, `confirm_password`, `active_sessions`, `assign_to_staff`, `staff_member`, `notes_optional`, `search_platform`, `no_results`, `email_notifications`, `new_request_notifications`, `weekly_summary`.
+
+## Out of scope
+
+No backend changes (no Supabase migration). No new dependencies — all UI primitives already exist in `src/components/ui/`.
+
+## Verification after build
+
+1. Cmd+K from any page → dialog opens, search filters across all 4 entity types, click navigates.
+2. Click avatar → dropdown shows; toggle dark mode and language inline; menu stays open.
+3. `/portal/settings` reachable from sidebar; all 4 sections render; edit/save in Company Info works.
+4. Open a request as SAIS reviewer → "Assign to staff" dialog → staff member set → header shows name.
+5. Browser tab title changes on every navigation.
+6. 375 px viewport: requests page shows cards (no horizontal scroll); chain stacks vertically on detail.
+7. Sidebar footer shows version line.

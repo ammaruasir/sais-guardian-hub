@@ -27,6 +27,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as RequestsIdRouteImport } from './routes/requests.$id'
 import { Route as ProjectsIdRouteImport } from './routes/projects.$id'
+import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalRequirementsRouteImport } from './routes/portal.requirements'
 import { Route as PortalNotificationsRouteImport } from './routes/portal.notifications'
 import { Route as PortalHelpRouteImport } from './routes/portal.help'
@@ -132,6 +133,11 @@ const ProjectsIdRoute = ProjectsIdRouteImport.update({
   path: '/projects/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalSettingsRoute = PortalSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalRequirementsRoute = PortalRequirementsRouteImport.update({
   id: '/requirements',
   path: '/requirements',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/requests/$id': typeof RequestsIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/requests/$id': typeof RequestsIdRoute
   '/admin': typeof AdminIndexRoute
@@ -291,6 +299,7 @@ export interface FileRoutesById {
   '/portal/help': typeof PortalHelpRoute
   '/portal/notifications': typeof PortalNotificationsRoute
   '/portal/requirements': typeof PortalRequirementsRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/requests/$id': typeof RequestsIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/portal/help'
     | '/portal/notifications'
     | '/portal/requirements'
+    | '/portal/settings'
     | '/projects/$id'
     | '/requests/$id'
     | '/admin/'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/portal/help'
     | '/portal/notifications'
     | '/portal/requirements'
+    | '/portal/settings'
     | '/projects/$id'
     | '/requests/$id'
     | '/admin'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/portal/help'
     | '/portal/notifications'
     | '/portal/requirements'
+    | '/portal/settings'
     | '/projects/$id'
     | '/requests/$id'
     | '/admin/'
@@ -554,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/settings': {
+      id: '/portal/settings'
+      path: '/settings'
+      fullPath: '/portal/settings'
+      preLoaderRoute: typeof PortalSettingsRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/requirements': {
       id: '/portal/requirements'
       path: '/requirements'
@@ -689,6 +708,7 @@ interface PortalRouteChildren {
   PortalHelpRoute: typeof PortalHelpRoute
   PortalNotificationsRoute: typeof PortalNotificationsRoute
   PortalRequirementsRoute: typeof PortalRequirementsRoute
+  PortalSettingsRoute: typeof PortalSettingsRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalProjectsIdRoute: typeof PortalProjectsIdRoute
   PortalRequestsIdRoute: typeof PortalRequestsIdRoute
@@ -702,6 +722,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalHelpRoute: PortalHelpRoute,
   PortalNotificationsRoute: PortalNotificationsRoute,
   PortalRequirementsRoute: PortalRequirementsRoute,
+  PortalSettingsRoute: PortalSettingsRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalProjectsIdRoute: PortalProjectsIdRoute,
   PortalRequestsIdRoute: PortalRequestsIdRoute,
