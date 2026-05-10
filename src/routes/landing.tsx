@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.svg";
 import type { TKey } from "@/i18n/translations";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/landing")({
   head: () => ({
@@ -51,6 +52,7 @@ function LandingPage() {
   const setLanguage = useAppStore((s) => s.setLanguage);
   const navigate = useNavigate();
   const { t, isAr } = useT();
+  usePageTitle(t("sais_name") + " — " + t("platform_name"));
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
   useEffect(() => {

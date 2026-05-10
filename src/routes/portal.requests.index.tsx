@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, ChevronLeft } from "lucide-react";
 import { requestStatusLabel, requestTypeLabel } from "@/data/requests";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/portal/requests/")({
   component: PortalRequestsList,
@@ -16,6 +17,7 @@ function PortalRequestsList() {
   const requests = useAppStore((s) => s.requests).filter((r) => r.companyId === "aramco");
   const departments = useAppStore((s) => s.departments);
   const { t, isAr, name } = useT();
+  usePageTitle(t("my_requests") + " — " + t("company_portal"));
 
   return (
     <>

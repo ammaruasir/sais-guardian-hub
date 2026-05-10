@@ -10,6 +10,7 @@ import { SectorDonut } from "@/components/dashboard/SectorDonut";
 import { OverdueTable } from "@/components/dashboard/OverdueTable";
 import { useRole } from "@/context/RoleContext";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
@@ -33,6 +34,7 @@ function RoleAwareDashboard() {
 
 function SaisDashboard() {
   const { t, isAr } = useT();
+  usePageTitle(t("dashboard") + " — SAIS");
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">

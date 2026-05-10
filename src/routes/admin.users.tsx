@@ -4,6 +4,7 @@ import { UsersTable } from "@/components/admin/users/UsersTable";
 import { useRole } from "@/context/RoleContext";
 import { NoAccess } from "@/components/common/NoAccess";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsersPage,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/admin/users")({
 function AdminUsersPage() {
   const { hasPermission } = useRole();
   const { t, isAr } = useT();
+  usePageTitle(t("users_mgmt") + " — SAIS");
   if (!hasPermission("users.view")) return <NoAccess />;
   return (
     <div className="space-y-6">

@@ -25,6 +25,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -46,6 +47,7 @@ function LoginPage() {
   const { setRole } = useRole();
   const navigate = useNavigate();
   const { t, isAr } = useT();
+  usePageTitle((isAr ? "تسجيل الدخول" : "Login") + " — SAIS");
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
   useEffect(() => {

@@ -17,6 +17,7 @@ import { ProjectFormDialog } from "@/components/projects/ProjectFormDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/projects/")({
   component: GuardedProjects,
@@ -35,6 +36,7 @@ function ProjectsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const filtered = useMemo(() => applyFilters(projects, filters), [filters, projects]);
   const { t, isAr } = useT();
+  usePageTitle(t("projects") + " — SAIS");
 
   return (
     <AppShell>

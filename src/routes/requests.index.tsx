@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronLeft, ChevronRight, Search, Inbox } from "lucide-react";
 import { requestStatusLabel, requestTypeLabel, priorityLabel } from "@/data/requests";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/requests/")({
   component: RequestsInboxPage,
@@ -21,6 +22,7 @@ function RequestsInboxPage() {
   const companies = useAppStore((s) => s.companies);
   const departments = useAppStore((s) => s.departments);
   const { t, lang, name, isAr } = useT();
+  usePageTitle(t("incoming_requests") + " — SAIS");
   const [tab, setTab] = useState<"inbox" | "all" | "mine">("inbox");
   const [q, setQ] = useState("");
   const Chevron = isAr ? ChevronLeft : ChevronRight;
