@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
+import { ExternalLink } from "lucide-react";
 import {
   type Task,
   type TaskComment,
