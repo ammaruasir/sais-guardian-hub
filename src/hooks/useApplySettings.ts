@@ -36,8 +36,12 @@ export function useApplySettings() {
   useEffect(() => {
     if (typeof document === "undefined") return;
     const root = document.documentElement;
-    root.dir = language === "ar" ? "rtl" : "ltr";
+    // Layout stays RTL always — only language attribute, font, and content alignment change
+    root.dir = "rtl";
     root.lang = language;
     root.classList.toggle("font-en", language === "en");
+    root.classList.toggle("font-ar", language === "ar");
+    document.body.classList.toggle("lang-en", language === "en");
+    document.body.classList.toggle("lang-ar", language === "ar");
   }, [language]);
 }
