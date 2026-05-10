@@ -336,6 +336,9 @@ function RequestDetailPage() {
               </Select>
               <Textarea placeholder={isAr ? "ملاحظة (اختياري)" : "Note (optional)"} value={actionNote} onChange={(e) => setActionNote(e.target.value)} rows={2} />
               <Button size="sm" className="w-full" onClick={onAssign}><ArrowRight className="h-3 w-3 me-1" /> {tr("assign")}</Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={() => setStaffOpen(true)}>
+                <UserCheck className="h-3 w-3 me-1" /> {tr("assign_to_staff")}
+              </Button>
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
