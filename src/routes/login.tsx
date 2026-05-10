@@ -265,7 +265,7 @@ function NafathIndividualForm({ onSubmit }: { onSubmit: (id: string) => void }) 
   };
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-6">
+    <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-border dark:bg-muted/30">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#006c35]/10">
           <UserIcon className="h-6 w-6 text-[#006c35]" />
