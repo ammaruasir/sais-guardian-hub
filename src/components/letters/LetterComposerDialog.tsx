@@ -269,19 +269,19 @@ export function LetterComposerDialog({
                 {(draft.commentsTable ?? []).map((row, i) => (
                   <div key={i} className="grid grid-cols-12 gap-2">
                     <Input
-                      className="col-span-4"
+                      className={`col-span-4 ${reqClass(row.doc)}`}
                       placeholder="المستند"
                       value={row.doc}
                       onChange={(e) => updateRow(i, { doc: e.target.value })}
                     />
                     <Input
-                      className="col-span-5"
+                      className={`col-span-5 ${reqClass(row.comment)}`}
                       placeholder="التعليق"
                       value={row.comment}
                       onChange={(e) => updateRow(i, { comment: e.target.value })}
                     />
                     <Input
-                      className="col-span-2"
+                      className={`col-span-2 ${reqClass(row.status)}`}
                       placeholder="الحالة"
                       value={row.status}
                       onChange={(e) => updateRow(i, { status: e.target.value })}
@@ -300,11 +300,12 @@ export function LetterComposerDialog({
             )}
 
             <div>
-              <Label>الخاتمة</Label>
+              <Label>الخاتمة / المطلوب <span className="text-destructive">*</span></Label>
               <Textarea
                 rows={2}
                 value={draft.closingAr}
                 onChange={(e) => set("closingAr", e.target.value)}
+                className={reqClass(draft.closingAr)}
               />
             </div>
 
