@@ -54,6 +54,7 @@ export function TaskDetailSheet({
 
   if (!task) return null;
   const project = projects.find((p) => p.id === task.projectId);
+  const relatedRequest = requests.find((r) => r.relatedProjectId === task.projectId);
   const prio = taskPriorityLabel[task.priority];
 
   const addComment = () => {
