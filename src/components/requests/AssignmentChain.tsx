@@ -25,28 +25,26 @@ export function AssignmentChain({ chain }: { chain: AssignmentEntry[] }) {
                     : "border-border bg-muted/30";
           return (
             <div key={e.id} className="flex flex-col md:flex-row md:items-center gap-2">
-              <div className={`w-full md:min-w-[200px] md:w-auto rounded-lg border p-3 ${tone}`}>
+              <div className={`w-full md:w-[220px] md:h-[140px] flex flex-col rounded-lg border p-3 ${tone}`}>
                 <div className="flex items-center gap-2 mb-2">
                   {e.action === "approved" ? (
-                    <CheckCircle2 className="h-4 w-4 text-success" />
+                    <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
                   ) : e.action === "rejected" ? (
-                    <AlertCircle className="h-4 w-4 text-destructive" />
+                    <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
                   ) : isCompleted ? (
-                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                    <CheckCircle2 className="h-4 w-4 text-muted-foreground shrink-0" />
                   ) : (
-                    <Circle className="h-4 w-4 text-primary" />
+                    <Circle className="h-4 w-4 text-primary shrink-0" />
                   )}
-                  <div className="text-xs font-bold">{deptName(e.department)}</div>
+                  <div className="text-xs font-bold truncate">{deptName(e.department)}</div>
                 </div>
-                <div className="text-xs text-foreground">{e.assigneeAr}</div>
-                <div className="text-[11px] text-muted-foreground mt-1">
+                <div className="text-xs text-foreground truncate">{e.assigneeAr}</div>
+                <div className="text-[11px] text-muted-foreground mt-1 truncate">
                   {e.startedAt}{e.endedAt ? ` → ${e.endedAt}` : " — جارٍ"}
                 </div>
-                {e.noteAr && (
-                  <div className="text-[11px] text-muted-foreground mt-2 line-clamp-2 border-t border-border/50 pt-1">
-                    {e.noteAr}
-                  </div>
-                )}
+                <div className="text-[11px] text-muted-foreground mt-2 line-clamp-2 border-t border-border/50 pt-1 flex-1">
+                  {e.noteAr ?? ""}
+                </div>
               </div>
               {!isLast && <ArrowLeft className="h-4 w-4 text-muted-foreground shrink-0 rotate-90 md:rotate-0 self-center" />}
             </div>
