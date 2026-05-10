@@ -75,31 +75,44 @@ function LandingPage() {
   ];
 
   return (
-    <div className="content-area min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground">
-      {/* Top utility bar */}
+    <div className="content-area min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground" style={{ fontFamily: isAr ? "'Tajawal', 'IBM Plex Sans Arabic', system-ui, sans-serif" : undefined }}>
+      {/* Top utility bar (gov style) */}
       <div className="bg-[#006c35] text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-[11px] md:px-6">
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-3 w-4 rounded-sm bg-white/90" />
-            <span>{isAr ? "المملكة العربية السعودية" : "Kingdom of Saudi Arabia"}</span>
-            <span className="hidden text-white/70 md:inline">
-              — {isAr ? "موقع حكومي رسمي" : "Official Government Portal"}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 text-[12px] md:px-6">
+          {/* Right side (in RTL): official gov notice */}
+          <div className="flex items-center gap-2 min-w-0">
+            <img src={saFlag} alt="SA" className="h-4 w-auto rounded-[2px]" />
+            <span className="truncate">
+              {isAr ? "موقع حكومي رسمي تابع لحكومة المملكة العربية السعودية" : "Official Government Portal — Kingdom of Saudi Arabia"}
             </span>
+            <button className="ms-2 inline-flex items-center gap-1 text-white/90 hover:text-white">
+              <span className="hidden sm:inline">{isAr ? "كيف تتحقق" : "How to verify"}</span>
+              <ChevronDown className="h-3 w-3" />
+            </button>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLanguage("en")}
-              className={isAr ? "hover:underline" : "font-semibold"}
-            >
-              English
-            </button>
+
+          {/* Left side (in RTL): meta info */}
+          <div className="hidden items-center gap-4 text-white/90 md:flex">
+            <span className="inline-flex items-center gap-1.5">
+              <Cloud className="h-3.5 w-3.5" />
+              {isAr ? "غائم جزئياً" : "Partly cloudy"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />
+              {isAr ? "الاثنين، ٢٤ ذو القعدة ١٤٤٧ هـ" : "Mon, 24 Dhul-Qadah 1447 H"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              <span dir="ltr">{isAr ? "١٢:٣١ ص" : "12:31 AM"}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" />
+              {isAr ? "الرياض" : "Riyadh"}
+            </span>
+            <span className="mx-1 h-3 w-px bg-white/30" />
+            <button onClick={() => setLanguage("en")} className={isAr ? "hover:underline" : "font-semibold"}>English</button>
             <span className="text-white/40">|</span>
-            <button
-              onClick={() => setLanguage("ar")}
-              className={isAr ? "font-semibold" : "hover:underline"}
-            >
-              عربي
-            </button>
+            <button onClick={() => setLanguage("ar")} className={isAr ? "font-semibold" : "hover:underline"}>عربي</button>
           </div>
         </div>
       </div>
