@@ -77,8 +77,17 @@ function RootComponent() {
   return (
     <AuthProvider>
       <RoleProvider>
+        <ThemeBootstrapper />
         <Outlet />
       </RoleProvider>
     </AuthProvider>
   );
+}
+
+function ThemeBootstrapper() {
+  // Reads settings.themeMode from store and applies the .dark class
+  // to <html> for all routes.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _t = useTheme();
+  return null;
 }
