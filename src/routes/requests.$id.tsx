@@ -27,7 +27,7 @@ import {
 import { letterTypeLabel, letterStatusLabel, type LetterType } from "@/data/letters";
 import {
   ArrowRight, Send, FileText, MessageSquare, History, FileWarning,
-  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil,
+  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil, UserCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/useT";
