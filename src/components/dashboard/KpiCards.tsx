@@ -7,6 +7,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
+import { useT } from "@/hooks/useT";
 
 function Kpi({
   icon: Icon, label, sub, value, tone = "primary", highlight = false,
@@ -43,10 +44,11 @@ function Kpi({
 
 export function KpiCards() {
   const requests = useAppStore((s) => s.requests);
+  const { t, isAr } = useT();
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 200);
-    return () => clearTimeout(t);
+    const tm = setTimeout(() => setLoading(false), 200);
+    return () => clearTimeout(tm);
   }, []);
 
   const active = requests.filter((r) => r.status !== "approved" && r.status !== "rejected").length;
@@ -74,14 +76,16 @@ export function KpiCards() {
       </div>
     );
   }
+  // Show secondary subtitle in opposite language for bilingual context
+  const sub = (ar: string, en: string) => (isAr ? en : ar);
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-      <Kpi icon={Inbox} label="الطلبات النشطة" sub="Active Requests" value={String(active)} tone="primary" />
-      <Kpi icon={FilePlus} label="جديدة (تحتاج إسناد)" sub="New / Unassigned" value={String(newCnt)} tone="warning" highlight={newCnt > 0} />
-      <Kpi icon={Eye} label="قيد المراجعة" sub="Under Review" value={String(inReview)} tone="secondary" />
-      <Kpi icon={FileWarning} label="بانتظار رد المنشأة" sub="Awaiting Reply" value={String(waiting)} tone="warning" />
-      <Kpi icon={CheckCircle2} label="معتمدة" sub="Approved" value={String(approved)} tone="success" />
-      <Kpi icon={BarChart3} label="نسبة الإنجاز" sub="Completion Rate" value={`${completion}%`} tone="success" />
+      <Kpi icon={Inbox} label={t("total_active")} sub={sub("Active Requests", "الطلبات النشطة")} value={String(active)} tone="primary" />
+      <Kpi icon={FilePlus} label={t("new_requests_kpi")} sub={sub("New / Unassigned", "جديدة")} value={String(newCnt)} tone="warning" highlight={newCnt > 0} />
+      <Kpi icon={Eye} label={t("under_review_kpi")} sub={sub("Under Review", "قيد المراجعة")} value={String(inReview)} tone="secondary" />
+      <Kpi icon={FileWarning} label={t("waiting_company")} sub={sub("Awaiting Reply", "بانتظار الرد")} value={String(waiting)} tone="warning" />
+      <Kpi icon={CheckCircle2} label={t("approved_kpi")} sub={sub("Approved", "معتمدة")} value={String(approved)} tone="success" />
+      <Kpi icon={BarChart3} label={t("completion_rate")} sub={sub("Completion Rate", "نسبة الإنجاز")} value={`${completion}%`} tone="success" />
     </div>
   );
 }
