@@ -262,11 +262,12 @@ export const useAppStore = create<State>()(
           ts: today,
           linkTo: `/requests/${id}`,
         });
-        return ref;
+        return { id, ref };
       },
 
       assignRequest: (id, dept, assigneeAr, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const reqBefore = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) => {
             if (r.id !== id) return r;
@@ -278,6 +279,14 @@ export const useAppStore = create<State>()(
             return { ...r, chain: [...closed, entry], currentDepartment: dept, status: "in_review", lastUpdate: today };
           }),
         }));
+        if (reqBefore) {
+          get().addNotification({
+            forRole: "company", type: "submission",
+            titleAr: `تحديث على طلبكم ${reqBefore.ref}`,
+            descriptionAr: `تم تحويل الطلب إلى إدارة جديدة وبدأت المراجعة`,
+            ts: today, linkTo: `/portal/requests/${id}`,
+          });
+        }
       },
 
       escalateRequest: (id, dept, assigneeAr, noteAr) => {
