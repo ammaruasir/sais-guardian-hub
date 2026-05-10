@@ -3,6 +3,7 @@ import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-r
 import appCss from "../styles.css?url";
 import { RoleProvider } from "@/context/RoleContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { useTheme } from "@/hooks/useTheme";
 
 function NotFoundComponent() {
   return (
@@ -77,8 +78,17 @@ function RootComponent() {
   return (
     <AuthProvider>
       <RoleProvider>
+        <ThemeBootstrapper />
         <Outlet />
       </RoleProvider>
     </AuthProvider>
   );
+}
+
+function ThemeBootstrapper() {
+  // Reads settings.themeMode from store and applies the .dark class
+  // to <html> for all routes.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _t = useTheme();
+  return null;
 }

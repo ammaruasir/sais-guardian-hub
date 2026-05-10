@@ -1,4 +1,6 @@
-import { Bell, ChevronLeft, Shield, Building2, LogOut } from "lucide-react";
+import { Bell, ChevronLeft, Shield, Building2, LogOut, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -105,6 +107,7 @@ export function TopBar() {
       <Breadcrumbs />
       <div className="ms-auto flex items-center gap-3">
         <RoleSwitcher />
+        <ThemeToggleButton />
         <Button variant="ghost" size="icon" className="relative" asChild>
           <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
             <Bell className="h-5 w-5" />
@@ -140,5 +143,27 @@ export function TopBar() {
         </Button>
       </div>
     </header>
+  );
+}
+
+export function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            aria-label={isDark ? "الوضع الفاتح" : "الوضع الداكن"}
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{isDark ? "الوضع الفاتح" : "الوضع الداكن"}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

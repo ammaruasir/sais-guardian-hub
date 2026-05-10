@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useAppStore } from "@/store/appStore";
 import { Button } from "@/components/ui/button";
+import { ThemeToggleButton } from "@/components/layout/TopBar";
 import {
   Shield,
   FolderPlus,
@@ -78,7 +79,7 @@ function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900" dir="rtl">
+    <div className="min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground" dir="rtl">
       {/* Top utility bar — Saudi flag green stripe */}
       <div className="bg-[#006c35] text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-[11px] md:px-6">
@@ -96,7 +97,7 @@ function LandingPage() {
       </div>
 
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-border dark:bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#006c35]/5">
@@ -112,7 +113,7 @@ function LandingPage() {
             </div>
           </div>
 
-          <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex">
+          <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex dark:text-foreground/85">
             <a href="#services" className="hover:text-[#006c35]">الخدمات</a>
             <a href="#stats" className="hover:text-[#006c35]">إحصائيات</a>
             <a href="#about" className="hover:text-[#006c35]">عن الهيئة</a>
@@ -128,6 +129,7 @@ function LandingPage() {
                 <div className="text-[8px] text-slate-400">Vision 2030</div>
               </div>
             </div>
+            <ThemeToggleButton />
             <Link to="/login">
               <Button className="gap-2 bg-[#006c35] text-white hover:bg-[#005528]">
                 تسجيل الدخول
@@ -138,7 +140,7 @@ function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-bl from-[#0b3a2c] via-[#0e4a37] to-[#103e57] text-white">
+      <section className="relative overflow-hidden bg-gradient-to-bl from-[#0b3a2c] via-[#0e4a37] to-[#103e57] text-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         {/* Subtle pattern */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
@@ -222,16 +224,16 @@ function LandingPage() {
       </section>
 
       {/* Services */}
-      <section id="services" className="bg-slate-50 py-20">
+      <section id="services" className="bg-slate-50 py-20 dark:bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="text-xs font-semibold uppercase tracking-widest text-[#006c35]">
+            <div className="text-xs font-semibold uppercase tracking-widest text-[#006c35] dark:text-[#83bf3f]">
               خدماتنا
             </div>
-            <h2 className="mt-3 text-2xl font-bold text-slate-900 md:text-3xl">
+            <h2 className="mt-3 text-2xl font-bold text-slate-900 md:text-3xl dark:text-foreground">
               ماذا تقدم لك المنصة
             </h2>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-slate-600 dark:text-muted-foreground">
               مجموعة متكاملة من الخدمات الرقمية لتسهيل تعاملاتكم مع الهيئة.
             </p>
           </div>
@@ -239,13 +241,13 @@ function LandingPage() {
             {services.map((s) => (
               <div
                 key={s.title}
-                className="group rounded-xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-[#006c35]/40 hover:shadow-md"
+                className="group rounded-xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-[#006c35]/40 hover:shadow-md dark:border-border dark:bg-card"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#006c35]/10 text-[#006c35] transition group-hover:bg-[#006c35] group-hover:text-white">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[#006c35]/10 text-[#006c35] transition group-hover:bg-[#006c35] group-hover:text-white dark:bg-[#83bf3f]/15 dark:text-[#83bf3f]">
                   <s.icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-base font-semibold text-slate-900">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">{s.desc}</p>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-foreground">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-muted-foreground">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -253,13 +255,13 @@ function LandingPage() {
       </section>
 
       {/* Stats */}
-      <section id="stats" className="bg-white py-20">
+      <section id="stats" className="bg-white py-20 dark:bg-background">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 sm:grid-cols-2 lg:grid-cols-4 dark:border-border dark:bg-border">
             {stats.map((s) => (
-              <div key={s.label} className="bg-white p-8 text-center">
-                <div className="text-3xl font-bold text-[#006c35] md:text-4xl">{s.value}</div>
-                <div className="mt-2 text-sm text-slate-600">{s.label}</div>
+              <div key={s.label} className="bg-white p-8 text-center dark:bg-card">
+                <div className="text-3xl font-bold text-[#006c35] md:text-4xl dark:text-[#83bf3f]">{s.value}</div>
+                <div className="mt-2 text-sm text-slate-600 dark:text-muted-foreground">{s.label}</div>
               </div>
             ))}
           </div>

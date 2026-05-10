@@ -60,7 +60,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900" dir="rtl">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-background dark:text-foreground" dir="rtl">
       {/* Top utility bar */}
       <div className="bg-[#006c35] text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-[11px] md:px-6">
@@ -70,7 +70,7 @@ function LoginPage() {
       </div>
 
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-border dark:bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <Link to="/landing" className="flex items-center gap-3">
             <img src={logo} alt="SAIS" className="h-10 w-10" />
@@ -114,16 +114,16 @@ function LoginPage() {
 
         {/* Login card */}
         <div className="lg:col-span-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8 dark:border-border dark:bg-card">
             <div className="mb-6 text-center">
-              <h1 className="text-2xl font-bold text-slate-900">تسجيل الدخول</h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-foreground">تسجيل الدخول</h1>
+              <p className="mt-1 text-sm text-slate-500 dark:text-muted-foreground">
                 اختر طريقة الدخول المناسبة لحسابك
               </p>
             </div>
 
             <Tabs defaultValue="nafath_business" className="w-full">
-              <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-slate-100 p-1 md:grid-cols-4">
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-slate-100 p-1 md:grid-cols-4 dark:bg-muted">
                 <TabsTrigger value="nafath_business" className="data-[state=active]:bg-[#006c35] data-[state=active]:text-white">
                   نفاذ أعمال
                 </TabsTrigger>
@@ -231,12 +231,12 @@ function NafathTab({
   onClick: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center dark:border-border dark:bg-muted/30">
       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#006c35]/10">
-        <Icon className="h-8 w-8 text-[#006c35]" />
+        <Icon className="h-8 w-8 text-[#006c35] dark:text-[#83bf3f]" />
       </div>
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm text-slate-600">{desc}</p>
+      <h3 className="text-base font-semibold text-slate-900 dark:text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-slate-600 dark:text-muted-foreground">{desc}</p>
       <Button
         onClick={onClick}
         size="lg"
@@ -245,7 +245,7 @@ function NafathTab({
         <KeyRound className="h-4 w-4" />
         {buttonText}
       </Button>
-      <p className="mt-3 text-[11px] text-slate-500">
+      <p className="mt-3 text-[11px] text-slate-500 dark:text-muted-foreground">
         سيتم توجيهك إلى تطبيق نفاذ لإكمال التحقق
       </p>
     </div>
@@ -265,7 +265,7 @@ function NafathIndividualForm({ onSubmit }: { onSubmit: (id: string) => void }) 
   };
 
   return (
-    <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-6">
+    <form onSubmit={submit} className="space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-border dark:bg-muted/30">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#006c35]/10">
           <UserIcon className="h-6 w-6 text-[#006c35]" />

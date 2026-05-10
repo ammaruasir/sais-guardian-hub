@@ -44,9 +44,12 @@ export function RequestsByStatusDonut() {
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                   fontSize: 12,
+                  color: "var(--popover-foreground)",
                 }}
+                itemStyle={{ color: "var(--popover-foreground)" }}
+                labelStyle={{ color: "var(--popover-foreground)" }}
               />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: "var(--foreground)" }} />
             </PieChart>
           </ResponsiveContainer>
         </div>

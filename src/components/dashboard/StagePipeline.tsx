@@ -48,7 +48,11 @@ export function StagePipeline() {
                   border: "1px solid var(--border)",
                   borderRadius: "8px",
                   fontSize: 12,
+                  color: "var(--popover-foreground)",
                 }}
+                itemStyle={{ color: "var(--popover-foreground)" }}
+                labelStyle={{ color: "var(--popover-foreground)" }}
+                cursor={{ fill: "var(--muted)", opacity: 0.4 }}
               />
               <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                 {data.map((_, i) => (
