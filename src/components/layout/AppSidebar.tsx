@@ -150,7 +150,8 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-3 text-[11px] text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-        © 2026 SAIS
+        <div>© 2026 SAIS</div>
+        <div className="opacity-70">v1.0.0-poc</div>
       </SidebarFooter>
     </Sidebar>
   );
