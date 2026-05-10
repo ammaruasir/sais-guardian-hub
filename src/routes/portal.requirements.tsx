@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/portal/requirements")({
   component: RequirementsPage,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/portal/requirements")({
 
 function RequirementsPage() {
   const { t, isAr } = useT();
+  usePageTitle(t("requirements") + " — " + t("company_portal"));
   return (
     <div className="space-y-6">
       <div>

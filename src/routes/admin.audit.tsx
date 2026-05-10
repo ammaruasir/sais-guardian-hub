@@ -41,6 +41,8 @@ import { auditCountBaseline, type AuditEvent } from "@/data/admin";
 import { toast } from "sonner";
 import { useRole } from "@/context/RoleContext";
 import { NoAccess } from "@/components/common/NoAccess";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/admin/audit")({
   component: AuditPage,
@@ -60,6 +62,8 @@ function formatTs(ts: string) {
 }
 
 function AuditPage() {
+  const { t } = useT();
+  usePageTitle(t("security_events") + " — SAIS");
   const { hasPermission } = useRole();
   const audit = useAppStore((s) => s.audit);
   const users = useAppStore((s) => s.users);

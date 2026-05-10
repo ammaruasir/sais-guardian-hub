@@ -26,7 +26,7 @@ function PortalSettingsPage() {
   usePageTitle(isAr ? "إعدادات الحساب — بوابة المنشآت" : "Account Settings — Company Portal");
   const language = useAppStore((s) => s.settings.language ?? "ar");
   const setLanguage = useAppStore((s) => s.setLanguage);
-  const { theme, setTheme } = useTheme();
+  const { themeMode, setTheme } = useTheme();
 
   const [editing, setEditing] = useState(false);
   const [info, setInfo] = useState({
@@ -143,7 +143,7 @@ function PortalSettingsPage() {
         </div>
         <div className="space-y-2">
           <Label className="text-sm">{t("settings_appearance")}</Label>
-          <RadioGroup value={theme} onValueChange={(v) => setTheme(v as "light" | "dark" | "auto")} className="flex gap-4">
+          <RadioGroup value={themeMode} onValueChange={(v) => setTheme(v as "light" | "dark" | "auto")} className="flex gap-4">
             <div className="flex items-center gap-2"><RadioGroupItem value="light" id="th-l" /><Label htmlFor="th-l">{t("theme_light")}</Label></div>
             <div className="flex items-center gap-2"><RadioGroupItem value="dark" id="th-d" /><Label htmlFor="th-d">{t("theme_dark")}</Label></div>
             <div className="flex items-center gap-2"><RadioGroupItem value="auto" id="th-a" /><Label htmlFor="th-a">{t("theme_system")}</Label></div>

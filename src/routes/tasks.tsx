@@ -11,6 +11,7 @@ import { currentUserId } from "@/data/tasks";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/tasks")({
   component: GuardedTasks,
@@ -27,6 +28,7 @@ function TasksPage() {
   const [mine, setMine] = useState(false);
   const [open, setOpen] = useState(false);
   const { t, isAr } = useT();
+  usePageTitle(t("tasks") + " — SAIS");
   const filtered = useMemo(
     () => (mine ? tasks.filter((tk) => tk.assigneeId === currentUserId) : tasks),
     [mine, tasks],

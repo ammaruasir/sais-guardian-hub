@@ -17,6 +17,7 @@ import { letterTypeLabel, type Letter } from "@/data/letters";
 import { FileWarning, Mail, Eye, Printer, Reply, FileText, MessageSquare, CheckCircle2, XCircle, Info, ChevronLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/portal/requests/$id")({
   component: PortalRequestDetail,
@@ -39,6 +40,7 @@ function PortalRequestDetail() {
   const st = requestStatusLabel[request.status];
   const p = priorityLabel[request.priority];
   const { t: tr, isAr, name } = useT();
+  usePageTitle((isAr ? "طلب " : "Request ") + request.ref + " — " + tr("company_portal"));
 
   const externalComments = request.comments.filter((c) => c.visibility === "external");
   const sentLetters = allLetters.filter((l) => l.requestId === request.id && l.status === "sent");

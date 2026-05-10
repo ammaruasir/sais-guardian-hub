@@ -34,6 +34,8 @@ import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/consultants")({
   component: GuardedConsultants,
@@ -46,6 +48,8 @@ function GuardedConsultants() {
 }
 
 function ConsultantsPage() {
+  const { t } = useT();
+  usePageTitle(t("consultants") + " — SAIS");
   const { currentUser } = useRole();
   const consultants = useAppStore((s) => s.consultants);
   const deleteConsultant = useAppStore((s) => s.deleteConsultant);

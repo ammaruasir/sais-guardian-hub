@@ -7,6 +7,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Phone, Mail, Clock, FileText, FileUp, UserCheck } from "lucide-react";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/portal/help")({
   component: HelpPage,
@@ -42,6 +44,8 @@ const links = [
 ];
 
 function HelpPage() {
+  const { t } = useT();
+  usePageTitle(t("help") + " — " + t("company_portal"));
   return (
     <div className="space-y-6">
       <div>

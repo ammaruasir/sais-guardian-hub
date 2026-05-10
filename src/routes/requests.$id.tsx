@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -27,10 +28,11 @@ import {
 import { letterTypeLabel, letterStatusLabel, type LetterType } from "@/data/letters";
 import {
   ArrowRight, Send, FileText, MessageSquare, History, FileWarning,
-  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil,
+  CheckCircle2, XCircle, RotateCcw, ArrowUpFromLine, Mail, Plus, Eye, Printer, Pencil, UserCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/useT";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/requests/$id")({
   component: RequestDetailPage,
@@ -49,6 +51,12 @@ function RequestDetailPage() {
   const requestAdditionalDocs = useAppStore((s) => s.requestAdditionalDocs);
   const addRequestComment = useAppStore((s) => s.addRequestComment);
   const allLetters = useAppStore((s) => s.letters);
+  const users = useAppStore((s) => s.users);
+  const assignToStaff = useAppStore((s) => s.assignToStaff);
+
+  const [staffOpen, setStaffOpen] = useState(false);
+  const [staffUserId, setStaffUserId] = useState("");
+  const [staffNote, setStaffNote] = useState("");
 
   const [assignDept, setAssignDept] = useState<DepartmentKey | "">("");
   const [actionNote, setActionNote] = useState("");
@@ -62,6 +70,7 @@ function RequestDetailPage() {
   if (!request) throw notFound();
 
   const { t: tr, isAr, name } = useT();
+  usePageTitle((isAr ? "طلب " : "Request ") + request.ref + " — SAIS");
   const company = companies.find((c) => c.id === request.companyId);
   const currentDept = departments.find((d) => d.key === request.currentDepartment);
   const tp = requestTypeLabel[request.type];
@@ -126,7 +135,15 @@ function RequestDetailPage() {
           </Card>
           <Card className="p-4">
             <div className="text-xs text-muted-foreground">{tr("col_department")}</div>
-            <div className="text-sm font-medium mt-1">{name(currentDept ?? null)}</div>
+            <div className="text-sm font-medium mt-1 flex items-center gap-2 flex-wrap">
+              <span>{name(currentDept ?? null)}</span>
+              {(() => {
+                const last = request.chain[request.chain.length - 1];
+                return last?.assignedToUserName ? (
+                  <Badge variant="outline" className="text-xs">{(isAr ? "المسؤول: " : "Assignee: ") + last.assignedToUserName}</Badge>
+                ) : null;
+              })()}
+            </div>
           </Card>
           <Card className="p-4">
             <div className="text-xs text-muted-foreground">{tr("col_received")}</div>
@@ -320,6 +337,9 @@ function RequestDetailPage() {
               </Select>
               <Textarea placeholder={isAr ? "ملاحظة (اختياري)" : "Note (optional)"} value={actionNote} onChange={(e) => setActionNote(e.target.value)} rows={2} />
               <Button size="sm" className="w-full" onClick={onAssign}><ArrowRight className="h-3 w-3 me-1" /> {tr("assign")}</Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={() => setStaffOpen(true)}>
+                <UserCheck className="h-3 w-3 me-1" /> {tr("assign_to_staff")}
+              </Button>
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
@@ -402,6 +422,48 @@ function RequestDetailPage() {
               <LetterTemplate letter={viewedLetter} idForPrint="letter-print-area" />
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={staffOpen} onOpenChange={setStaffOpen}>
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isAr ? "إسناد لموظف في الإدارة" : "Assign to Staff Member"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(() => {
+              const deptName = currentDept?.nameAr ?? "";
+              const filtered = users.filter((u) => u.active && (deptName ? u.department.includes(deptName.replace(/^إدارة\s*/, "")) : true));
+              const list = filtered.length > 0 ? filtered : users.filter((u) => u.active);
+              return (
+                <>
+                  <Label className="text-xs">{isAr ? "الموظف" : "Staff member"}</Label>
+                  <Select value={staffUserId} onValueChange={setStaffUserId}>
+                    <SelectTrigger><SelectValue placeholder={isAr ? "اختر موظفاً" : "Select a staff member"} /></SelectTrigger>
+                    <SelectContent>
+                      {list.map((u) => (
+                        <SelectItem key={u.id} value={u.id}>{u.nameAr} — <span className="text-muted-foreground text-xs">{u.department}</span></SelectItem>
+                      ))}
+                      {list.length === 0 && <div className="px-3 py-2 text-xs text-muted-foreground">{isAr ? "لا يوجد موظفون" : "No staff"}</div>}
+                    </SelectContent>
+                  </Select>
+                </>
+              );
+            })()}
+            <Label className="text-xs">{isAr ? "ملاحظات (اختياري)" : "Notes (optional)"}</Label>
+            <Textarea rows={3} value={staffNote} onChange={(e) => setStaffNote(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStaffOpen(false)}>{tr("cancel")}</Button>
+            <Button onClick={() => {
+              if (!staffUserId) return toast.error(isAr ? "اختر موظفاً" : "Select a staff member");
+              const u = users.find((x) => x.id === staffUserId);
+              if (!u) return;
+              assignToStaff(request.id, u.id, u.nameAr, staffNote || undefined);
+              setStaffOpen(false); setStaffUserId(""); setStaffNote("");
+              toast.success(tr("toast_assigned"));
+            }}>{tr("assign")}</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </AppShell>

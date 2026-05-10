@@ -7,8 +7,8 @@ export function AssignmentChain({ chain }: { chain: AssignmentEntry[] }) {
   const deptName = (k: string) => departments.find((d) => d.key === k)?.nameAr ?? k;
 
   return (
-    <div className="overflow-x-auto">
-      <div className="flex items-stretch gap-2 min-w-max p-2">
+    <div className="md:overflow-x-auto">
+      <div className="flex flex-col md:flex-row md:items-stretch md:min-w-max gap-2 p-2">
         {chain.map((e, i) => {
           const isLast = i === chain.length - 1;
           const isCurrent = isLast && !e.endedAt;
@@ -24,8 +24,8 @@ export function AssignmentChain({ chain }: { chain: AssignmentEntry[] }) {
                     ? "border-border bg-card"
                     : "border-border bg-muted/30";
           return (
-            <div key={e.id} className="flex items-center gap-2">
-              <div className={`min-w-[200px] rounded-lg border p-3 ${tone}`}>
+            <div key={e.id} className="flex flex-col md:flex-row md:items-center gap-2">
+              <div className={`w-full md:min-w-[200px] md:w-auto rounded-lg border p-3 ${tone}`}>
                 <div className="flex items-center gap-2 mb-2">
                   {e.action === "approved" ? (
                     <CheckCircle2 className="h-4 w-4 text-success" />
@@ -48,7 +48,7 @@ export function AssignmentChain({ chain }: { chain: AssignmentEntry[] }) {
                   </div>
                 )}
               </div>
-              {!isLast && <ArrowLeft className="h-4 w-4 text-muted-foreground shrink-0" />}
+              {!isLast && <ArrowLeft className="h-4 w-4 text-muted-foreground shrink-0 rotate-90 md:rotate-0 self-center" />}
             </div>
           );
         })}
