@@ -235,7 +235,7 @@ export function TopBar() {
     (s) =>
       s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
   );
-  const openPalette = useCommandPalette((s) => s.open);
+  const openPalette = useCommandPalette((s: { open: () => void }) => s.open);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-card/80 px-3 backdrop-blur md:gap-4 md:px-6">
