@@ -612,6 +612,7 @@ function AppearanceTab() {
               <RadioGroupItem value="collapsed" /> مصغر
             </label>
           </RadioGroup>
+        </div>
         <div>
           <Label className="text-xs text-muted-foreground">اللغة / Language</Label>
           <RadioGroup
