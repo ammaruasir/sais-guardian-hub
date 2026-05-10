@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
+import { useT } from "@/hooks/useT";
 
 type Props = {
   open: boolean;
@@ -23,19 +24,25 @@ type Props = {
 export function ConfirmDialog({
   open,
   onOpenChange,
-  title = "تأكيد الحذف",
-  description = "هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء.",
-  confirmText = "تأكيد",
-  cancelText = "إلغاء",
+  title,
+  description,
+  confirmText,
+  cancelText,
   destructive = true,
   onConfirm,
 }: Props) {
+  const { t, isAr } = useT();
+  const resolvedTitle = title ?? t("confirm_delete_title");
+  const resolvedDescription =
+    description ?? (isAr ? "هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء." : "Are you sure? This action cannot be undone.");
+  const resolvedConfirm = confirmText ?? t("confirm");
+  const resolvedCancel = cancelText ?? t("cancel");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent dir="rtl" className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-end">{title}</DialogTitle>
-          <DialogDescription className="text-end">{description}</DialogDescription>
+          <DialogTitle>{resolvedTitle}</DialogTitle>
+          <DialogDescription>{resolvedDescription}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-row justify-start gap-2 sm:justify-start">
           <Button
@@ -45,10 +52,10 @@ export function ConfirmDialog({
               onOpenChange(false);
             }}
           >
-            {confirmText}
+            {resolvedConfirm}
           </Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {cancelText}
+            {resolvedCancel}
           </Button>
         </DialogFooter>
       </DialogContent>
