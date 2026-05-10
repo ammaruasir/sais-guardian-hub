@@ -22,6 +22,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import vision2030 from "@/assets/vision-2030.png";
 import type { TKey } from "@/i18n/translations";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
