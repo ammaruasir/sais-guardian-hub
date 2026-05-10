@@ -145,3 +145,24 @@ export function TopBar() {
     </header>
   );
 }
+
+export function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            aria-label={isDark ? "الوضع الفاتح" : "الوضع الداكن"}
+          >
+            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{isDark ? "الوضع الفاتح" : "الوضع الداكن"}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
