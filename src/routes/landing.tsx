@@ -140,7 +140,7 @@ function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-bl from-[#0b3a2c] via-[#0e4a37] to-[#103e57] text-white">
+      <section className="relative overflow-hidden bg-gradient-to-bl from-[#0b3a2c] via-[#0e4a37] to-[#103e57] text-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         {/* Subtle pattern */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
