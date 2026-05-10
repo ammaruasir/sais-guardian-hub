@@ -104,6 +104,22 @@ function ProjectDetailPage() {
           </div>
         </header>
 
+        {relatedRequest && (
+          <Link
+            to="/requests/$id"
+            params={{ id: relatedRequest.id }}
+            className="inline-flex"
+          >
+            <Badge
+              variant="outline"
+              className="gap-1.5 border-primary/40 bg-primary/5 px-3 py-1.5 text-primary hover:bg-primary/10"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span>الطلب المرتبط: {relatedRequest.ref}</span>
+            </Badge>
+          </Link>
+        )}
+
         <Tabs defaultValue="submissions">
           <TabsList>
             <TabsTrigger value="submissions">التقديمات</TabsTrigger>
