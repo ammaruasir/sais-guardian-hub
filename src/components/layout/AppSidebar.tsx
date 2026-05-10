@@ -32,7 +32,7 @@ import {
 import { useRole } from "@/context/RoleContext";
 import { useT } from "@/hooks/useT";
 import type { TKey } from "@/i18n/translations";
-import logoUrl from "@/assets/logo.svg";
+
 import saisLogo from "@/assets/sais-logo.png";
 
 const saisNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
