@@ -80,8 +80,8 @@ export function AppSidebar() {
                 className="h-14 w-full object-contain"
               />
             </div>
-            <div className="hidden h-10 w-10 shrink-0 items-center justify-center group-data-[collapsible=icon]:flex">
-              <img src={saisLogo} alt="SAIS" className="h-full w-full object-contain" />
+            <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground text-sm font-extrabold tracking-tight group-data-[collapsible=icon]:flex">
+              S
             </div>
           </>
         ) : (
