@@ -133,11 +133,11 @@ export const notifications: AppNotification[] = [
   {
     id: "n12",
     type: "submission",
-    titleAr: "تم استلام تقديمكم — رقم المرجع SAIS-2026-04-P6-S3-001",
+    titleAr: "تم استلام تقديمكم — رقم المرجع REQ-0001",
     descriptionAr: "سيتم إشعاركم عند بدء المراجعة.",
     ts: "قبل أسبوعين",
     read: true,
-    linkTo: "/portal/projects/p6",
+    linkTo: "/portal/requests/r1",
     forRole: "company",
   },
 ];
