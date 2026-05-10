@@ -313,8 +313,7 @@ export const useAppStore = create<State>()(
           level: "info",
         });
       },
-
-
+      escalateRequest: (id, dept, assigneeAr, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
         set((s) => ({
           requests: s.requests.map((r) => {
