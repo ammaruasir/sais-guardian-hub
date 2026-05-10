@@ -61,7 +61,7 @@ export function KpiCards() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="p-5 space-y-4">
@@ -79,7 +79,7 @@ export function KpiCards() {
   // Show secondary subtitle in opposite language for bilingual context
   const sub = (ar: string, en: string) => (isAr ? en : ar);
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
       <Kpi icon={Inbox} label={t("total_active")} sub={sub("Active Requests", "الطلبات النشطة")} value={String(active)} tone="primary" />
       <Kpi icon={FilePlus} label={t("new_requests_kpi")} sub={sub("New / Unassigned", "جديدة")} value={String(newCnt)} tone="warning" highlight={newCnt > 0} />
       <Kpi icon={Eye} label={t("under_review_kpi")} sub={sub("Under Review", "قيد المراجعة")} value={String(inReview)} tone="secondary" />
