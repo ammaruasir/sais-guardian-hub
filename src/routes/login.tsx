@@ -231,12 +231,12 @@ function NafathTab({
   onClick: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center">
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center dark:border-border dark:bg-muted/30">
       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#006c35]/10">
-        <Icon className="h-8 w-8 text-[#006c35]" />
+        <Icon className="h-8 w-8 text-[#006c35] dark:text-[#83bf3f]" />
       </div>
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm text-slate-600">{desc}</p>
+      <h3 className="text-base font-semibold text-slate-900 dark:text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-slate-600 dark:text-muted-foreground">{desc}</p>
       <Button
         onClick={onClick}
         size="lg"
@@ -245,7 +245,7 @@ function NafathTab({
         <KeyRound className="h-4 w-4" />
         {buttonText}
       </Button>
-      <p className="mt-3 text-[11px] text-slate-500">
+      <p className="mt-3 text-[11px] text-slate-500 dark:text-muted-foreground">
         سيتم توجيهك إلى تطبيق نفاذ لإكمال التحقق
       </p>
     </div>
