@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/layout/AppShell";
+
 import { useAppStore } from "@/store/appStore";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ function PortalRequestsList() {
   const { t, isAr, name } = useT();
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-6">
         <div className="flex items-end justify-between flex-wrap gap-3">
           <div>
@@ -61,6 +61,6 @@ function PortalRequestsList() {
           })}
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }

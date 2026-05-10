@@ -11,10 +11,9 @@ import { requestStatusLabel, requestTypeLabel } from "@/data/requests";
 import { useT } from "@/hooks/useT";
 
 export function ActiveRequestsSection() {
-  const requests = useAppStore((s) =>
-    s.requests.filter(
-      (r) => r.companyId === "aramco" && r.status !== "approved" && r.status !== "rejected",
-    ),
+  const allRequests = useAppStore((s) => s.requests);
+  const requests = allRequests.filter(
+    (r) => r.companyId === "aramco" && r.status !== "approved" && r.status !== "rejected",
   );
   const departments = useAppStore((s) => s.departments);
   const { t, isAr, name } = useT();
