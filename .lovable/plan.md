@@ -1,62 +1,53 @@
-# المرحلة D — المتبقي
+# المرحلة E — الفحص النهائي (Final Audit)
 
-## 1) إصلاح خطأ portal.settings.tsx
-`useTheme()` يصدّر `themeMode` و`setTheme` (لا يوجد `theme`). نستبدل في السطرين 29 و146:
-- السطر 29: `const { themeMode, setTheme } = useTheme();`
-- السطر 146: `<RadioGroup value={themeMode} ...>`
+هذه مرحلة فحص + إصلاح، لا بناء. الخطة تحدد ترتيب التحقق وكيفية التعامل مع المشاكل.
 
-## 2) تطبيق usePageTitle على كل الصفحات
-أضيف استدعاء `usePageTitle(...)` في أعلى مكوّن كل route حسب الجدول الذي زوّدتنا به.
-- صفحات SAIS الداخلية: `${t("key")} — ${t("sais_short") || "SAIS"}` (نستخدم نص "SAIS" مباشرة كما طلبت).
-- صفحات البوابة: `${t("key")} — ${t("company_portal")}`.
-- الصفحات ذات معرف ديناميكي (`requests/$id`, `portal/requests/$id`): العنوان يُحسب من `request.referenceNo` بعد التحميل (`isAr ? "طلب " + ref : "Request " + ref`).
-- اللاندنغ: `${t("sais_name")} — ${t("platform_name")}`.
-- صفحات Login/Register/Auth: `${t("login")} — SAIS` إلخ.
+## النهج
 
-سأمر على كل ملفات `src/routes/*.tsx` المذكورة وأضيف السطر داخل المكوّن مباشرة بعد `useT()`.
+أمشي على القوائم الست بالترتيب، وكل خانة تفشل أوقف وأصلح فوراً ثم أكمل. الإصلاحات تكون موضعية (لا إعادة هيكلة). التقرير النهائي يلخّص ما مرّ بدون تغيير وما تم إصلاحه.
 
-## 3) زر "إسناد لموظف" في `/requests/$id`
-في لوحة الإجراءات داخل `src/routes/requests.$id.tsx`:
-- زر جديد بعد "إسناد لإدارة أخرى" بعنوان `t("assign_to_staff")` وأيقونة `UserCheck`.
-- يفتح `Dialog` يحتوي:
-  - عنوان (AR/EN حسب `isAr`)
-  - `Select` يعرض `users` من المتجر مفلترة بـ `user.department === currentDepartment` (الإدارة الحالية = آخر `assignmentChain.departmentName`).
-  - `Textarea` للملاحظات (اختياري)
-  - زر "إسناد" يستدعي `assignToStaff(requestId, userId, userName, notes)` الموجود مسبقاً، يضيف `assignedToUserId/Name` لآخر entry، يضيف audit log، ويعرض `toast.success(t("toast_assigned"))`.
-- في هيدر تفاصيل الطلب: عند وجود `assignedToUserName` في آخر entry، أعرض `<Badge>` صغيرة: "المسؤول: {name}" بجانب اسم الإدارة.
+## 1) فحص workflow كامل (٢٧ خطوة) — Browser
+- أفتح Browser على `/landing` بحجم 1280×720، وأنفّذ السلسلة كاملة (login → portal → new request → submit → portal/requests/$id → portal/requests → portal dashboard → logout → admin login → /requests/$id → assign → letter → portal upload → approve).
+- بعد كل خطوة محورية: screenshot أو observe للتأكد، وقراءة console logs.
+- الإصلاحات المتوقعة:
+  - مسارات روابط مكسورة (Link to/params)
+  - أسماء action في store ناقصة
+  - placeholder بدل صفحات حقيقية
+  - role switcher لا يحدّث الـ navigation
 
-## 4) تحسينات الموبايل (375px)
-أ) **Landing** (`landing.tsx`): Hero → `flex-col md:flex-row`, نص `w-full`. Service cards → `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`. Stats → `grid-cols-2 md:grid-cols-4`. Footer → `flex-col md:flex-row`.
+## 2) Navigation Completeness
+- أتحقق من وجود كل route ملف في `src/routes/`، ومن sidebar entries في `AppSidebar.tsx` (أنا قد فحصته).
+- خانات Auth Protection: المشروع POC بدون حماية فعلية. سأضيف guard خفيف في `portal.tsx` و `admin.tsx` و `requests.index.tsx` يستخدم `useRole().role`؛ إن كانت `null/guest` → `<Navigate to="/login" />`. لا يلزم `_authenticated` layout (تجنّب إعادة هيكلة المسارات).
+- سجلّ روابط dashboard/breadcrumbs/notifications: مراجعة بصرية + click-through في المتصفح على عينات.
 
-ب) **Login/Register** (`login.tsx`, `register.tsx`, `auth.tsx`): البطاقة `w-full max-w-md mx-4` بدل عرض ثابت.
+## 3) Dark Mode
+- أبدّل `themeMode` لـ `dark` عبر store أو الإعدادات، وأمر على ١٧ صفحة.
+- إصلاحات شائعة محتملة: ألوان hex مباشرة في landing (`#005528`, `#83bf3f`, `slate-900` …) — أتركها كما هي إن كانت مقصودة للـ government brand، لكن أتأكد من قراءة النصوص في dark.
+- Letter preview: يجب أن يبقى الورق أبيض في dark (تحقق من `LetterTemplate`).
 
-ج) **Dashboards** (`index.tsx` SAIS + `portal.index.tsx`): KPI grid → `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`. Charts wrapper → `grid-cols-1 lg:grid-cols-2`. Action-required cards (`ActionRequiredCards`, `RequestsNeedingAction`) → `flex-col md:flex-row` أو `grid-cols-1 md:grid-cols-2`.
+## 4) Language Switch
+- أبدّل لـ EN، أمر على نفس الصفحات، أتحقق من `dir="ltr"` و sidebar يساراً (موجود في `useApplySettings`).
+- نقاط حساسة: عناوين `usePageTitle` في صفحات إنجليزية تستخدم `t()` فعلاً (تحقق)، ونصوص hardcoded عربية متبقّية في landing/login/components → استبدال بـ `isAr ? ... : ...` عند اللزوم.
 
-د) **Request inbox** (`requests.index.tsx`, `portal.requests.index.tsx`):
-- التفاف الجدول الحالي بـ `<div className="hidden md:block">`.
-- إضافة قائمة بطاقات `<div className="md:hidden space-y-3">` تعرض كل طلب كـ `<Card>` (رقم مرجعي، عنوان، شركة، حالة badge، تاريخ، رابط للتفاصيل).
+## 5) Visual Consistency
+- ألوان البادج: مراجعة `requestStatusLabel`, `priorityLabel` في `src/data/requests.ts` — toned مرة واحدة، تنطبق في كل مكان.
+- Empty states: فحص Kanban/Tasks/Notifications/Search results.
+- Confirm dialogs على destructive: تحقق من `delete user`, `reject request`.
+- Demo badge: قراءة `DemoBadge.tsx` في dark mode.
 
-هـ) **Request detail — Assignment chain** (`requests.$id.tsx` + `portal.requests.$id.tsx`):
-- Wrapper visualizer: `flex flex-col md:flex-row md:items-center gap-2 md:gap-3`.
-- الأسهم بين العقد: `rotate-90 md:rotate-0` (أو إخفاء/إظهار بأيقونة سفلية للموبايل).
+## 6) Data Consistency
+- ربط KPI ↔ store: تتبّع selectors في `KpiCards.tsx` لتأكيد أنها تقرأ `requests` مباشرة.
+- Notification bell: `topbar` يقرأ `notifications.filter(n => !n.read && n.audience matches role)`.
+- Company portal scoping: تحقق من فلترة `companyId === "aramco"` في `portal.requests.index.tsx` و `ActiveRequestsSection`.
+- Audit log: تأكد أن actions في store تضيف `auditEvents`.
 
-و) **Sidebar** (`AppSidebar.tsx` / `AppShell.tsx`): التحقق أن `SidebarTrigger` (هامبرغر) ظاهر على الموبايل في TopBar وأن السايدبار في وضع `offcanvas`/`sheet` لا يطغى على المحتوى.
+## 7) Performance & Polish
+- قراءة `code--read_console_logs` و `code--read_runtime_errors`.
+- التحقق من أن `RoleSwitcher` لا يعيد mount كامل التطبيق (transition في `AppShell`).
+- لا blank screens: tested via workflow.
 
-ز) **Dialogs**: في `ConfirmDialog` و Dialogs الإسناد الجديدة → `max-w-[calc(100vw-2rem)] sm:max-w-lg`.
-
-## 5) فوتر Landing
-أتحقق من فوتر `landing.tsx` ويحوي:
-- شعار + اسم الهيئة
-- روابط سريعة: عن الهيئة / الخدمات / تواصل معنا (anchors داخل الصفحة)
-- اتصال: `920001234` و `info@sais.gov.sa`
-- "© 2026 الهيئة العليا للأمن الصناعي — جميع الحقوق محفوظة"
-- "مبادرة من وزارة الداخلية"
-- 3 أيقونات تواصل اجتماعي (Twitter/LinkedIn/YouTube من lucide) كروابط `#`
-- التنسيق: `grid-cols-1 md:grid-cols-4` على الموبايل stack عمودي
-
-أضيف ما ينقص من ترجمات (`assign_to_staff_dialog_title`, `staff_member`, `notes_optional`, إلخ) إلى `src/i18n/translations.ts` إن لم تكن موجودة.
-
-## ملاحظات تقنية
-- لا تغييرات على المتجر — `assignToStaff` موجود من المرحلة السابقة.
-- لا تبعيات جديدة — كل المكوّنات (`Dialog`, `Select`, `Textarea`, `Badge`) موجودة في `src/components/ui/`.
-- بعد الانتهاء أتحقق من البناء وأقف هنا بانتظار المرحلة E.
+## مخرجات
+بعد التنفيذ، تقرير منظّم:
+- ✅ مرّ بدون تغيير: قائمة
+- 🔧 تم إصلاحه: قائمة + الملف المعدّل + سطر مختصر
+- ⚠️ ملاحظات (POC limitations): قائمة
