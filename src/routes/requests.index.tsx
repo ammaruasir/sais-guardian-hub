@@ -78,58 +78,96 @@ function RequestsInboxPage() {
           </TabsList>
         </Tabs>
 
-        <Card className="p-0 overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("col_reference")}</TableHead>
-                <TableHead>{t("col_title")}</TableHead>
-                <TableHead>{t("col_type")}</TableHead>
-                <TableHead>{t("col_company")}</TableHead>
-                <TableHead>{t("col_department")}</TableHead>
-                <TableHead>{t("col_priority")}</TableHead>
-                <TableHead>{t("col_status")}</TableHead>
-                <TableHead>{t("col_received")}</TableHead>
-                <TableHead className="text-end">{t("col_action")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((r) => {
-                const ty = requestTypeLabel[r.type];
-                const st = requestStatusLabel[r.status];
-                const p = priorityLabel[r.priority];
-                const company = companies.find((c) => c.id === r.companyId);
-                const dept = departments.find((d) => d.key === r.currentDepartment);
-                return (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-mono text-xs">{r.ref}</TableCell>
-                    <TableCell className="font-medium max-w-[280px] truncate">{r.titleAr}</TableCell>
-                    <TableCell><Badge variant="outline">{ty[lang]}</Badge></TableCell>
-                    <TableCell className="text-sm">{name(company)}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{name(dept)}</TableCell>
-                    <TableCell><Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{p[lang]}</Badge></TableCell>
-                    <TableCell><Badge variant="secondary">{st[lang]}</Badge></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{r.receivedAt}</TableCell>
-                    <TableCell className="text-end">
-                      <Button asChild size="sm" variant="ghost">
-                        <Link to="/requests/$id" params={{ id: r.id }}>
-                          {isAr ? "فتح" : "Open"} <Chevron className="ms-1 h-3 w-3" />
-                        </Link>
-                      </Button>
+        <Card className="p-0 overflow-hidden hidden md:block">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("col_reference")}</TableHead>
+                  <TableHead>{t("col_title")}</TableHead>
+                  <TableHead>{t("col_type")}</TableHead>
+                  <TableHead>{t("col_company")}</TableHead>
+                  <TableHead>{t("col_department")}</TableHead>
+                  <TableHead>{t("col_priority")}</TableHead>
+                  <TableHead>{t("col_status")}</TableHead>
+                  <TableHead>{t("col_received")}</TableHead>
+                  <TableHead className="text-end">{t("col_action")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((r) => {
+                  const ty = requestTypeLabel[r.type];
+                  const st = requestStatusLabel[r.status];
+                  const p = priorityLabel[r.priority];
+                  const company = companies.find((c) => c.id === r.companyId);
+                  const dept = departments.find((d) => d.key === r.currentDepartment);
+                  return (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-mono text-xs">{r.ref}</TableCell>
+                      <TableCell className="font-medium max-w-[280px] truncate">{r.titleAr}</TableCell>
+                      <TableCell><Badge variant="outline">{ty[lang]}</Badge></TableCell>
+                      <TableCell className="text-sm">{name(company)}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{name(dept)}</TableCell>
+                      <TableCell><Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{p[lang]}</Badge></TableCell>
+                      <TableCell><Badge variant="secondary">{st[lang]}</Badge></TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{r.receivedAt}</TableCell>
+                      <TableCell className="text-end">
+                        <Button asChild size="sm" variant="ghost">
+                          <Link to="/requests/$id" params={{ id: r.id }}>
+                            {isAr ? "فتح" : "Open"} <Chevron className="ms-1 h-3 w-3" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-10">
+                      {isAr ? "لا توجد طلبات مطابقة" : "No matching requests"}
                     </TableCell>
                   </TableRow>
-                );
-              })}
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-10">
-                    {isAr ? "لا توجد طلبات مطابقة" : "No matching requests"}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </Card>
+
+        {/* Mobile card list */}
+        <div className="md:hidden space-y-3">
+          {filtered.map((r) => {
+            const ty = requestTypeLabel[r.type];
+            const st = requestStatusLabel[r.status];
+            const p = priorityLabel[r.priority];
+            const company = companies.find((c) => c.id === r.companyId);
+            const dept = departments.find((d) => d.key === r.currentDepartment);
+            return (
+              <Card key={r.id} className="p-3 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-mono text-[11px] text-muted-foreground">{r.ref}</div>
+                  <Badge variant="secondary" className="text-[10px]">{st[lang]}</Badge>
+                </div>
+                <div className="font-medium text-sm">{r.titleAr}</div>
+                <div className="flex flex-wrap gap-1.5 text-xs text-muted-foreground">
+                  <Badge variant="outline" className="text-[10px]">{ty[lang]}</Badge>
+                  <Badge variant="outline" className={`text-[10px] border-${p.tone}/40 text-${p.tone}`}>{p[lang]}</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">{name(company)} · {name(dept)}</div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{r.receivedAt}</span>
+                  <Button asChild size="sm" variant="ghost">
+                    <Link to="/requests/$id" params={{ id: r.id }}>
+                      {isAr ? "فتح" : "Open"} <Chevron className="ms-1 h-3 w-3" />
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="text-center text-sm text-muted-foreground py-10">{isAr ? "لا توجد طلبات مطابقة" : "No matching requests"}</div>
+          )}
+        </div>
       </div>
     </AppShell>
   );
