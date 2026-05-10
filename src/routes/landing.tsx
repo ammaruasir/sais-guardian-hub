@@ -21,7 +21,7 @@ import {
   ArrowRight,
   ChevronDown,
 } from "lucide-react";
-import logo from "@/assets/logo.svg";
+import logo from "@/assets/sais-logo-full.svg";
 import vision2030 from "@/assets/vision-2030.png";
 import heroBg from "@/assets/hero-industrial.png";
 import type { TKey } from "@/i18n/translations";
@@ -105,18 +105,8 @@ function LandingPage() {
       {/* Header */}
       <header className="border-b border-slate-200 bg-white dark:border-border dark:bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6 md:py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#006c35]/5">
-              <img src={logo} alt="SAIS" className="h-10 w-10" />
-            </div>
-            <div className="leading-tight">
-              <div className="text-sm font-bold text-slate-900 md:text-base dark:text-foreground">
-                {t("sais_name")}
-              </div>
-              <div className="text-[11px] text-slate-500 md:text-xs dark:text-muted-foreground">
-                {isAr ? "Supreme Authority for Industrial Security" : t("platform_name")}
-              </div>
-            </div>
+          <div className="flex items-center">
+            <img src={logo} alt={t("sais_name")} className="h-10 w-auto md:h-12" />
           </div>
 
           <nav className="hidden items-center gap-6 text-sm text-slate-700 lg:flex dark:text-foreground/85">
