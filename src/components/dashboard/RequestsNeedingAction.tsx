@@ -40,7 +40,7 @@ export function RequestsNeedingAction() {
             const ty = requestTypeLabel[r.type];
             const p = priorityLabel[r.priority];
             const company = companies.find((c) => c.id === r.companyId);
-            const title = lang === "ar" ? r.titleAr : r.titleEn ?? r.titleAr;
+            const title = r.titleAr;
             return (
               <div
                 key={r.id}
