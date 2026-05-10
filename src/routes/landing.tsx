@@ -25,7 +25,7 @@ import logo from "@/assets/sais-logo-full.svg";
 import vision2030 from "@/assets/vision-2030.png";
 import heroBg from "@/assets/hero-industrial.png";
 import saFlag from "@/assets/sa-flag.png";
-import { Calendar, Clock, MapPin, Cloud, ChevronDown as ChevronDownIcon, Eye, ZoomIn, ZoomOut } from "lucide-react";
+import { Calendar, Clock, MapPin, Cloud, Eye, ZoomIn, ZoomOut } from "lucide-react";
 import type { TKey } from "@/i18n/translations";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
