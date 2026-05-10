@@ -123,7 +123,7 @@ function LoginPage() {
             </div>
 
             <Tabs defaultValue="nafath_business" className="w-full">
-              <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-slate-100 p-1 md:grid-cols-4">
+              <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-slate-100 p-1 md:grid-cols-4 dark:bg-muted">
                 <TabsTrigger value="nafath_business" className="data-[state=active]:bg-[#006c35] data-[state=active]:text-white">
                   نفاذ أعمال
                 </TabsTrigger>
