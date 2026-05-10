@@ -134,12 +134,8 @@ function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 rounded border border-slate-200 px-2 py-1 text-[10px] text-slate-600 md:flex dark:border-border dark:text-muted-foreground">
-              <div className="h-5 w-5 rounded-full bg-gradient-to-br from-[#006c35] to-[#83bf3f]" />
-              <div className="leading-none">
-                <div className="font-semibold">{isAr ? "رؤية 2030" : "Vision 2030"}</div>
-                <div className="text-[8px] text-slate-400">{isAr ? "Vision 2030" : "رؤية 2030"}</div>
-              </div>
+            <div className="hidden items-center rounded border border-slate-200 bg-white px-2 py-1 md:flex dark:border-border dark:bg-card">
+              <img src={vision2030} alt="Vision 2030" className="h-7 w-auto object-contain" />
             </div>
             <ThemeToggleButton />
             <Link to="/login">
