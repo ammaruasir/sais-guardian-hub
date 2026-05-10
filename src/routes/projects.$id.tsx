@@ -3,7 +3,8 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { AppShell } from "@/components/layout/AppShell";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Pencil, Trash2 } from "lucide-react";
+import { ChevronRight, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/appStore";
 import { getActivitiesByProject, getNotesByProject } from "@/data/notes";
 import { StageStepper } from "@/components/projects/StageStepper";
@@ -47,6 +48,7 @@ function ProjectDetailPage() {
   const [reviewing, setReviewing] = useState<Submission | null>(null);
 
   const allSubs = useAppStore((s) => s.submissions);
+  const relatedRequest = useAppStore((s) => s.requests.find((r) => r.relatedProjectId === id));
   if (!project) throw notFound();
   const subs = allSubs.filter((s) => s.projectId === id);
   const currentSub = subs.find((s) => s.stage === project.stage);
@@ -101,6 +103,22 @@ function ProjectDetailPage() {
             <StageStepper current={project.stage} />
           </div>
         </header>
+
+        {relatedRequest && (
+          <Link
+            to="/requests/$id"
+            params={{ id: relatedRequest.id }}
+            className="inline-flex"
+          >
+            <Badge
+              variant="outline"
+              className="gap-1.5 border-primary/40 bg-primary/5 px-3 py-1.5 text-primary hover:bg-primary/10"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span>الطلب المرتبط: {relatedRequest.ref}</span>
+            </Badge>
+          </Link>
+        )}
 
         <Tabs defaultValue="submissions">
           <TabsList>

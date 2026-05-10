@@ -8,6 +8,7 @@ import { FacilityCard } from "@/components/companies/FacilityCard";
 import { stageLabel } from "@/data";
 import { facilities, companyComplianceScore, companyAssignedConsultant } from "@/data/facilities";
 import { useAppStore } from "@/store/appStore";
+import { departments, requestStatusLabel, requestTypeLabel } from "@/data/requests";
 import { ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/companies/$id")({
@@ -19,6 +20,7 @@ function CompanyDetailPage() {
   const companies = useAppStore((s) => s.companies);
   const projects = useAppStore((s) => s.projects);
   const consultants = useAppStore((s) => s.consultants);
+  const requests = useAppStore((s) => s.requests);
   const company = companies.find((c) => c.id === id);
   if (!company) {
     return (
@@ -32,6 +34,10 @@ function CompanyDetailPage() {
   const facs = facilities.filter((f) => f.companyId === company.id);
   const projs = projects.filter((p) => p.companyId === company.id);
   const consultant = consultants.find((c) => c.id === companyAssignedConsultant[company.id]);
+  const companyRequests = requests.filter(
+    (r) => r.companyId === company.id && r.status !== "approved" && r.status !== "rejected",
+  );
+  const deptName = (key: string) => departments.find((d) => d.key === key)?.nameAr ?? key;
 
   return (
     <AppShell>
@@ -108,6 +114,56 @@ function CompanyDetailPage() {
               </Link>
             ))}
           </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-lg font-bold">الطلبات النشطة ({companyRequests.length})</h2>
+          {companyRequests.length === 0 ? (
+            <Card className="p-4 text-sm text-muted-foreground">لا توجد طلبات نشطة لهذه المنشأة.</Card>
+          ) : (
+            <Card className="overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50 text-xs text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2 text-start font-medium">المرجع</th>
+                      <th className="px-3 py-2 text-start font-medium">العنوان</th>
+                      <th className="px-3 py-2 text-start font-medium">النوع</th>
+                      <th className="px-3 py-2 text-start font-medium">الحالة</th>
+                      <th className="px-3 py-2 text-start font-medium">الإدارة الحالية</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {companyRequests.map((r) => (
+                      <tr key={r.id} className="border-t border-border transition hover:bg-accent/40">
+                        <td className="px-3 py-2 num font-medium">
+                          <Link to="/requests/$id" params={{ id: r.id }} className="hover:underline">
+                            {r.ref}
+                          </Link>
+                        </td>
+                        <td className="px-3 py-2">
+                          <Link to="/requests/$id" params={{ id: r.id }} className="block hover:underline">
+                            {r.titleAr}
+                          </Link>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          {requestTypeLabel[r.type].ar}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge variant="outline" className="text-xs">
+                            {requestStatusLabel[r.status].ar}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                          {deptName(r.currentDepartment)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
         </section>
       </div>
     </AppShell>

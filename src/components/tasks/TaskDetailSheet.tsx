@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@tanstack/react-router";
+import { ExternalLink } from "lucide-react";
 import {
   type Task,
   type TaskComment,
@@ -33,6 +34,7 @@ export function TaskDetailSheet({
   onClose: () => void;
 }) {
   const projects = useAppStore((s) => s.projects);
+  const requests = useAppStore((s) => s.requests);
   const updateTask = useAppStore((s) => s.updateTask);
   const updateTaskStatus = useAppStore((s) => s.updateTaskStatus);
   const deleteTask = useAppStore((s) => s.deleteTask);
@@ -52,6 +54,7 @@ export function TaskDetailSheet({
 
   if (!task) return null;
   const project = projects.find((p) => p.id === task.projectId);
+  const relatedRequest = requests.find((r) => r.relatedProjectId === task.projectId);
   const prio = taskPriorityLabel[task.priority];
 
   const addComment = () => {
@@ -91,6 +94,20 @@ export function TaskDetailSheet({
                 className="text-secondary hover:underline"
               >
                 {project.nameAr}
+              </Link>
+            </div>
+          )}
+
+          {relatedRequest && (
+            <div className="text-sm">
+              <span className="text-muted-foreground">الطلب المرتبط: </span>
+              <Link
+                to="/requests/$id"
+                params={{ id: relatedRequest.id }}
+                className="inline-flex items-center gap-1 text-secondary hover:underline"
+              >
+                {relatedRequest.ref}
+                <ExternalLink className="h-3 w-3" />
               </Link>
             </div>
           )}

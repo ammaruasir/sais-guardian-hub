@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { type Stage } from "@/data";
 import { useAppStore } from "@/store/appStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -30,6 +31,7 @@ function PortalProjectDetailPage() {
   const company = companies.find((c) => c.id === project.companyId);
   const subs = submissions.filter((s) => s.projectId === project.id);
   const currentSub = subs.find((s) => s.stage === project.stage);
+  const relatedRequest = useAppStore((s) => s.requests.find((r) => r.relatedProjectId === project.id));
 
   const meta: Partial<Record<Stage, { approvedAt?: string; subLabel?: string }>> = {};
   for (const s of subs) {
@@ -66,6 +68,22 @@ function PortalProjectDetailPage() {
           <PortalStageStepper current={project.stage} meta={meta} />
         </div>
       </header>
+
+      {relatedRequest && (
+        <Link
+          to="/portal/requests/$id"
+          params={{ id: relatedRequest.id }}
+          className="inline-flex"
+        >
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-primary/40 bg-primary/5 px-3 py-1.5 text-primary hover:bg-primary/10"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            <span>الطلب المرتبط: {relatedRequest.ref}</span>
+          </Badge>
+        </Link>
+      )}
 
       <Tabs defaultValue="status">
         <TabsList>
