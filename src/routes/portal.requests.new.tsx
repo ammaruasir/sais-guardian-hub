@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/layout/AppShell";
+
 import { useAppStore } from "@/store/appStore";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ function NewRequestWizard() {
 
   if (step === 5 && created) {
     return (
-      <AppShell>
+      <>
         <div className="max-w-xl mx-auto py-12 text-center space-y-4">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
             <CheckCircle2 className="h-8 w-8 text-success" />
@@ -60,12 +60,12 @@ function NewRequestWizard() {
             <Button asChild variant="outline"><Link to="/portal">العودة للرئيسية</Link></Button>
           </div>
         </div>
-      </AppShell>
+      </>
     );
   }
 
   return (
-    <AppShell>
+    <>
       <div className="max-w-3xl mx-auto space-y-6">
         <div>
           <Link to="/portal/requests" className="text-xs text-muted-foreground hover:text-primary">
@@ -179,7 +179,7 @@ function NewRequestWizard() {
           )}
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }
 

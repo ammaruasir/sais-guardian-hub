@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { AppShell } from "@/components/layout/AppShell";
+
 import { useAppStore } from "@/store/appStore";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +56,7 @@ function PortalRequestDetail() {
   };
 
   return (
-    <AppShell>
+    <>
       <div className="space-y-6">
         <nav className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
           <Link to="/portal" className="hover:text-foreground">{tr("home")}</Link>
@@ -276,7 +276,7 @@ function PortalRequestDetail() {
           recipientName={company?.nameAr ?? "المنشأة"}
         />
       )}
-    </AppShell>
+    </>
   );
 }
 
