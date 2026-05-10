@@ -63,6 +63,8 @@ function SaisDashboard() {
         <RequestsByDepartmentBar />
       </div>
 
+      <AnalyticsSection />
+
       <ActivityFeed />
 
       <details className="group rounded-2xl border border-border bg-card">
