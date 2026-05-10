@@ -34,6 +34,7 @@ export function TaskDetailSheet({
   onClose: () => void;
 }) {
   const projects = useAppStore((s) => s.projects);
+  const requests = useAppStore((s) => s.requests);
   const updateTask = useAppStore((s) => s.updateTask);
   const updateTaskStatus = useAppStore((s) => s.updateTaskStatus);
   const deleteTask = useAppStore((s) => s.deleteTask);
