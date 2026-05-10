@@ -183,26 +183,46 @@ export function LetterComposerDialog({
           </TabsList>
 
           <TabsContent value="edit" className="space-y-4">
+            <p className="text-xs text-muted-foreground">
+              الحقول المعلّمة <span className="text-destructive font-bold">باللون الأحمر</span> مطلوبة قبل الإصدار.
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>الموضوع</Label>
-                <Input value={draft.subjectAr} onChange={(e) => set("subjectAr", e.target.value)} />
+                <Label>الموضوع <span className="text-destructive">*</span></Label>
+                <Input
+                  value={draft.subjectAr}
+                  onChange={(e) => set("subjectAr", e.target.value)}
+                  className={reqClass(draft.subjectAr)}
+                />
               </div>
               <div>
-                <Label>المُرسل إليه</Label>
+                <Label>المُرسل إليه <span className="text-destructive">*</span></Label>
                 <Input
                   value={draft.addresseeAr}
                   onChange={(e) => set("addresseeAr", e.target.value)}
+                  className={reqClass(draft.addresseeAr)}
                 />
               </div>
             </div>
 
             <div>
-              <Label>مقدمة الخطاب</Label>
+              <Label>الإشارة <span className="text-destructive">*</span></Label>
+              <Textarea
+                rows={2}
+                placeholder="مثال: بالإشارة إلى الطلب رقم REQ-0001 المقدّم من ..."
+                value={draft.referenceAr ?? ""}
+                onChange={(e) => set("referenceAr", e.target.value)}
+                className={reqClass(draft.referenceAr ?? "")}
+              />
+            </div>
+
+            <div>
+              <Label>مقدمة الخطاب (الإفادة) <span className="text-destructive">*</span></Label>
               <Textarea
                 rows={3}
                 value={draft.bodyIntroAr}
                 onChange={(e) => set("bodyIntroAr", e.target.value)}
+                className={reqClass(draft.bodyIntroAr)}
               />
             </div>
 
@@ -214,7 +234,8 @@ export function LetterComposerDialog({
                       ? "المستندات المطلوبة"
                       : type === "approval"
                         ? "الشروط"
-                        : "الأسباب"}
+                        : "الأسباب"}{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Button size="sm" variant="outline" onClick={addItem}>
                     <Plus className="h-3 w-3 me-1" /> إضافة بند
@@ -222,7 +243,11 @@ export function LetterComposerDialog({
                 </div>
                 {draft.items.map((it, i) => (
                   <div key={i} className="flex gap-2">
-                    <Input value={it} onChange={(e) => updateItem(i, e.target.value)} />
+                    <Input
+                      value={it}
+                      onChange={(e) => updateItem(i, e.target.value)}
+                      className={reqClass(it)}
+                    />
                     <Button size="icon" variant="ghost" onClick={() => removeItem(i)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
