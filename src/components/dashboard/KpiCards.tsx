@@ -2,31 +2,21 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-  FileSearch,
+  Inbox, FilePlus, Eye, FileWarning, CheckCircle2, BarChart3,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/appStore";
 
 function Kpi({
-  icon: Icon,
-  label,
-  sub,
-  value,
-  trend,
-  tone = "primary",
+  icon: Icon, label, sub, value, tone = "primary", highlight = false,
 }: {
   icon: LucideIcon;
   label: string;
   sub: string;
   value: string;
-  trend?: { dir: "up" | "down"; text: string };
   tone?: "primary" | "secondary" | "warning" | "destructive" | "success";
+  highlight?: boolean;
 }) {
   const toneMap: Record<string, string> = {
     primary: "bg-primary/10 text-primary",
@@ -36,29 +26,10 @@ function Kpi({
     success: "bg-success/10 text-success",
   };
   return (
-    <Card className="overflow-hidden">
+    <Card className={cn("overflow-hidden", highlight && "ring-2 ring-warning/40")}>
       <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div
-            className={cn("flex h-11 w-11 items-center justify-center rounded-xl", toneMap[tone])}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
-          {trend && (
-            <div
-              className={cn(
-                "flex items-center gap-1 text-xs font-medium",
-                trend.dir === "up" ? "text-success" : "text-destructive",
-              )}
-            >
-              {trend.dir === "up" ? (
-                <TrendingUp className="h-3 w-3" />
-              ) : (
-                <TrendingDown className="h-3 w-3" />
-              )}
-              {trend.text}
-            </div>
-          )}
+        <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", toneMap[tone])}>
+          <Icon className="h-5 w-5" />
         </div>
         <div className="mt-4">
           <div className="num text-3xl font-bold tracking-tight text-foreground">{value}</div>
@@ -71,30 +42,25 @@ function Kpi({
 }
 
 export function KpiCards() {
-  const projects = useAppStore((s) => s.projects);
-  const submissions = useAppStore((s) => s.submissions);
+  const requests = useAppStore((s) => s.requests);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 350);
+    const t = setTimeout(() => setLoading(false), 200);
     return () => clearTimeout(t);
   }, []);
 
-  const activeProjects = projects.length;
-  const pendingReviews = projects.filter((p) => p.status === "under_review").length;
-  const overdue = projects.filter((p) => p.overdue).length;
-  const decided = submissions.filter((s) => !!s.decision);
-  const approvalRate = decided.length
-    ? Math.round((decided.filter((s) => s.decision === "approved").length / decided.length) * 100)
-    : 0;
-  const reviewing = projects.filter((p) => p.status === "under_review");
-  const avgReviewDays = reviewing.length
-    ? (reviewing.reduce((a, p) => a + p.daysInStage, 0) / reviewing.length).toFixed(1)
-    : "0";
+  const active = requests.filter((r) => r.status !== "approved" && r.status !== "rejected").length;
+  const newCnt = requests.filter((r) => r.status === "submitted").length;
+  const inReview = requests.filter((r) => r.status === "in_review" || r.status === "escalated").length;
+  const waiting = requests.filter((r) => r.status === "additional_docs").length;
+  const approved = requests.filter((r) => r.status === "approved").length;
+  const decided = requests.filter((r) => r.status === "approved" || r.status === "rejected").length;
+  const completion = decided ? Math.round((approved / decided) * 100) : 0;
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="p-5 space-y-4">
               <Skeleton className="h-11 w-11 rounded-xl" />
@@ -109,42 +75,13 @@ export function KpiCards() {
     );
   }
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
-      <Kpi
-        icon={FileSearch}
-        label="المشاريع النشطة"
-        sub="Active Projects"
-        value={String(activeProjects)}
-        tone="primary"
-      />
-      <Kpi
-        icon={Clock}
-        label="قيد المراجعة"
-        sub="Pending Reviews"
-        value={String(pendingReviews)}
-        tone="secondary"
-      />
-      <Kpi
-        icon={AlertTriangle}
-        label="متأخرة"
-        sub="Overdue"
-        value={String(overdue)}
-        tone="destructive"
-      />
-      <Kpi
-        icon={CheckCircle2}
-        label="نسبة الاعتماد"
-        sub="Approval Rate"
-        value={`${approvalRate}%`}
-        tone="success"
-      />
-      <Kpi
-        icon={Clock}
-        label="متوسط وقت المراجعة"
-        sub="Avg Review (days)"
-        value={`${avgReviewDays}`}
-        tone="warning"
-      />
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <Kpi icon={Inbox} label="الطلبات النشطة" sub="Active Requests" value={String(active)} tone="primary" />
+      <Kpi icon={FilePlus} label="جديدة (تحتاج إسناد)" sub="New / Unassigned" value={String(newCnt)} tone="warning" highlight={newCnt > 0} />
+      <Kpi icon={Eye} label="قيد المراجعة" sub="Under Review" value={String(inReview)} tone="secondary" />
+      <Kpi icon={FileWarning} label="بانتظار رد المنشأة" sub="Awaiting Reply" value={String(waiting)} tone="warning" />
+      <Kpi icon={CheckCircle2} label="معتمدة" sub="Approved" value={String(approved)} tone="success" />
+      <Kpi icon={BarChart3} label="نسبة الإنجاز" sub="Completion Rate" value={`${completion}%`} tone="success" />
     </div>
   );
 }

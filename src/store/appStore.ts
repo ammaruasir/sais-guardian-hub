@@ -79,13 +79,14 @@ type State = {
   deleteLetter: (id: string) => void;
 
   // Request actions
-  createRequest: (r: Omit<SaisRequest, "id" | "ref" | "chain" | "comments" | "documents" | "lastUpdate" | "status" | "currentDepartment"> & { initialAssigneeAr?: string }) => string;
+  createRequest: (r: Omit<SaisRequest, "id" | "ref" | "chain" | "comments" | "documents" | "lastUpdate" | "status" | "currentDepartment"> & { initialAssigneeAr?: string }) => { id: string; ref: string };
   assignRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
   escalateRequest: (id: string, dept: DepartmentKey, assigneeAr: string, noteAr?: string) => void;
   returnRequest: (id: string, noteAr?: string) => void;
   approveRequest: (id: string, noteAr?: string) => void;
   rejectRequest: (id: string, noteAr?: string) => void;
   requestAdditionalDocs: (id: string, noteAr: string) => void;
+  respondToAdditionalDocs: (id: string, noteAr?: string) => void;
   addRequestComment: (id: string, c: Omit<RequestComment, "id" | "ts">) => void;
   addRequestDocument: (id: string, d: Omit<RequestDocument, "id" | "ts">) => void;
 
@@ -261,11 +262,12 @@ export const useAppStore = create<State>()(
           ts: today,
           linkTo: `/requests/${id}`,
         });
-        return ref;
+        return { id, ref };
       },
 
       assignRequest: (id, dept, assigneeAr, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const reqBefore = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) => {
             if (r.id !== id) return r;
@@ -277,6 +279,14 @@ export const useAppStore = create<State>()(
             return { ...r, chain: [...closed, entry], currentDepartment: dept, status: "in_review", lastUpdate: today };
           }),
         }));
+        if (reqBefore) {
+          get().addNotification({
+            forRole: "company", type: "submission",
+            titleAr: `تحديث على طلبكم ${reqBefore.ref}`,
+            descriptionAr: `تم تحويل الطلب إلى إدارة جديدة وبدأت المراجعة`,
+            ts: today, linkTo: `/portal/requests/${id}`,
+          });
+        }
       },
 
       escalateRequest: (id, dept, assigneeAr, noteAr) => {
@@ -307,6 +317,7 @@ export const useAppStore = create<State>()(
 
       approveRequest: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -314,10 +325,17 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "approval",
+          titleAr: `تم اعتماد طلبكم ${r0.ref}`,
+          descriptionAr: r0.titleAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
       },
 
       rejectRequest: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -325,10 +343,17 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "rejection",
+          titleAr: `تم رفض طلبكم ${r0.ref}`,
+          descriptionAr: noteAr ?? r0.titleAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
       },
 
       requestAdditionalDocs: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -336,6 +361,37 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "request",
+          titleAr: `مطلوب مستندات إضافية — ${r0.ref}`,
+          descriptionAr: noteAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
+      },
+
+      respondToAdditionalDocs: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const entry: AssignmentEntry = {
+              id: `c${Date.now()}`,
+              department: r.currentDepartment,
+              assigneeAr: "المنشأة",
+              action: "commented",
+              noteAr: noteAr ?? "تم إرفاق المستندات المطلوبة",
+              startedAt: today,
+            };
+            return { ...r, status: "in_review" as RequestStatus, lastUpdate: today, chain: [...r.chain, entry] };
+          }),
+        }));
+        if (r0) get().addNotification({
+          forRole: "sais", type: "submission",
+          titleAr: `رد المنشأة على ${r0.ref}`,
+          descriptionAr: noteAr ?? "تم إرفاق المستندات المطلوبة",
+          ts: today, linkTo: `/requests/${id}`,
+        });
       },
 
       addRequestComment: (id, c) => {
