@@ -24,6 +24,8 @@ import {
 import logo from "@/assets/sais-logo-full.svg";
 import vision2030 from "@/assets/vision-2030.png";
 import heroBg from "@/assets/hero-industrial.png";
+import saFlag from "@/assets/sa-flag.png";
+import { Calendar, Clock, MapPin, Cloud, Eye, ZoomIn, ZoomOut } from "lucide-react";
 import type { TKey } from "@/i18n/translations";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
@@ -73,31 +75,44 @@ function LandingPage() {
   ];
 
   return (
-    <div className="content-area min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground">
-      {/* Top utility bar */}
+    <div className="content-area min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground" style={{ fontFamily: isAr ? "'Tajawal', 'IBM Plex Sans Arabic', system-ui, sans-serif" : undefined }}>
+      {/* Top utility bar (gov style) */}
       <div className="bg-[#006c35] text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-[11px] md:px-6">
-          <div className="flex items-center gap-2">
-            <span className="inline-block h-3 w-4 rounded-sm bg-white/90" />
-            <span>{isAr ? "المملكة العربية السعودية" : "Kingdom of Saudi Arabia"}</span>
-            <span className="hidden text-white/70 md:inline">
-              — {isAr ? "موقع حكومي رسمي" : "Official Government Portal"}
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 text-[12px] md:px-6">
+          {/* Right side (in RTL): official gov notice */}
+          <div className="flex items-center gap-2 min-w-0">
+            <img src={saFlag} alt="SA" className="h-4 w-auto rounded-[2px]" />
+            <span className="truncate">
+              {isAr ? "موقع حكومي رسمي تابع لحكومة المملكة العربية السعودية" : "Official Government Portal — Kingdom of Saudi Arabia"}
             </span>
+            <button className="ms-2 inline-flex items-center gap-1 text-white/90 hover:text-white">
+              <span className="hidden sm:inline">{isAr ? "كيف تتحقق" : "How to verify"}</span>
+              <ChevronDown className="h-3 w-3" />
+            </button>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLanguage("en")}
-              className={isAr ? "hover:underline" : "font-semibold"}
-            >
-              English
-            </button>
+
+          {/* Left side (in RTL): meta info */}
+          <div className="hidden items-center gap-4 text-white/90 md:flex">
+            <span className="inline-flex items-center gap-1.5">
+              <Cloud className="h-3.5 w-3.5" />
+              {isAr ? "غائم جزئياً" : "Partly cloudy"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5" />
+              {isAr ? "الاثنين، ٢٤ ذو القعدة ١٤٤٧ هـ" : "Mon, 24 Dhul-Qadah 1447 H"}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              <span dir="ltr">{isAr ? "١٢:٣١ ص" : "12:31 AM"}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" />
+              {isAr ? "الرياض" : "Riyadh"}
+            </span>
+            <span className="mx-1 h-3 w-px bg-white/30" />
+            <button onClick={() => setLanguage("en")} className={isAr ? "hover:underline" : "font-semibold"}>English</button>
             <span className="text-white/40">|</span>
-            <button
-              onClick={() => setLanguage("ar")}
-              className={isAr ? "font-semibold" : "hover:underline"}
-            >
-              عربي
-            </button>
+            <button onClick={() => setLanguage("ar")} className={isAr ? "font-semibold" : "hover:underline"}>عربي</button>
           </div>
         </div>
       </div>
@@ -295,71 +310,114 @@ function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-slate-900 text-slate-300">
+      <footer id="contact" className="bg-slate-50 text-slate-700 dark:bg-card dark:text-foreground/80">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 md:px-6">
+          {/* Main links */}
           <div>
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="SAIS" className="h-10 w-10" />
-              <div className="leading-tight">
-                <div className="text-sm font-bold text-white">{t("sais_name")}</div>
-                <div className="text-[11px] text-slate-400">SAIS</div>
+            <h4 className="mb-4 text-base font-bold text-slate-900 dark:text-foreground">
+              {isAr ? "الرئيسية" : "Main"}
+            </h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#about" className="hover:text-[#006c35]">{isAr ? "عن الهيئة" : "About SAIS"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "استراتيجية الهيئة" : "Strategy"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "مجلس الإدارة" : "Board"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "محافظ الهيئة" : "Governor"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "فروع الهيئة" : "Branches"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "القطاعات" : "Sectors"}</a></li>
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="mb-4 text-base font-bold text-slate-900 dark:text-foreground">
+              {isAr ? "الخدمات" : "Services"}
+            </h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "الأنشطة الأمنية" : "Security activities"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "إدارة المواد الكيميائية" : "Chemical materials"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "المصاعد والسلالم والسيور المتحركة" : "Elevators & escalators"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "الحراسات الأمنية ونقل النقود" : "Security guarding"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "تأهيل المقاولين والاستشاريين" : "Contractors qualification"}</a></li>
+              <li><a href="#" className="hover:text-[#006c35]">{isAr ? "الوقاية والحماية من الحريق" : "Fire prevention"}</a></li>
+            </ul>
+          </div>
+
+          {/* Contact channels */}
+          <div>
+            <h4 className="mb-4 text-base font-bold text-slate-900 dark:text-foreground">
+              {isAr ? "قنوات التواصل" : "Contact channels"}
+            </h4>
+            <div className="space-y-3 text-sm">
+              <div>
+                <div className="text-slate-500 dark:text-muted-foreground">
+                  {isAr ? "للتواصل مع أحد مسؤولي الدعم الفني:" : "Technical support:"}
+                </div>
+                <div className="mt-1 flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-[#006c35]" />
+                  <span dir="ltr">920033887</span>
+                </div>
+                <div className="mt-1 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#006c35]" />
+                  <span dir="ltr">info@hcis.gov.sa</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-slate-500 dark:text-muted-foreground">
+                  {isAr ? "لخدمات إدارة المواد الكيميائية:" : "Chemical materials services:"}
+                </div>
+                <div className="mt-1 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#006c35]" />
+                  <span dir="ltr">chem@hcis.gov.sa</span>
+                </div>
               </div>
             </div>
-            <p className="mt-4 text-xs leading-relaxed text-slate-400">
-              {isAr
-                ? "مبادرة من وزارة الداخلية — المملكة العربية السعودية"
-                : "An initiative of the Ministry of Interior — Kingdom of Saudi Arabia"}
-            </p>
           </div>
 
+          {/* Follow + accessibility */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">
-              {isAr ? "روابط سريعة" : "Quick Links"}
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#about" className="hover:text-white">{isAr ? "عن الهيئة" : "About"}</a></li>
-              <li><a href="#services" className="hover:text-white">{isAr ? "الخدمات" : "Services"}</a></li>
-              <li><a href="#contact" className="hover:text-white">{isAr ? "تواصل معنا" : "Contact"}</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">
-              {isAr ? "تواصل معنا" : "Contact Us"}
-            </h4>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-[#83bf3f]" />
-                <span dir="ltr">920001234</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-[#83bf3f]" />
-                <span dir="ltr">info@sais.gov.sa</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">
-              {isAr ? "تابعنا" : "Follow Us"}
+            <h4 className="mb-4 text-base font-bold text-slate-900 dark:text-foreground">
+              {isAr ? "تابعنا على" : "Follow us"}
             </h4>
             <div className="flex items-center gap-2">
-              {[Twitter, Linkedin, Youtube].map((I, i) => (
+              {[Twitter, Linkedin].map((I, i) => (
                 <a
                   key={i}
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 hover:border-[#83bf3f] hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:border-[#006c35] hover:text-[#006c35] dark:border-border dark:text-foreground/70"
                 >
                   <I className="h-4 w-4" />
                 </a>
               ))}
             </div>
+
+            <h4 className="mb-3 mt-8 text-base font-bold text-slate-900 dark:text-foreground">
+              {isAr ? "أدوات الإتاحة وسهولة الوصول" : "Accessibility"}
+            </h4>
+            <div className="flex items-center gap-2">
+              {[ZoomIn, ZoomOut, Eye].map((I, i) => (
+                <button
+                  key={i}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:border-[#006c35] hover:text-[#006c35] dark:border-border dark:text-foreground/70"
+                >
+                  <I className="h-4 w-4" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="border-t border-slate-800 py-5">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 text-xs text-slate-500 md:flex-row md:px-6">
-            <div>{t("copyright")}</div>
-            <div>{isAr ? "مبادرة من وزارة الداخلية" : "Ministry of Interior initiative"}</div>
+
+        <div className="border-t border-slate-200 dark:border-border">
+          <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 py-6 md:flex-row md:items-center md:px-6">
+            <img src={logo} alt={t("sais_name")} className="h-12 w-auto" />
+            <div className="flex flex-col items-start gap-1 text-xs text-slate-500 md:items-end dark:text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <a href="#" className="hover:text-[#006c35]">{isAr ? "خريطة الموقع" : "Sitemap"}</a>
+                <a href="#" className="hover:text-[#006c35]">{isAr ? "سياسة الخصوصية" : "Privacy"}</a>
+                <a href="#" className="hover:text-[#006c35]">{isAr ? "سياسات الاستخدام الآمن" : "Safe use"}</a>
+              </div>
+              <div>{isAr ? "جميع الحقوق محفوظة للهيئة العليا للأمن الصناعي © 2026" : "© 2026 SAIS. All rights reserved."}</div>
+              <div>{isAr ? "تم تطويره وصيانته بواسطة الهيئة العليا للأمن الصناعي" : "Developed & maintained by SAIS"}</div>
+            </div>
           </div>
         </div>
       </footer>
