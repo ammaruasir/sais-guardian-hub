@@ -103,7 +103,7 @@ function RequestDetailPage() {
       <div className="space-y-6">
         <div>
           <Link to="/requests" className="text-xs text-muted-foreground hover:text-primary">
-            ← العودة إلى الطلبات
+            {tr("back_to_list")}
           </Link>
           <div className="mt-2 flex items-end justify-between gap-3 flex-wrap">
             <div>
@@ -112,28 +112,28 @@ function RequestDetailPage() {
               <p className="text-sm text-muted-foreground mt-1">{request.descriptionAr}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline">{t.ar}</Badge>
-              <Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{p.ar}</Badge>
-              <Badge variant="secondary">{st.ar}</Badge>
+              <Badge variant="outline">{isAr ? tp.ar : tp.en}</Badge>
+              <Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{isAr ? p.ar : p.en}</Badge>
+              <Badge variant="secondary">{isAr ? st.ar : st.en}</Badge>
             </div>
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">المنشأة</div>
-            <div className="text-sm font-medium mt-1">{company?.nameAr}</div>
+            <div className="text-xs text-muted-foreground">{tr("col_company")}</div>
+            <div className="text-sm font-medium mt-1">{name(company ?? null)}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">الإدارة الحالية</div>
-            <div className="text-sm font-medium mt-1">{currentDept?.nameAr}</div>
+            <div className="text-xs text-muted-foreground">{tr("col_department")}</div>
+            <div className="text-sm font-medium mt-1">{name(currentDept ?? null)}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">تاريخ الاستلام</div>
+            <div className="text-xs text-muted-foreground">{tr("col_received")}</div>
             <div className="text-sm font-medium mt-1">{request.receivedAt}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">آخر تحديث</div>
+            <div className="text-xs text-muted-foreground">{isAr ? "آخر تحديث" : "Last update"}</div>
             <div className="text-sm font-medium mt-1">{request.lastUpdate}</div>
           </Card>
         </div>
@@ -141,7 +141,7 @@ function RequestDetailPage() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <ArrowRight className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-bold">سلسلة التحويل</h2>
+            <h2 className="text-sm font-bold">{isAr ? "سلسلة التحويل" : "Assignment chain"}</h2>
           </div>
           <AssignmentChain chain={request.chain} />
         </Card>
@@ -150,10 +150,10 @@ function RequestDetailPage() {
           <div className="lg:col-span-2">
             <Tabs defaultValue="documents">
               <TabsList>
-                <TabsTrigger value="documents"><FileText className="h-4 w-4 me-1" />المستندات</TabsTrigger>
-                <TabsTrigger value="comments"><MessageSquare className="h-4 w-4 me-1" />التعليقات</TabsTrigger>
-                <TabsTrigger value="log"><History className="h-4 w-4 me-1" />سجل التحويل</TabsTrigger>
-                <TabsTrigger value="letters"><Mail className="h-4 w-4 me-1" />الخطابات</TabsTrigger>
+                <TabsTrigger value="documents"><FileText className="h-4 w-4 me-1" />{tr("tab_documents")}</TabsTrigger>
+                <TabsTrigger value="comments"><MessageSquare className="h-4 w-4 me-1" />{tr("tab_comments")}</TabsTrigger>
+                <TabsTrigger value="log"><History className="h-4 w-4 me-1" />{tr("tab_assignment_log")}</TabsTrigger>
+                <TabsTrigger value="letters"><Mail className="h-4 w-4 me-1" />{tr("tab_letters")}</TabsTrigger>
               </TabsList>
               <TabsContent value="documents">
                 <Card className="p-0 overflow-hidden">
@@ -307,65 +307,65 @@ function RequestDetailPage() {
           </div>
 
           <Card className="p-4 space-y-4 h-fit">
-            <h3 className="text-sm font-bold">إجراءات</h3>
+            <h3 className="text-sm font-bold">{isAr ? "إجراءات" : "Actions"}</h3>
             <div className="space-y-2">
-              <label className="text-xs text-muted-foreground">تحويل إلى إدارة</label>
+              <label className="text-xs text-muted-foreground">{tr("assign_to_dept")}</label>
               <Select value={assignDept} onValueChange={(v) => setAssignDept(v as DepartmentKey)}>
-                <SelectTrigger><SelectValue placeholder="اختر إدارة" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={isAr ? "اختر إدارة" : "Select department"} /></SelectTrigger>
                 <SelectContent>
                   {departments.filter((d) => d.key !== request.currentDepartment).map((d) => (
-                    <SelectItem key={d.key} value={d.key}>{d.nameAr}</SelectItem>
+                    <SelectItem key={d.key} value={d.key}>{name(d)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <Textarea placeholder="ملاحظة (اختياري)" value={actionNote} onChange={(e) => setActionNote(e.target.value)} rows={2} />
-              <Button size="sm" className="w-full" onClick={onAssign}><ArrowRight className="h-3 w-3 me-1" /> تحويل</Button>
+              <Textarea placeholder={isAr ? "ملاحظة (اختياري)" : "Note (optional)"} value={actionNote} onChange={(e) => setActionNote(e.target.value)} rows={2} />
+              <Button size="sm" className="w-full" onClick={onAssign}><ArrowRight className="h-3 w-3 me-1" /> {tr("assign")}</Button>
             </div>
 
             <div className="border-t border-border pt-3 space-y-2">
               <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("additional_docs")}>
-                <FileWarning className="h-3 w-3 me-1" /> خطاب مستندات إضافية
+                <FileWarning className="h-3 w-3 me-1" /> {tr("request_docs")}
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => openComposer("comments")}>
-                <Mail className="h-3 w-3 me-1" /> خطاب ملاحظات
+                <Mail className="h-3 w-3 me-1" /> {isAr ? "خطاب ملاحظات" : "Comments letter"}
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
-                if (!actionNote.trim()) return toast.error("اكتب سبب الإرجاع");
+                if (!actionNote.trim()) return toast.error(isAr ? "اكتب سبب الإرجاع" : "Write a reason");
                 requestAdditionalDocs(request.id, actionNote);
-                setActionNote(""); toast.success("تم طلب مستندات إضافية (بدون خطاب)");
+                setActionNote(""); toast.success(isAr ? "تم طلب مستندات إضافية (بدون خطاب)" : "Additional docs requested (no letter)");
               }}>
-                <FileWarning className="h-3 w-3 me-1" /> طلب سريع بدون خطاب
+                <FileWarning className="h-3 w-3 me-1" /> {isAr ? "طلب سريع بدون خطاب" : "Quick request (no letter)"}
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={() => {
                 returnRequest(request.id, actionNote || undefined); setActionNote("");
-                toast.success("تم إرجاع الطلب");
+                toast.success(isAr ? "تم إرجاع الطلب" : "Request returned");
               }}>
-                <RotateCcw className="h-3 w-3 me-1" /> إرجاع للمنشأة
+                <RotateCcw className="h-3 w-3 me-1" /> {tr("return_to_company")}
               </Button>
               <Button size="sm" variant="outline" className="w-full" onClick={onEscalate}>
-                <ArrowUpFromLine className="h-3 w-3 me-1" /> تصعيد
+                <ArrowUpFromLine className="h-3 w-3 me-1" /> {tr("escalate")}
               </Button>
               {currentDept?.canFinalApprove && (
                 <Button size="sm" className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => openComposer("approval")}>
-                  <CheckCircle2 className="h-3 w-3 me-1" /> اعتماد نهائي بخطاب
+                  <CheckCircle2 className="h-3 w-3 me-1" /> {tr("final_approval")}
                 </Button>
               )}
               {currentDept?.canFinalApprove && (
                 <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                   approveRequest(request.id, actionNote || undefined); setActionNote("");
-                  toast.success("تم الاعتماد النهائي");
+                  toast.success(tr("toast_approved"));
                 }}>
-                  اعتماد سريع بدون خطاب
+                  {isAr ? "اعتماد سريع بدون خطاب" : "Quick approval (no letter)"}
                 </Button>
               )}
               <Button size="sm" variant="destructive" className="w-full" onClick={() => openComposer("rejection")}>
-                <XCircle className="h-3 w-3 me-1" /> رفض بخطاب
+                <XCircle className="h-3 w-3 me-1" /> {tr("reject")}
               </Button>
               <Button size="sm" variant="ghost" className="w-full" onClick={() => {
                 rejectRequest(request.id, actionNote || undefined); setActionNote("");
-                toast.success("تم رفض الطلب");
+                toast.success(tr("toast_rejected"));
               }}>
-                رفض سريع بدون خطاب
+                {isAr ? "رفض سريع بدون خطاب" : "Quick reject (no letter)"}
               </Button>
             </div>
           </Card>
