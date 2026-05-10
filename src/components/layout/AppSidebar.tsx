@@ -32,7 +32,7 @@ import {
 import { useRole } from "@/context/RoleContext";
 import { useT } from "@/hooks/useT";
 import type { TKey } from "@/i18n/translations";
-import logoUrl from "@/assets/logo.svg";
+
 import saisLogo from "@/assets/sais-logo.png";
 
 const saisNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
@@ -73,15 +73,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         {role === "sais" ? (
           <>
-            <div className="flex w-full items-center justify-center rounded-lg bg-white p-2 group-data-[collapsible=icon]:hidden">
+            <div className="flex w-full items-center justify-center p-1 group-data-[collapsible=icon]:hidden">
               <img
                 src={saisLogo}
                 alt={t("sais_name")}
-                className="h-12 w-full object-contain"
+                className="h-14 w-full object-contain"
               />
             </div>
-            <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white p-1 group-data-[collapsible=icon]:flex">
-              <img src={logoUrl} alt="SAIS" className="h-full w-full object-contain" />
+            <div className="hidden h-10 w-10 shrink-0 items-center justify-center group-data-[collapsible=icon]:flex">
+              <img src={saisLogo} alt="SAIS" className="h-full w-full object-contain" />
             </div>
           </>
         ) : (

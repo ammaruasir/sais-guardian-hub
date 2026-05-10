@@ -81,14 +81,16 @@
   --chart-3: oklch(0.5 0.13 150);
   --chart-4: oklch(0.74 0.14 75);
   --chart-5: oklch(0.55 0.19 25);
-  --sidebar: oklch(0.28 0.05 250);               /* deep navy sidebar */
-  --sidebar-foreground: oklch(0.96 0.005 270);
-  --sidebar-primary: oklch(0.58 0.09 195);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.36 0.06 250);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.36 0.06 250);
+  --sidebar: oklch(1 0 0);                       /* white sidebar */
+  --sidebar-foreground: oklch(0.32 0.06 250);    /* navy text */
+  --sidebar-primary: oklch(0.32 0.06 250);       /* navy active */
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0.01 250);        /* hover light */
+  --sidebar-accent-foreground: oklch(0.32 0.06 250);
+  --sidebar-border: oklch(0.91 0.01 270);
   --sidebar-ring: oklch(0.58 0.09 195);
+  --gradient-primary: linear-gradient(135deg, oklch(0.32 0.06 250), oklch(0.58 0.09 195));
+  --gradient-success: linear-gradient(135deg, oklch(0.58 0.09 195), oklch(0.5 0.13 150));
 }
 
 .dark {

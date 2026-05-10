@@ -5,6 +5,7 @@ import { RequestsNeedingAction } from "@/components/dashboard/RequestsNeedingAct
 import { RequestsByStatusDonut } from "@/components/dashboard/RequestsByStatusDonut";
 import { RequestsByDepartmentBar } from "@/components/dashboard/RequestsByDepartmentBar";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { AnalyticsSection } from "@/components/dashboard/AnalyticsSection";
 import { StagePipeline } from "@/components/dashboard/StagePipeline";
 import { SectorDonut } from "@/components/dashboard/SectorDonut";
 import { OverdueTable } from "@/components/dashboard/OverdueTable";
@@ -61,6 +62,8 @@ function SaisDashboard() {
         <RequestsByStatusDonut />
         <RequestsByDepartmentBar />
       </div>
+
+      <AnalyticsSection />
 
       <ActivityFeed />
 
