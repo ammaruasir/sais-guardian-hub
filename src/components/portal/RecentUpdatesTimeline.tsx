@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, FileWarning, Send, MessageSquare, XCircle } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
+import { useT } from "@/hooks/useT";
 
 const iconMap = {
   approved: { Icon: CheckCircle2, color: "var(--success)" },
@@ -13,11 +14,12 @@ const iconMap = {
 export function RecentUpdatesTimeline() {
   const activity = useAppStore((s) => s.activity);
   const requests = useAppStore((s) => s.requests);
+  const { t } = useT();
   const updates = activity.slice(0, 5);
   const aramcoFirstReqId = requests.find((r) => r.companyId === "aramco")?.id;
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <h2 className="mb-4 text-base font-semibold">آخر التحديثات</h2>
+      <h2 className="mb-4 text-base font-semibold">{t("recent_updates")}</h2>
       <ol className="relative space-y-4 pe-4">
         <span className="absolute end-[7px] top-1 bottom-1 w-px bg-border" />
         {updates.map((u) => {
