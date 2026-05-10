@@ -136,16 +136,16 @@ function PortalRequestDetail() {
         <Tabs defaultValue="letters">
           <TabsList>
             <TabsTrigger value="letters">
-              <Mail className="h-4 w-4 me-1" /> الخطابات الرسمية{" "}
+              <Mail className="h-4 w-4 me-1" /> {tr("tab_letters")}{" "}
               {sentLetters.length > 0 && (
                 <Badge variant="secondary" className="ms-2 num">{sentLetters.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="documents">
-              <FileText className="h-4 w-4 me-1" /> المستندات
+              <FileText className="h-4 w-4 me-1" /> {tr("tab_documents")}
             </TabsTrigger>
             <TabsTrigger value="messages">
-              <MessageSquare className="h-4 w-4 me-1" /> الرسائل
+              <MessageSquare className="h-4 w-4 me-1" /> {isAr ? "الرسائل" : "Messages"}
             </TabsTrigger>
           </TabsList>
 
