@@ -42,6 +42,8 @@ import { ncaControls, ncaStatusLabel } from "@/data/ncaControls";
 import { toast } from "sonner";
 import { useRole } from "@/context/RoleContext";
 import { NoAccess } from "@/components/common/NoAccess";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/admin/settings")({
   component: SettingsPage,
@@ -59,6 +61,8 @@ const tabs: { key: TabKey; ar: string; Icon: typeof Globe }[] = [
 ];
 
 function SettingsPage() {
+  const { t } = useT();
+  usePageTitle(t("settings") + " — SAIS");
   const { hasPermission } = useRole();
   const [active, setActive] = useState<TabKey>("security");
 

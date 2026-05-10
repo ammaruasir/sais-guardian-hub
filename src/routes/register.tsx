@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Building2, ArrowLeft } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/register")({
 });
 
 function RegisterPlaceholder() {
+  usePageTitle("Register — SAIS");
   return (
     <div className="content-area min-h-screen bg-slate-50" dir="rtl">
       <div className="bg-[#006c35] py-1.5 text-center text-[11px] text-white">

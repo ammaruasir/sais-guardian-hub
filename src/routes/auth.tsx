@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Loader2, ArrowRight, Shield } from "lucide-react";
 import logo from "@/assets/logo.svg";
+import { usePageTitle } from "@/hooks/usePageTitle";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional().default("signin"),
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
+  usePageTitle("تسجيل الدخول — SAIS");
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { user, loading } = useAuth();

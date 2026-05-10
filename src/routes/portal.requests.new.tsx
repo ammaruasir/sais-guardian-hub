@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { CheckCircle2, ChevronLeft, ChevronRight, Upload } from "lucide-react";
 import {
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
   requestTypeLabel, priorityLabel,
   type RequestType, type Priority,
 } from "@/data/requests";
@@ -21,6 +23,8 @@ export const Route = createFileRoute("/portal/requests/new")({
 });
 
 function NewRequestWizard() {
+  const { t } = useT();
+  usePageTitle(t("new_request") + " — " + t("company_portal"));
   const createRequest = useAppStore((s) => s.createRequest);
   const [step, setStep] = useState(1);
   const [type, setType] = useState<RequestType>("new_project");

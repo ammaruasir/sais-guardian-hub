@@ -13,12 +13,16 @@ import type { Role } from "@/data/admin";
 import { toast } from "sonner";
 import { useRole } from "@/context/RoleContext";
 import { NoAccess } from "@/components/common/NoAccess";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/admin/roles")({
   component: AdminRolesPage,
 });
 
 function AdminRolesPage() {
+  const { t } = useT();
+  usePageTitle(t("roles_permissions") + " — SAIS");
   const { hasPermission, currentUser } = useRole();
   const roles = useAppStore((s) => s.roles);
   const deleteRole = useAppStore((s) => s.deleteRole);

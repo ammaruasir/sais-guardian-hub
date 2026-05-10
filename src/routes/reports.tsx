@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { useRole } from "@/context/RoleContext";
 import {
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { useT } from "@/hooks/useT";
   BarChart,
   Bar,
   XAxis,
@@ -29,6 +31,8 @@ export const Route = createFileRoute("/reports")({
 });
 
 function ReportsPage() {
+  const { t } = useT();
+  usePageTitle(t("reports") + " — SAIS");
   const { role } = useRole();
   if (role !== "sais") return <Navigate to="/portal" />;
   return (
