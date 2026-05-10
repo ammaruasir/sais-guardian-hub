@@ -97,6 +97,7 @@ export function LetterComposerDialog({
       type,
       status: "draft",
       addresseeAr,
+      referenceAr: "",
       subjectAr: `${d.subjectAr} — ${requestRef}`,
       bodyIntroAr: d.bodyIntroAr,
       items: [...d.items],
