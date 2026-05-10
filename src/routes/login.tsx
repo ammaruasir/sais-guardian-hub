@@ -70,7 +70,7 @@ function LoginPage() {
       </div>
 
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-border dark:bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <Link to="/landing" className="flex items-center gap-3">
             <img src={logo} alt="SAIS" className="h-10 w-10" />
