@@ -317,6 +317,7 @@ export const useAppStore = create<State>()(
 
       approveRequest: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -324,10 +325,17 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "approval",
+          titleAr: `تم اعتماد طلبكم ${r0.ref}`,
+          descriptionAr: r0.titleAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
       },
 
       rejectRequest: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -335,10 +343,17 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "rejection",
+          titleAr: `تم رفض طلبكم ${r0.ref}`,
+          descriptionAr: noteAr ?? r0.titleAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
       },
 
       requestAdditionalDocs: (id, noteAr) => {
         const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
         set((s) => ({
           requests: s.requests.map((r) =>
             r.id === id
@@ -346,6 +361,37 @@ export const useAppStore = create<State>()(
               : r,
           ),
         }));
+        if (r0) get().addNotification({
+          forRole: "company", type: "request",
+          titleAr: `مطلوب مستندات إضافية — ${r0.ref}`,
+          descriptionAr: noteAr,
+          ts: today, linkTo: `/portal/requests/${id}`,
+        });
+      },
+
+      respondToAdditionalDocs: (id, noteAr) => {
+        const today = new Date().toISOString().slice(0, 10);
+        const r0 = get().requests.find((r) => r.id === id);
+        set((s) => ({
+          requests: s.requests.map((r) => {
+            if (r.id !== id) return r;
+            const entry: AssignmentEntry = {
+              id: `c${Date.now()}`,
+              department: r.currentDepartment,
+              assigneeAr: "المنشأة",
+              action: "commented",
+              noteAr: noteAr ?? "تم إرفاق المستندات المطلوبة",
+              startedAt: today,
+            };
+            return { ...r, status: "in_review" as RequestStatus, lastUpdate: today, chain: [...r.chain, entry] };
+          }),
+        }));
+        if (r0) get().addNotification({
+          forRole: "sais", type: "submission",
+          titleAr: `رد المنشأة على ${r0.ref}`,
+          descriptionAr: noteAr ?? "تم إرفاق المستندات المطلوبة",
+          ts: today, linkTo: `/requests/${id}`,
+        });
       },
 
       addRequestComment: (id, c) => {
