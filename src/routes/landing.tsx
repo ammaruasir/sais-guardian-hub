@@ -151,12 +151,12 @@ function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-bl from-[#0b3a2c] via-[#0e4a37] to-[#103e57] text-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-            backgroundSize: "40px 40px, 60px 60px",
-          }}
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity"
+          style={{ backgroundImage: `url(${heroBg})` }}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-bl from-[#0b3a2c]/70 via-[#0e4a37]/60 to-[#103e57]/70"
           aria-hidden
         />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 md:px-6 md:py-28 lg:grid-cols-5">
