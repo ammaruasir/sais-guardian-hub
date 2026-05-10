@@ -34,6 +34,10 @@ function CompanyDetailPage() {
   const facs = facilities.filter((f) => f.companyId === company.id);
   const projs = projects.filter((p) => p.companyId === company.id);
   const consultant = consultants.find((c) => c.id === companyAssignedConsultant[company.id]);
+  const companyRequests = requests.filter(
+    (r) => r.companyId === company.id && r.status !== "approved" && r.status !== "rejected",
+  );
+  const deptName = (key: string) => departments.find((d) => d.key === key)?.nameAr ?? key;
 
   return (
     <AppShell>
