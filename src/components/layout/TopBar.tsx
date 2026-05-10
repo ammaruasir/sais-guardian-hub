@@ -1,4 +1,6 @@
-import { Bell, ChevronLeft, Shield, Building2, LogOut } from "lucide-react";
+import { Bell, ChevronLeft, Shield, Building2, LogOut, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
