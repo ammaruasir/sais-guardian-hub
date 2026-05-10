@@ -95,7 +95,7 @@ function RequestsInboxPage() {
         {search.filter && (
           <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
             <span className="text-muted-foreground">{isAr ? "تم الفلترة من اللوحة:" : "Filtered from dashboard:"}</span>
-            <Badge variant="secondary">{filterMeta[search.filter][lang]}</Badge>
+            <Badge variant="secondary">{isAr ? filterMeta[search.filter].ar : filterMeta[search.filter].en}</Badge>
             <span className="text-muted-foreground">· {filtered.length}</span>
             <Button size="sm" variant="ghost" className="ms-auto h-7" onClick={clearFilter}>
               {isAr ? "مسح الفلتر" : "Clear filter"}
