@@ -41,13 +41,7 @@ export function LetterTemplate({ letter, idForPrint }: { letter: Letter; idForPr
 
           {/* Center: emblem */}
           <div className="flex flex-col items-center">
-            <img src={saisEmblem} alt="SAIS" className="h-20 w-auto object-contain" />
-            <div className="mt-1 text-center text-[7pt] text-[#0E5A3A] font-semibold leading-tight">
-              الهيئة العليا للأمن الصناعي
-              <div className="text-[6pt] text-[#0E5A3A]/70">
-                Supreme Authority For Industrial Security
-              </div>
-            </div>
+            <img src={saisEmblem} alt="SAIS" className="h-32 w-auto object-contain" />
           </div>
 
           {/* Left: meta */}
