@@ -3,7 +3,8 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { AppShell } from "@/components/layout/AppShell";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Pencil, Trash2 } from "lucide-react";
+import { ChevronRight, ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/store/appStore";
 import { getActivitiesByProject, getNotesByProject } from "@/data/notes";
 import { StageStepper } from "@/components/projects/StageStepper";
