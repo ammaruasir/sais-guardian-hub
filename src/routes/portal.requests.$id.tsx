@@ -16,6 +16,7 @@ import { requestStatusLabel, requestTypeLabel, priorityLabel } from "@/data/requ
 import { letterTypeLabel, type Letter } from "@/data/letters";
 import { FileWarning, Mail, Eye, Printer, Reply, FileText, MessageSquare, CheckCircle2, XCircle, Info, ChevronLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/portal/requests/$id")({
   component: PortalRequestDetail,
@@ -34,9 +35,10 @@ function PortalRequestDetail() {
 
   const dept = departments.find((d) => d.key === request.currentDepartment);
   const company = companies.find((c) => c.id === request.companyId);
-  const t = requestTypeLabel[request.type];
+  const tp = requestTypeLabel[request.type];
   const st = requestStatusLabel[request.status];
   const p = priorityLabel[request.priority];
+  const { t: tr, isAr, name } = useT();
 
   const externalComments = request.comments.filter((c) => c.visibility === "external");
   const sentLetters = allLetters.filter((l) => l.requestId === request.id && l.status === "sent");
@@ -57,15 +59,15 @@ function PortalRequestDetail() {
     <AppShell>
       <div className="space-y-6">
         <nav className="flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
-          <Link to="/portal" className="hover:text-foreground">الرئيسية</Link>
+          <Link to="/portal" className="hover:text-foreground">{tr("home")}</Link>
           <ChevronLeft className="h-3 w-3" />
-          <Link to="/portal/requests" className="hover:text-foreground">طلباتي</Link>
+          <Link to="/portal/requests" className="hover:text-foreground">{tr("my_requests")}</Link>
           <ChevronLeft className="h-3 w-3" />
           <span className="text-foreground font-mono">{request.ref}</span>
         </nav>
         <div>
           <Link to="/portal/requests" className="text-xs text-muted-foreground hover:text-primary">
-            ← العودة لقائمة الطلبات
+            {tr("back_to_list")}
           </Link>
           <div className="mt-2 flex items-end justify-between gap-3 flex-wrap">
             <div>
@@ -74,24 +76,24 @@ function PortalRequestDetail() {
               <p className="text-sm text-muted-foreground mt-1">{request.descriptionAr}</p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline">{t.ar}</Badge>
-              <Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{p.ar}</Badge>
-              <Badge variant="secondary">{st.ar}</Badge>
+              <Badge variant="outline">{isAr ? tp.ar : tp.en}</Badge>
+              <Badge variant="outline" className={`border-${p.tone}/40 text-${p.tone}`}>{isAr ? p.ar : p.en}</Badge>
+              <Badge variant="secondary">{isAr ? st.ar : st.en}</Badge>
             </div>
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">الإدارة الحالية</div>
-            <div className="text-sm font-medium mt-1">{dept?.nameAr}</div>
+            <div className="text-xs text-muted-foreground">{tr("col_department")}</div>
+            <div className="text-sm font-medium mt-1">{name(dept ?? null)}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">تاريخ التقديم</div>
+            <div className="text-xs text-muted-foreground">{isAr ? "تاريخ التقديم" : "Submitted on"}</div>
             <div className="text-sm font-medium mt-1">{request.receivedAt}</div>
           </Card>
           <Card className="p-4">
-            <div className="text-xs text-muted-foreground">آخر تحديث</div>
+            <div className="text-xs text-muted-foreground">{isAr ? "آخر تحديث" : "Last update"}</div>
             <div className="text-sm font-medium mt-1">{request.lastUpdate}</div>
           </Card>
         </div>
