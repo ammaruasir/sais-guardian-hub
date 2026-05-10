@@ -136,7 +136,11 @@
   }
 
   html {
-    font-family: var(--font-sans);
+    font-family: var(--app-font, "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif);
+  }
+
+  html.font-en {
+    --app-font: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
   }
 
   body {

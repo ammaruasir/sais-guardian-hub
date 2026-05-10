@@ -10,6 +10,7 @@ const FONT_SIZE_PX: Record<string, string> = {
 export function useApplySettings() {
   const themeMode = useAppStore((s) => s.settings.themeMode);
   const fontSize = useAppStore((s) => s.settings.fontSize);
+  const language = useAppStore((s) => s.settings.language ?? "ar");
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -31,4 +32,12 @@ export function useApplySettings() {
     if (typeof document === "undefined") return;
     document.documentElement.style.fontSize = FONT_SIZE_PX[fontSize] ?? "16px";
   }, [fontSize]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    root.dir = language === "ar" ? "rtl" : "ltr";
+    root.lang = language;
+    root.classList.toggle("font-en", language === "en");
+  }, [language]);
 }

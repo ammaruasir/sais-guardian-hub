@@ -3,14 +3,16 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
 import { useAppStore } from "@/store/appStore";
+import { useT } from "@/hooks/useT";
 
 export function RequestsByDepartmentBar() {
   const requests = useAppStore((s) => s.requests);
   const departments = useAppStore((s) => s.departments);
+  const { t, name } = useT();
   const active = requests.filter((r) => r.status !== "approved" && r.status !== "rejected");
   const data = departments
     .map((d) => ({
-      name: d.nameAr,
+      name: name(d),
       count: active.filter((r) => r.currentDepartment === d.key).length,
     }))
     .filter((d) => d.count > 0);
@@ -18,8 +20,7 @@ export function RequestsByDepartmentBar() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">الطلبات حسب الإدارة</CardTitle>
-        <p className="text-xs text-muted-foreground">Active Requests by Department</p>
+        <CardTitle className="text-base">{t("requests_by_dept")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-64 w-full">

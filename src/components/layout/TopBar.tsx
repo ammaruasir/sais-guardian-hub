@@ -1,5 +1,6 @@
-import { Bell, ChevronLeft, Shield, Building2, LogOut, Moon, Sun } from "lucide-react";
+import { Bell, ChevronLeft, Shield, Building2, LogOut, Moon, Sun, Languages } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { useT } from "@/hooks/useT";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -11,9 +12,11 @@ import { cn } from "@/lib/utils";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAppStore } from "@/store/appStore";
 import { toast } from "sonner";
+import type { TKey } from "@/i18n/translations";
 
 function RoleSwitcher() {
   const { role, setRole } = useRole();
+  const { t } = useT();
   return (
     <div className="inline-flex items-center rounded-full border border-border bg-card p-1 shadow-sm">
       <button
@@ -26,7 +29,7 @@ function RoleSwitcher() {
         )}
       >
         <Shield className="h-4 w-4" />
-        <span>مركز الهيئة</span>
+        <span>{t("sais_hub")}</span>
       </button>
       <button
         onClick={() => setRole("company")}
@@ -38,7 +41,7 @@ function RoleSwitcher() {
         )}
       >
         <Building2 className="h-4 w-4" />
-        <span>بوابة المنشآت</span>
+        <span>{t("company_portal")}</span>
       </button>
     </div>
   );
@@ -46,35 +49,37 @@ function RoleSwitcher() {
 
 function Breadcrumbs() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const map: Record<string, string> = {
-    "/": "لوحة المعلومات",
-    "/projects": "المشاريع",
-    "/tasks": "المهام",
-    "/companies": "المنشآت",
-    "/consultants": "الاستشاريون المعتمدون",
-    "/reports": "التقارير",
-    "/notifications": "الإشعارات",
-    "/portal": "لوحة المنشأة",
-    "/portal/projects": "مشاريعنا",
-    "/portal/submissions/new": "تقديم جديد",
-    "/portal/requirements": "المتطلبات",
-    "/portal/notifications": "الإشعارات",
-    "/portal/help": "المساعدة",
-    "/admin": "الإدارة",
-    "/admin/users": "المستخدمون",
-    "/admin/roles": "الصلاحيات والأدوار",
-    "/admin/audit": "الأحداث الأمنية",
-    "/admin/settings": "الإعدادات",
+  const { t } = useT();
+  const map: Record<string, TKey> = {
+    "/": "dashboard",
+    "/requests": "incoming_requests",
+    "/projects": "projects",
+    "/tasks": "tasks",
+    "/companies": "companies",
+    "/consultants": "consultants",
+    "/reports": "reports",
+    "/notifications": "notifications",
+    "/portal": "dashboard",
+    "/portal/requests": "my_requests",
+    "/portal/requirements": "requirements",
+    "/portal/notifications": "notifications",
+    "/portal/help": "help",
+    "/admin": "administration",
+    "/admin/users": "users_mgmt",
+    "/admin/roles": "roles_permissions",
+    "/admin/audit": "security_events",
+    "/admin/settings": "settings",
   };
-  let label = map[path];
-  if (!label) {
+  let key = map[path];
+  if (!key) {
     const seg = "/" + path.split("/").filter(Boolean)[0];
-    label = map[seg] ?? "";
+    key = map[seg];
   }
+  const label = key ? t(key) : "";
   return (
     <div className="hidden items-center gap-2 text-sm text-muted-foreground md:flex">
       <Link to="/" className="hover:text-foreground">
-        الرئيسية
+        {t("home")}
       </Link>
       {label && (
         <>
@@ -90,6 +95,7 @@ export function TopBar() {
   const { role } = useRole();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useT();
   const unread = useAppStore(
     (s) =>
       s.notifications.filter((n) => !n.read && (n.forRole === role || n.forRole === "both")).length,
@@ -98,7 +104,7 @@ export function TopBar() {
   const handleSignOut = async () => {
     await signOut();
     logoutMock();
-    toast.success("تم تسجيل الخروج");
+    toast.success(t("toast_logout"));
     navigate({ to: "/login" });
   };
   return (
@@ -107,6 +113,7 @@ export function TopBar() {
       <Breadcrumbs />
       <div className="ms-auto flex items-center gap-3">
         <RoleSwitcher />
+        <LanguageToggleButton />
         <ThemeToggleButton />
         <Button variant="ghost" size="icon" className="relative" asChild>
           <Link to={role === "sais" ? "/notifications" : "/portal/notifications"}>
@@ -137,7 +144,7 @@ export function TopBar() {
           variant="ghost"
           size="icon"
           onClick={handleSignOut}
-          title="تسجيل الخروج"
+          title={t("logout")}
         >
           <LogOut className="h-5 w-5" />
         </Button>
@@ -149,6 +156,10 @@ export function TopBar() {
 export function ThemeToggleButton() {
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const { isAr } = useT();
+  const label = isDark
+    ? isAr ? "الوضع الفاتح" : "Light mode"
+    : isAr ? "الوضع الداكن" : "Dark mode";
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
@@ -157,12 +168,38 @@ export function ThemeToggleButton() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            aria-label={isDark ? "الوضع الفاتح" : "الوضع الداكن"}
+            aria-label={label}
           >
             {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
         </TooltipTrigger>
-        <TooltipContent>{isDark ? "الوضع الفاتح" : "الوضع الداكن"}</TooltipContent>
+        <TooltipContent>{label}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+export function LanguageToggleButton() {
+  const { isAr } = useT();
+  const setLanguage = useAppStore((s) => s.setLanguage);
+  const target = isAr ? "en" : "ar";
+  const label = isAr ? "English" : "عربي";
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLanguage(target)}
+            aria-label={label}
+            className="gap-1.5 px-2"
+          >
+            <Languages className="h-4 w-4" />
+            <span className="text-xs font-semibold">{isAr ? "EN" : "عربي"}</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{label}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

@@ -30,49 +30,52 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useRole } from "@/context/RoleContext";
+import { useT } from "@/hooks/useT";
+import type { TKey } from "@/i18n/translations";
 import logoUrl from "@/assets/logo.svg";
 import saisLogo from "@/assets/sais-logo.png";
 
-const saisNav = [
-  { to: "/", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
-  { to: "/requests", icon: Inbox, ar: "الطلبات", en: "Requests" },
-  { to: "/projects", icon: FolderKanban, ar: "المشاريع", en: "Projects" },
-  { to: "/tasks", icon: ListTodo, ar: "المهام", en: "Tasks" },
-  { to: "/companies", icon: Building2, ar: "المنشآت", en: "Companies" },
-  { to: "/consultants", icon: UserCheck, ar: "الاستشاريون المعتمدون", en: "Consultants" },
-  { to: "/reports", icon: BarChart3, ar: "التقارير", en: "Reports" },
-  { to: "/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
+const saisNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
+  { to: "/", icon: LayoutDashboard, key: "dashboard" },
+  { to: "/requests", icon: Inbox, key: "incoming_requests" },
+  { to: "/projects", icon: FolderKanban, key: "projects" },
+  { to: "/tasks", icon: ListTodo, key: "tasks" },
+  { to: "/companies", icon: Building2, key: "companies" },
+  { to: "/consultants", icon: UserCheck, key: "consultants" },
+  { to: "/reports", icon: BarChart3, key: "reports" },
+  { to: "/notifications", icon: Bell, key: "notifications" },
 ];
 
-const adminNav = [
-  { to: "/admin/users", icon: Users, ar: "المستخدمون", en: "Users" },
-  { to: "/admin/roles", icon: Shield, ar: "الصلاحيات والأدوار", en: "Roles & Permissions" },
-  { to: "/admin/audit", icon: ShieldAlert, ar: "الأحداث الأمنية", en: "Security Events" },
-  { to: "/admin/settings", icon: Settings, ar: "الإعدادات", en: "Settings" },
+const adminNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
+  { to: "/admin/users", icon: Users, key: "users_mgmt" },
+  { to: "/admin/roles", icon: Shield, key: "roles_permissions" },
+  { to: "/admin/audit", icon: ShieldAlert, key: "security_events" },
+  { to: "/admin/settings", icon: Settings, key: "settings" },
 ];
 
-const companyNav = [
-  { to: "/portal", icon: LayoutDashboard, ar: "لوحة المعلومات", en: "Dashboard" },
-  { to: "/portal/requests", icon: FileStack, ar: "طلباتي", en: "My Requests" },
-  { to: "/portal/requirements", icon: FileText, ar: "المتطلبات", en: "Requirements" },
-  { to: "/portal/notifications", icon: Bell, ar: "الإشعارات", en: "Notifications" },
-  { to: "/portal/help", icon: HelpCircle, ar: "المساعدة", en: "Help" },
+const companyNav: { to: string; icon: typeof LayoutDashboard; key: TKey }[] = [
+  { to: "/portal", icon: LayoutDashboard, key: "dashboard" },
+  { to: "/portal/requests", icon: FileStack, key: "my_requests" },
+  { to: "/portal/requirements", icon: FileText, key: "requirements" },
+  { to: "/portal/notifications", icon: Bell, key: "notifications" },
+  { to: "/portal/help", icon: HelpCircle, key: "help" },
 ];
 
 export function AppSidebar() {
   const { role } = useRole();
+  const { t, isAr } = useT();
   const items = role === "sais" ? saisNav : companyNav;
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <Sidebar side="left" collapsible="icon">
+    <Sidebar side={isAr ? "right" : "left"} collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         {role === "sais" ? (
           <>
             <div className="flex w-full items-center justify-center rounded-lg bg-white p-2 group-data-[collapsible=icon]:hidden">
               <img
                 src={saisLogo}
-                alt="الهيئة العليا للأمن الصناعي - SAIS"
+                alt={t("sais_name")}
                 className="h-12 w-full object-contain"
               />
             </div>
@@ -87,10 +90,10 @@ export function AppSidebar() {
             </div>
             <div className="min-w-0 group-data-[collapsible=icon]:hidden">
               <div className="truncate text-sm font-bold text-sidebar-foreground">
-                أرامكو السعودية
+                {isAr ? "أرامكو السعودية" : "Saudi Aramco"}
               </div>
               <div className="truncate text-[11px] text-sidebar-foreground/60">
-                بوابة المنشآت
+                {t("company_portal")}
               </div>
             </div>
           </div>
@@ -98,7 +101,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{role === "sais" ? "مركز الهيئة" : "بوابة المنشآت"}</SidebarGroupLabel>
+          <SidebarGroupLabel>{role === "sais" ? t("sais_hub") : t("company_portal")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
@@ -106,12 +109,13 @@ export function AppSidebar() {
                 const active = isHome
                   ? path === item.to
                   : path === item.to || path.startsWith(item.to + "/");
+                const label = t(item.key);
                 return (
                   <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>
+                    <SidebarMenuButton asChild isActive={active} tooltip={label}>
                       <Link to={item.to} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4 shrink-0" />
-                        <span className="truncate">{item.ar}</span>
+                        <span className="truncate">{label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -122,17 +126,18 @@ export function AppSidebar() {
         </SidebarGroup>
         {role === "sais" && (
           <SidebarGroup>
-            <SidebarGroupLabel>الإدارة</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("administration")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminNav.map((item) => {
                   const active = path === item.to || path.startsWith(item.to + "/");
+                  const label = t(item.key);
                   return (
                     <SidebarMenuItem key={item.to}>
-                      <SidebarMenuButton asChild isActive={active} tooltip={item.ar}>
+                      <SidebarMenuButton asChild isActive={active} tooltip={label}>
                         <Link to={item.to} className="flex items-center gap-3">
                           <item.icon className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{item.ar}</span>
+                          <span className="truncate">{label}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

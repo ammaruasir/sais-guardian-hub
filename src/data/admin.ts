@@ -73,6 +73,7 @@ export type AppSettings = {
   themeMode: "light" | "dark" | "auto";
   fontSize: "small" | "medium" | "large";
   sidebarMode: "open" | "collapsed";
+  language: "ar" | "en";
 };
 
 export const departments = [
@@ -483,4 +484,5 @@ export const seedSettings: AppSettings = {
   themeMode: "light",
   fontSize: "medium",
   sidebarMode: "open",
+  language: "ar",
 };

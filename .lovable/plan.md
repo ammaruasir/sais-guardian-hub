@@ -1,84 +1,60 @@
-## المرحلة B — تفعيل الوضع الداكن
+# Phase C — Bilingual AR/EN Support
 
-### ملاحظة هامة
-المتجر يحتوي بالفعل على `settings.themeMode: "light" | "dark" | "auto"` (في `src/data/admin.ts`). سأستخدم الحقل الموجود بدل إضافة `theme` جديد — `auto` تكافئ `system`. متغيّرات `.dark` موجودة بالفعل في `src/styles.css`.
+Wire a full Arabic ↔ English translation system to existing `appStore.settings`, plus an HTML `dir`/font switcher and translation rollout across UI chrome.
 
----
+## 1. Foundations (new + store)
 
-### 1) Hook لتطبيق الثيم — `src/hooks/useTheme.ts` (جديد)
-- يقرأ `settings.themeMode` من المتجر.
-- `applyTheme(mode)`:
-  - `light` → إزالة `.dark` من `document.documentElement`.
-  - `dark` → إضافة `.dark`.
-  - `auto` → فحص `window.matchMedia("(prefers-color-scheme: dark)")` وتطبيق النتيجة.
-- `useEffect` يطبّق الثيم عند تغيير `themeMode` ويُسجّل listener للـ matchMedia عند `auto`.
-- إرجاع `{ themeMode, resolvedTheme, setTheme }` حيث `setTheme(m)` يستدعي `updateSettings({ themeMode: m })`.
+- **Create `src/i18n/translations.ts`** — full dictionary from spec (`{ar, en}` per key) and `TKey` type.
+- **Create `src/hooks/useT.ts`** — returns `{ t, lang, dir, isAr, name(entity) }`. Reads `useAppStore(s => s.settings.language ?? "ar")`.
+- **Update `src/data/admin.ts`** — add `language: "ar" | "en"` to `AppSettings`; default `"ar"` in `seedSettings`.
+- **Update `src/store/appStore.ts`** — add `setLanguage(lang)` action (thin wrapper over `updateSettings({ language })`); bump persist version to migrate old persisted state (default missing `language` → `"ar"`).
 
-### 2) تركيب الـ hook في الـ AppShell
-- استدعاء `useTheme()` مرة واحدة داخل `src/components/layout/AppShell.tsx` ليطبّق الثيم على كل الصفحات الداخلية.
-- وأيضاً داخل `src/routes/landing.tsx` و`src/routes/login.tsx` (صفحات بدون AppShell).
-- بديل أنظف: استدعاؤه في `src/routes/__root.tsx` ليُطبَّق على كل التطبيق دفعة واحدة. **سأستخدم `__root.tsx`**.
-- إضافة `transition-colors duration-200` على `<html>` عبر CSS في `styles.css` (لأن `<html>` لا نملكه عبر JSX في TanStack Start بسهولة — سأضيف انتقال على `body` و`html` في `styles.css`).
+## 2. Apply language globally
 
-### 3) زر التبديل في TopBar — `src/components/layout/TopBar.tsx`
-- إضافة `<Button variant="ghost" size="icon">` بجانب جرس الإشعارات.
-- يعرض `Moon` في الوضع الفاتح و`Sun` في الوضع الداكن.
-- النقر: إذا `resolvedTheme === "dark"` → `setTheme("light")`، وإلا `setTheme("dark")`.
-- `Tooltip` بنص "الوضع الداكن"/"الوضع الفاتح".
+- **Extend `src/hooks/useTheme.ts`** (or add side-effect in existing `useApplySettings.ts` — already imported in root) to also apply on every `language` change:
+  - `document.documentElement.dir = lang === "ar" ? "rtl" : "ltr"`
+  - `document.documentElement.lang = lang`
+  - Toggle a `font-en` class on `<html>` (or set `--app-font` CSS var) — Arabic stays default `IBM Plex Sans Arabic, Inter, system-ui`; English becomes `Inter, IBM Plex Sans Arabic, system-ui`.
+- **`src/styles.css`** — define `html { font-family: var(--app-font, "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif); }` and `html.font-en { --app-font: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif; }`. Add `transition` already exists.
 
-### 4) زر تبديل في Landing — `src/routes/landing.tsx`
-- إضافة نفس الزر في شريط التنقل العلوي (الجهة اليسرى من الـ nav في RTL → `me-auto` أو ضمن مجموعة الأزرار).
+## 3. Language toggles (UI controls)
 
-### 5) ضبط الألوان في Landing & Login
-- **`landing.tsx`**: استبدال أي `bg-white`/`text-black` ثابتة بـ `bg-card`/`bg-background`/`text-foreground`. تعديل تدرّج الـ Hero ليستخدم `dark:from-*` و`dark:to-*` (تدرّج أغمق رمادي/كحلي عميق). بطاقات الخدمات → `bg-card`. قسم الإحصاءات والـ Footer → `bg-muted`/`bg-card`.
-- **`login.tsx`**: التأكد أن البطاقة تستخدم `bg-card`، الحقول `border-input`، وزر نفاذ يحتفظ بألوانه.
+- **`src/components/layout/TopBar.tsx`** — add `LanguageToggleButton` next to `ThemeToggleButton`. Shows `EN` when AR active, `عربي` when EN active. Click → `setLanguage(other)`.
+- **`src/routes/landing.tsx`** — add the same toggle in the top nav header (text variant: "عربي | English").
+- **Appearance settings** (`src/routes/admin.settings.tsx` appearance tab) — add language radio (عربي / English) bound to `settings.language`, switches immediately on change.
 
-### 6) ربط تبويب المظهر — `src/routes/admin.settings.tsx` (السطر 567-581)
-- الـ `RadioGroup` الموجود يستخدم `update({ themeMode: ... })`. مع الـ hook في `__root.tsx` التغيير سيُطبَّق فوراً (المتجر يبثّ التغيير → useEffect يطبّق `.dark`).
-- لا يحتاج تغيير إضافي — يكفي أن الـ store-update فوري والـ hook يستجيب. زر "حفظ التغييرات" يبقى لباقي الإعدادات.
+## 4. Translation rollout (replace hardcoded AR strings)
 
-### 7) إصلاح الرسوم (Recharts)
-الملفات: `SectorDonut.tsx`, `StagePipeline.tsx`, `RequestsByStatusDonut.tsx`, `RequestsByDepartmentBar.tsx`.
-- `XAxis`/`YAxis tick={{ fill: "hsl(var(--muted-foreground))" }}` — استبدال أي `var(--muted-foreground)` المباشر بـ `hsl(...)` إذا لزم (مع `oklch` نستخدم `var(--muted-foreground)` مباشرة، يعمل).
-- `Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--foreground)" }}`.
-- `CartesianGrid stroke="var(--border)"` إذا موجود.
-- `Legend` → `wrapperStyle={{ color: "var(--foreground)" }}`.
+Apply `const { t, name } = useT()` and replace literals in (priority order):
 
-### 8) فحص شامل للصفحات في الوضع الداكن
-بعد التطبيق، سأمر على المسارات الرئيسية (Landing, Login, /, /requests, /requests/$id, /projects, /projects/$id, /companies/$id, /tasks, /notifications, /admin/users, /admin/settings, /admin/audit, /portal, /portal/requests, /portal/requests/$id, /portal/requirements) وألتقط لقطات في الوضع الداكن، وأصحّح أي:
-- نصوص ثابتة `text-black`/`text-white` → `text-foreground`.
-- خلفيات ثابتة `bg-white`/`bg-gray-50` → `bg-card`/`bg-muted`.
-- حدود ثابتة → `border-border`.
-- خطاب SAIS (`LetterTemplate.tsx`) **يبقى أبيض** — لا تغيير.
+1. **Layout**: `AppSidebar.tsx`, `TopBar.tsx`, `DemoBadge.tsx`.
+2. **Dashboards**: `KpiCards.tsx`, `RequestsByStatusDonut.tsx`, `RequestsByDepartmentBar.tsx`, `RequestsNeedingAction.tsx`, `ActionRequiredCards.tsx`, `ActiveRequestsSection.tsx`, `RecentUpdatesTimeline.tsx`, dashboard route titles.
+3. **Requests**: `routes/requests.index.tsx`, `requests.$id.tsx`, `requests.new.tsx`, `portal.requests.*`, related card / table / tab components.
+4. **Landing & Login**: `routes/landing.tsx`, `routes/login.tsx`.
+5. **Admin**: `routes/admin.users.tsx`, `admin.roles.tsx`, `admin.settings.tsx`, `admin.audit.tsx`.
+6. **Other**: projects, tasks, companies, consultants, reports, notifications, help, requirements pages — table headers, filter placeholders, primary buttons.
 
-### 9) تحسينات إضافية
-- Toaster (`<Toaster />` من sonner): إضافة `theme={resolvedTheme}` إذا الـ Sonner يدعمها (يدعم).
-- إضافة `transition-colors` على `body` في `styles.css`.
+For toasts: replace `toast.success("تم …")` literals with `t("toast_*")` keys.
 
----
+For entity names with `nameAr`/`nameEn` (companies, departments, consultants, facilities), use `name(entity)`. Where code currently passes raw `nameAr`, swap to `name()`. Helpers in `src/data/requests.ts` like `requestStatusLabel` / `requestTypeLabel` will be replaced at call sites with `t("status_*")` / `t("type_*")` (keep helpers for non-React usage but prefer `t` in components).
 
-### الملفات المعدّلة/الجديدة
-**جديد:**
-- `src/hooks/useTheme.ts`
+**Do NOT translate**: seeded demo content (activity feed text, comments, letter bodies).
 
-**معدّل:**
-- `src/routes/__root.tsx` (تركيب useTheme)
-- `src/components/layout/TopBar.tsx` (زر التبديل + Tooltip)
-- `src/routes/landing.tsx` (زر التبديل + dark variants)
-- `src/routes/login.tsx` (dark variants)
-- `src/styles.css` (transition-colors)
-- `src/components/dashboard/SectorDonut.tsx`
-- `src/components/dashboard/StagePipeline.tsx`
-- `src/components/dashboard/RequestsByStatusDonut.tsx`
-- `src/components/dashboard/RequestsByDepartmentBar.tsx`
-- أي ملف يستخدم ألوان ثابتة `bg-white`/`text-black`/`text-gray-*` يُعدَّل أثناء جولة الفحص (قائمة كاملة بعد المسح، متوقع: بطاقات Landing، KPI cards، بعض جداول الطلبات/المنشآت).
+## 5. Verification checklist
 
-### قائمة التحقق النهائية
-- [ ] زر القمر/الشمس في TopBar يبدّل الثيم فوراً.
-- [ ] زر القمر/الشمس في Landing يعمل.
-- [ ] /admin/settings → تغيير الراديو يطبّق فوراً.
-- [ ] جميع الصفحات الرئيسية مقروءة بدون نص أبيض على أبيض.
-- [ ] الرسوم البيانية: محاور وtooltip مقروءة.
-- [ ] خطاب SAIS يظل بخلفية بيضاء.
-- [ ] Toasts مقروءة.
-- [ ] الديالوجات والنماذج مقروءة بحدود واضحة.
+- Toggle EN → sidebar labels, topbar, KPIs, tables, buttons all in English; `<html dir="ltr" lang="en">`; sidebar flips to left; font switches to Inter.
+- Toggle AR → reverts; RTL restored; font reverts.
+- Company names + department names follow language.
+- Toasts in current language.
+- Landing + Login fully switch.
+- Settings appearance radio reflects current and switches live.
+
+## Technical notes
+
+- `useT` is the single read path; never read translations dictionary directly in components.
+- `dir` is applied via root effect, NOT per-component, so the existing logical-property classes (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) flip automatically.
+- Persist migration: increment `persist({ version })` and supply a `migrate` that injects `language: "ar"` if absent — avoids blank UI for returning users.
+- Recharts tick/legend labels that come from data also need `name(...)` translation where the data has bilingual fields (e.g., department breakdown chart).
+
+Files created: `src/i18n/translations.ts`, `src/hooks/useT.ts`.
+Files edited (core): `src/data/admin.ts`, `src/store/appStore.ts`, `src/hooks/useApplySettings.ts` (or `useTheme.ts`), `src/styles.css`, `src/components/layout/TopBar.tsx`, `src/components/layout/AppSidebar.tsx`, `src/routes/landing.tsx`, `src/routes/login.tsx`, `src/routes/admin.settings.tsx`, plus the dashboards, request, admin, and listing pages enumerated above.

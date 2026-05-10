@@ -99,6 +99,7 @@ type State = {
   deleteRole: (key: string) => void;
   setPermission: (perm: string, roleKey: string, value: boolean) => void;
   updateSettings: (patch: Partial<AppSettings>) => void;
+  setLanguage: (lang: "ar" | "en") => void;
   addAudit: (e: Omit<AuditEvent, "id" | "ts">) => void;
   deleteAudit: (id: string) => void;
 
@@ -458,6 +459,7 @@ export const useAppStore = create<State>()(
         })),
 
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
+      setLanguage: (lang) => set((s) => ({ settings: { ...s.settings, language: lang } })),
 
       addAudit: (e) =>
         set((s) => ({
@@ -589,6 +591,13 @@ export const useAppStore = create<State>()(
           letters: seedLetters,
         }),
     }),
-    { name: "sais-app-store-v2" },
+    {
+      name: "sais-app-store-v3",
+      migrate: (state: unknown, _v: number) => {
+        const s = (state as { settings?: { language?: "ar" | "en" } }) ?? {};
+        if (s.settings && !s.settings.language) s.settings.language = "ar";
+        return state as never;
+      },
+    },
   ),
 );

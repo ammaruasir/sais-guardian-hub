@@ -61,11 +61,11 @@ export const requestStatusLabel: Record<RequestStatus, { ar: string; en: string;
 };
 
 export type Priority = "urgent" | "high" | "normal" | "low";
-export const priorityLabel: Record<Priority, { ar: string; tone: string }> = {
-  urgent: { ar: "عاجل", tone: "destructive" },
-  high: { ar: "عالية", tone: "warning" },
-  normal: { ar: "عادية", tone: "secondary" },
-  low: { ar: "منخفضة", tone: "muted" },
+export const priorityLabel: Record<Priority, { ar: string; en: string; tone: string }> = {
+  urgent: { ar: "عاجل", en: "Urgent", tone: "destructive" },
+  high: { ar: "عالية", en: "High", tone: "warning" },
+  normal: { ar: "عادية", en: "Normal", tone: "secondary" },
+  low: { ar: "منخفضة", en: "Low", tone: "muted" },
 };
 
 export type AssignmentAction =

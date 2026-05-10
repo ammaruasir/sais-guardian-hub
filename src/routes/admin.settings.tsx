@@ -613,6 +613,21 @@ function AppearanceTab() {
             </label>
           </RadioGroup>
         </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">اللغة / Language</Label>
+          <RadioGroup
+            className="mt-2 flex gap-4"
+            value={s.language ?? "ar"}
+            onValueChange={(v) => update({ language: v as "ar" | "en" })}
+          >
+            <label className="flex items-center gap-2 text-sm">
+              <RadioGroupItem value="ar" /> عربي
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <RadioGroupItem value="en" /> English
+            </label>
+          </RadioGroup>
+        </div>
       </div>
     </SectionCard>
   );
