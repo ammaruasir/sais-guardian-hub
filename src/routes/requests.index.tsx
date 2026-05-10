@@ -13,15 +13,34 @@ import { requestStatusLabel, requestTypeLabel, priorityLabel } from "@/data/requ
 import { useT } from "@/hooks/useT";
 import { usePageTitle } from "@/hooks/usePageTitle";
 
+type RequestsSearch = { filter?: "active" | "new" | "in_review" | "waiting" | "approved" };
+
 export const Route = createFileRoute("/requests/")({
   component: RequestsInboxPage,
+  validateSearch: (s: Record<string, unknown>): RequestsSearch => {
+    const f = s.filter;
+    if (f === "active" || f === "new" || f === "in_review" || f === "waiting" || f === "approved") {
+      return { filter: f };
+    }
+    return {};
+  },
 });
+
+const filterMeta: Record<NonNullable<RequestsSearch["filter"]>, { ar: string; en: string }> = {
+  active: { ar: "الطلبات النشطة", en: "Active Requests" },
+  new: { ar: "طلبات جديدة", en: "New Requests" },
+  in_review: { ar: "قيد المراجعة", en: "Under Review" },
+  waiting: { ar: "بانتظار الرد", en: "Awaiting Reply" },
+  approved: { ar: "معتمدة", en: "Approved" },
+};
 
 function RequestsInboxPage() {
   const requests = useAppStore((s) => s.requests);
   const companies = useAppStore((s) => s.companies);
   const departments = useAppStore((s) => s.departments);
   const { t, lang, name, isAr } = useT();
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
   usePageTitle(t("incoming_requests") + " — SAIS");
   const [tab, setTab] = useState<"inbox" | "all" | "mine">("inbox");
   const [q, setQ] = useState("");
@@ -29,14 +48,21 @@ function RequestsInboxPage() {
 
   const filtered = useMemo(() => {
     let list = requests;
-    if (tab === "inbox") list = list.filter((r) => !["approved", "rejected"].includes(r.status));
-    if (tab === "mine") list = list.filter((r) => r.currentDepartment === "compliance");
+    if (search.filter === "active") list = list.filter((r) => !["approved", "rejected"].includes(r.status));
+    else if (search.filter === "new") list = list.filter((r) => r.status === "submitted");
+    else if (search.filter === "in_review") list = list.filter((r) => r.status === "in_review" || r.status === "escalated");
+    else if (search.filter === "waiting") list = list.filter((r) => r.status === "additional_docs");
+    else if (search.filter === "approved") list = list.filter((r) => r.status === "approved");
+    else if (tab === "inbox") list = list.filter((r) => !["approved", "rejected"].includes(r.status));
+    else if (tab === "mine") list = list.filter((r) => r.currentDepartment === "compliance");
     if (q.trim()) {
       const s = q.toLowerCase();
       list = list.filter((r) => r.ref.toLowerCase().includes(s) || r.titleAr.includes(q));
     }
     return list;
-  }, [requests, tab, q]);
+  }, [requests, tab, q, search.filter]);
+
+  const clearFilter = () => navigate({ search: {} });
 
   return (
     <AppShell>
