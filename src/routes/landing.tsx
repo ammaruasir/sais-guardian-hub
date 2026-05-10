@@ -69,7 +69,7 @@ function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground">
+    <div className="content-area min-h-screen bg-white text-slate-900 dark:bg-background dark:text-foreground">
       {/* Top utility bar */}
       <div className="bg-[#006c35] text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 text-[11px] md:px-6">

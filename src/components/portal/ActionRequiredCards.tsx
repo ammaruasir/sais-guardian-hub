@@ -2,9 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { FileWarning, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/appStore";
+import { useT } from "@/hooks/useT";
 
 export function ActionRequiredCards() {
   const requests = useAppStore((s) => s.requests);
+  const { t, isAr } = useT();
   const items = requests.filter(
     (r) => r.companyId === "aramco" && r.status === "additional_docs",
   );
@@ -13,7 +15,7 @@ export function ActionRequiredCards() {
     return (
       <div className="rounded-xl border border-success/30 bg-success/5 p-4 text-sm flex items-center gap-3">
         <CheckCircle2 className="h-5 w-5 text-success" />
-        لا توجد إجراءات مطلوبة حالياً ✓
+        {t("no_actions")}
       </div>
     );
   }
@@ -39,14 +41,14 @@ export function ActionRequiredCards() {
                 <div className="font-mono text-[11px] text-muted-foreground mt-0.5">{r.ref}</div>
                 {lastNote && (
                   <div className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                    المطلوب: {lastNote}
+                    {isAr ? "المطلوب:" : "Required:"} {lastNote}
                   </div>
                 )}
               </div>
             </div>
             <Button asChild size="sm">
               <Link to="/portal/requests/$id" params={{ id: r.id }}>
-                الرد وإرفاق المستندات
+                {t("respond_attach")}
               </Link>
             </Button>
           </div>

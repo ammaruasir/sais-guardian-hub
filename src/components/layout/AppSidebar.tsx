@@ -68,7 +68,7 @@ export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <Sidebar side={isAr ? "right" : "left"} collapsible="icon">
+    <Sidebar side="right" collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         {role === "sais" ? (
           <>

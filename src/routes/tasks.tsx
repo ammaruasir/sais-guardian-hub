@@ -10,6 +10,7 @@ import { NewTaskDialog } from "@/components/tasks/NewTaskDialog";
 import { currentUserId } from "@/data/tasks";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/tasks")({
   component: GuardedTasks,
@@ -25,8 +26,9 @@ function TasksPage() {
   const tasks = useAppStore((s) => s.tasks);
   const [mine, setMine] = useState(false);
   const [open, setOpen] = useState(false);
+  const { t, isAr } = useT();
   const filtered = useMemo(
-    () => (mine ? tasks.filter((t) => t.assigneeId === currentUserId) : tasks),
+    () => (mine ? tasks.filter((tk) => tk.assigneeId === currentUserId) : tasks),
     [mine, tasks],
   );
 
@@ -35,17 +37,19 @@ function TasksPage() {
       <div className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">المهام</h1>
-            <p className="text-sm text-muted-foreground">إدارة مهام المراجعة والتفتيش والمتابعة</p>
+            <h1 className="text-2xl font-bold tracking-tight">{t("tasks")}</h1>
+            <p className="text-sm text-muted-foreground">
+              {isAr ? "إدارة مهام المراجعة والتفتيش والمتابعة" : "Manage review, inspection and follow-up tasks"}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-sm">
               <Switch checked={mine} onCheckedChange={setMine} />
-              <span>مهامي</span>
+              <span>{isAr ? "مهامي" : "My tasks"}</span>
             </label>
             <Button onClick={() => setOpen(true)} className="gap-1">
               <Plus className="h-4 w-4" />
-              إضافة مهمة
+              {isAr ? "إضافة مهمة" : "Add task"}
             </Button>
           </div>
         </div>

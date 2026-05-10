@@ -16,6 +16,7 @@ import {
 import { ProjectFormDialog } from "@/components/projects/ProjectFormDialog";
 import { useAppStore } from "@/store/appStore";
 import { Toaster } from "@/components/ui/sonner";
+import { useT } from "@/hooks/useT";
 
 export const Route = createFileRoute("/projects/")({
   component: GuardedProjects,
@@ -33,26 +34,29 @@ function ProjectsPage() {
   const [view, setView] = useState<"kanban" | "table">("kanban");
   const [dialogOpen, setDialogOpen] = useState(false);
   const filtered = useMemo(() => applyFilters(projects, filters), [filters, projects]);
+  const { t, isAr } = useT();
 
   return (
     <AppShell>
       <div className="space-y-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">المشاريع</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{t("projects")}</h1>
             <p className="text-sm text-muted-foreground">
-              إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع
+              {isAr
+                ? "إدارة ومتابعة جميع تقديمات المشاريع عبر المراحل الأربع"
+                : "Manage and track all project submissions across the four stages"}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={() => setDialogOpen(true)}>
               <Plus className="ms-1 h-4 w-4" />
-              إضافة مشروع
+              {t("add_project")}
             </Button>
             <Tabs value={view} onValueChange={(v) => setView(v as "kanban" | "table")}>
               <TabsList>
-                <TabsTrigger value="kanban">كانبان</TabsTrigger>
-                <TabsTrigger value="table">جدول</TabsTrigger>
+                <TabsTrigger value="kanban">{isAr ? "كانبان" : "Kanban"}</TabsTrigger>
+                <TabsTrigger value="table">{isAr ? "جدول" : "Table"}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -61,8 +65,11 @@ function ProjectsPage() {
         <ProjectsFilters value={filters} onChange={setFilters} />
 
         <div className="text-xs text-muted-foreground">
-          يعرض <span className="num font-semibold text-foreground">{filtered.length}</span> من
-          <span className="num font-semibold text-foreground"> {projects.length}</span> مشروع
+          {isAr ? "يعرض" : "Showing"}{" "}
+          <span className="num font-semibold text-foreground">{filtered.length}</span>{" "}
+          {isAr ? "من" : "of"}{" "}
+          <span className="num font-semibold text-foreground">{projects.length}</span>{" "}
+          {isAr ? "مشروع" : "projects"}
         </div>
 
         {view === "kanban" ? (

@@ -39,7 +39,7 @@ function AuthPage() {
 
   return (
     <div
-      className="relative min-h-screen bg-[#0a0f1f] text-white"
+      className="content-area relative min-h-screen bg-[#0a0f1f] text-white"
       dir="rtl"
     >
       <Toaster position="top-center" />

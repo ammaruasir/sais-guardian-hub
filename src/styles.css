@@ -140,7 +140,11 @@
   }
 
   html.font-en {
-    --app-font: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
+    font-family: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  }
+
+  html.font-ar {
+    font-family: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
   }
 
   body {
@@ -189,5 +193,26 @@
 
 html, body {
   transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* ===== Bilingual content alignment =====
+   Layout always stays RTL. Only text alignment inside .content-area
+   flips when the active language is English. */
+body.lang-ar .content-area { text-align: right; }
+body.lang-en .content-area { text-align: left; }
+body.lang-en .content-area :is(h1, h2, h3, h4, h5, h6, p, span, label, li, dt, dd, td, th) {
+  text-align: left;
+}
+body.lang-en .content-area table {
+  direction: ltr;
+}
+/* Allow explicit overrides (e.g. Arabic-only snippets in EN mode) */
+body.lang-en .content-area [dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+body.lang-ar .content-area [dir="ltr"] {
+  direction: ltr;
+  text-align: left;
 }
 

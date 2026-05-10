@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <AppSidebar />
           <SidebarInset className="flex flex-1 flex-col">
             <TopBar />
-            <main key={role} className="flex-1 p-4 md:p-6 animate-in fade-in duration-200">
+            <main key={role} className="content-area flex-1 p-4 md:p-6 animate-in fade-in duration-200">
               {children}
             </main>
           </SidebarInset>
