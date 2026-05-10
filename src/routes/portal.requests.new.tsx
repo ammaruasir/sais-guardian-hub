@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { useAppStore } from "@/store/appStore";
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/portal/requests/new")({
 });
 
 function NewRequestWizard() {
-  const navigate = useNavigate();
   const createRequest = useAppStore((s) => s.createRequest);
   const [step, setStep] = useState(1);
   const [type, setType] = useState<RequestType>("new_project");
@@ -29,21 +28,21 @@ function NewRequestWizard() {
   const [descriptionAr, setDescriptionAr] = useState("");
   const [priority, setPriority] = useState<Priority>("normal");
   const [files, setFiles] = useState<string[]>([]);
-  const [createdRef, setCreatedRef] = useState<string | null>(null);
+  const [created, setCreated] = useState<{ id: string; ref: string } | null>(null);
 
   const next = () => setStep((s) => Math.min(4, s + 1));
   const back = () => setStep((s) => Math.max(1, s - 1));
 
   const submit = () => {
-    const ref = createRequest({
+    const result = createRequest({
       titleAr, descriptionAr, type, priority, companyId: "aramco",
       receivedAt: new Date().toISOString().slice(0, 10),
     });
-    setCreatedRef(ref);
+    setCreated(result);
     setStep(5);
   };
 
-  if (step === 5 && createdRef) {
+  if (step === 5 && created) {
     return (
       <AppShell>
         <div className="max-w-xl mx-auto py-12 text-center space-y-4">
@@ -52,11 +51,13 @@ function NewRequestWizard() {
           </div>
           <h1 className="text-2xl font-bold">تم تقديم طلبك بنجاح</h1>
           <p className="text-muted-foreground">رقم الطلب المرجعي:</p>
-          <div className="text-3xl font-mono font-bold text-primary">{createdRef}</div>
-          <p className="text-sm text-muted-foreground">يمكنك متابعة حالة الطلب من قائمة طلباتك.</p>
+          <div className="text-3xl font-mono font-bold text-primary">{created.ref}</div>
+          <p className="text-sm text-muted-foreground">يمكنك متابعة حالة الطلب أو العودة للوحة الرئيسية.</p>
           <div className="flex gap-2 justify-center pt-4">
-            <Button asChild><Link to="/portal/requests">عرض طلباتي</Link></Button>
-            <Button asChild variant="outline"><Link to="/portal">العودة للوحة</Link></Button>
+            <Button asChild>
+              <Link to="/portal/requests/$id" params={{ id: created.id }}>متابعة الطلب</Link>
+            </Button>
+            <Button asChild variant="outline"><Link to="/portal">العودة للرئيسية</Link></Button>
           </div>
         </div>
       </AppShell>

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { CheckCircle2, FileWarning, Send, MessageSquare, XCircle } from "lucide-react";
 import { useAppStore } from "@/store/appStore";
 
@@ -11,7 +12,9 @@ const iconMap = {
 
 export function RecentUpdatesTimeline() {
   const activity = useAppStore((s) => s.activity);
-  const updates = activity.slice(0, 6);
+  const requests = useAppStore((s) => s.requests);
+  const updates = activity.slice(0, 5);
+  const aramcoFirstReqId = requests.find((r) => r.companyId === "aramco")?.id;
   return (
     <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
       <h2 className="mb-4 text-base font-semibold">آخر التحديثات</h2>
@@ -26,11 +29,27 @@ export function RecentUpdatesTimeline() {
                 style={{ color: m.color, boxShadow: `inset 0 0 0 2px ${m.color}` }}
               />
               <div className="me-4 flex-1">
-                <div className="flex items-start gap-2">
-                  <m.Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: m.color }} />
-                  <div className="text-sm leading-snug">{u.ar}</div>
-                </div>
-                <div className="mt-1 me-6 text-[11px] text-muted-foreground">{u.ts}</div>
+                {aramcoFirstReqId ? (
+                  <Link
+                    to="/portal/requests/$id"
+                    params={{ id: aramcoFirstReqId }}
+                    className="block hover:opacity-80"
+                  >
+                    <div className="flex items-start gap-2">
+                      <m.Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: m.color }} />
+                      <div className="text-sm leading-snug">{u.ar}</div>
+                    </div>
+                    <div className="mt-1 me-6 text-[11px] text-muted-foreground">{u.ts}</div>
+                  </Link>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-2">
+                      <m.Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: m.color }} />
+                      <div className="text-sm leading-snug">{u.ar}</div>
+                    </div>
+                    <div className="mt-1 me-6 text-[11px] text-muted-foreground">{u.ts}</div>
+                  </>
+                )}
               </div>
             </li>
           );
