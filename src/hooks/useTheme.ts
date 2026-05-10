@@ -36,6 +36,16 @@ export function useTheme() {
     applyClass(resolvedTheme);
   }, [resolvedTheme]);
 
+  // Apply RTL/LTR + font on language change
+  const language = (useAppStore((s) => s.settings.language) ?? "ar") as "ar" | "en";
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    root.dir = language === "ar" ? "rtl" : "ltr";
+    root.lang = language;
+    root.classList.toggle("font-en", language === "en");
+  }, [language]);
+
   const setTheme = (m: ThemeMode) => updateSettings({ themeMode: m });
 
   return { themeMode, resolvedTheme, setTheme };
