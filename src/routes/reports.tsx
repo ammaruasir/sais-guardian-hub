@@ -241,38 +241,60 @@ function ReportsContent() {
     setExporting(true);
     toast.info("جاري إنشاء التقرير...");
     try {
-      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+      const [{ default: jsPDF }, html2canvasMod] = await Promise.all([
         import("jspdf"),
-        import("html2canvas"),
+        import("html2canvas-pro"),
       ]);
-      const canvas = await html2canvas(reportRef.current, {
+      const html2canvas = (html2canvasMod as any).default ?? html2canvasMod;
+      const node = reportRef.current;
+      // Wait one frame so any pending chart re-render settles
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+      const canvas = await html2canvas(node, {
         scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
-        windowWidth: reportRef.current.scrollWidth,
+        windowWidth: node.scrollWidth,
       });
-      const imgData = canvas.toDataURL("image/png");
+
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgW = pageWidth;
-      const imgH = (canvas.height * imgW) / canvas.width;
-      let heightLeft = imgH;
-      let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-      heightLeft -= pageHeight;
-      while (heightLeft > 0) {
-        position = heightLeft - imgH;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-        heightLeft -= pageHeight;
+
+      // Pixel height of one PDF page from the source canvas
+      const pxPerMm = canvas.width / pageWidth;
+      const pageHeightPx = Math.floor(pageHeight * pxPerMm);
+
+      let renderedHeight = 0;
+      let pageIndex = 0;
+      while (renderedHeight < canvas.height) {
+        const sliceHeight = Math.min(pageHeightPx, canvas.height - renderedHeight);
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext("2d");
+        if (!ctx) throw new Error("Canvas context unavailable");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(
+          canvas,
+          0, renderedHeight, canvas.width, sliceHeight,
+          0, 0, canvas.width, sliceHeight
+        );
+        const imgData = pageCanvas.toDataURL("image/jpeg", 0.92);
+        const imgH = (sliceHeight / canvas.width) * pageWidth;
+        if (pageIndex > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgH);
+        renderedHeight += sliceHeight;
+        pageIndex += 1;
       }
+
       const stamp = new Date().toISOString().slice(0, 10);
       pdf.save(`SAIS-Report-${stamp}.pdf`);
       toast.success("تم تنزيل التقرير بنجاح ✓");
-    } catch (e) {
-      console.error(e);
-      toast.error("تعذّر إنشاء التقرير");
+    } catch (e: any) {
+      console.error("PDF export failed:", e);
+      toast.error(`تعذّر إنشاء التقرير: ${e?.message ?? "خطأ غير معروف"}`);
     } finally {
       setExporting(false);
     }
