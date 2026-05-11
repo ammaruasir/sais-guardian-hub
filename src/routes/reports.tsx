@@ -25,6 +25,7 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import { useT } from "@/hooks/useT";
 import { Download, FileText, ClipboardList, Building2, Users, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import saisEmblem from "@/assets/sais-emblem.png";
 import {
   BarChart,
   Bar,
@@ -240,38 +241,60 @@ function ReportsContent() {
     setExporting(true);
     toast.info("جاري إنشاء التقرير...");
     try {
-      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+      const [{ default: jsPDF }, html2canvasMod] = await Promise.all([
         import("jspdf"),
-        import("html2canvas"),
+        import("html2canvas-pro"),
       ]);
-      const canvas = await html2canvas(reportRef.current, {
+      const html2canvas = (html2canvasMod as any).default ?? html2canvasMod;
+      const node = reportRef.current;
+      // Wait one frame so any pending chart re-render settles
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+      const canvas = await html2canvas(node, {
         scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
-        windowWidth: reportRef.current.scrollWidth,
+        windowWidth: node.scrollWidth,
       });
-      const imgData = canvas.toDataURL("image/png");
+
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgW = pageWidth;
-      const imgH = (canvas.height * imgW) / canvas.width;
-      let heightLeft = imgH;
-      let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-      heightLeft -= pageHeight;
-      while (heightLeft > 0) {
-        position = heightLeft - imgH;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-        heightLeft -= pageHeight;
+
+      // Pixel height of one PDF page from the source canvas
+      const pxPerMm = canvas.width / pageWidth;
+      const pageHeightPx = Math.floor(pageHeight * pxPerMm);
+
+      let renderedHeight = 0;
+      let pageIndex = 0;
+      while (renderedHeight < canvas.height) {
+        const sliceHeight = Math.min(pageHeightPx, canvas.height - renderedHeight);
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext("2d");
+        if (!ctx) throw new Error("Canvas context unavailable");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(
+          canvas,
+          0, renderedHeight, canvas.width, sliceHeight,
+          0, 0, canvas.width, sliceHeight
+        );
+        const imgData = pageCanvas.toDataURL("image/jpeg", 0.92);
+        const imgH = (sliceHeight / canvas.width) * pageWidth;
+        if (pageIndex > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgH);
+        renderedHeight += sliceHeight;
+        pageIndex += 1;
       }
+
       const stamp = new Date().toISOString().slice(0, 10);
       pdf.save(`SAIS-Report-${stamp}.pdf`);
       toast.success("تم تنزيل التقرير بنجاح ✓");
-    } catch (e) {
-      console.error(e);
-      toast.error("تعذّر إنشاء التقرير");
+    } catch (e: any) {
+      console.error("PDF export failed:", e);
+      toast.error(`تعذّر إنشاء التقرير: ${e?.message ?? "خطأ غير معروف"}`);
     } finally {
       setExporting(false);
     }
@@ -305,22 +328,29 @@ function ReportsContent() {
       </div>
 
       {/* Report area to capture */}
-      <div ref={reportRef} className="space-y-6 bg-background p-1">
-        {/* PDF cover (visible inside the page too) */}
-        <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-l from-primary/5 to-secondary/5 p-6">
-            <div>
-              <div className="text-xs text-muted-foreground">الهيئة العليا للأمن الصناعي</div>
-              <h2 className="mt-1 text-xl font-bold">تقرير الأداء التحليلي</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                الفترة: {range === "30d" ? "آخر 30 يوم" : range === "3m" ? "آخر 3 أشهر" : range === "1y" ? "سنة كاملة" : "آخر 6 أشهر"}
-                {" — "}
-                تاريخ الإصدار: {new Date().toLocaleDateString("ar-SA")}
-              </p>
-            </div>
-            <FileText className="h-10 w-10 text-primary/60" />
+      <div ref={reportRef} dir="rtl" className="space-y-6 bg-white p-6 border-2 border-[#0E5A3A] rounded-md">
+        {/* Official SAIS header */}
+        <div className="grid grid-cols-3 items-center gap-4 pb-4 border-b-2 border-[#0E5A3A]">
+          <div className="text-right text-[#0E5A3A]">
+            <div className="text-sm font-bold">المملكة العربية السعودية</div>
+            <div className="text-xs">الهيئة العليا للأمن الصناعي</div>
+            <div className="text-[10px] text-muted-foreground mt-1">Supreme Authority For Industrial Security</div>
           </div>
-        </Card>
+          <div className="flex justify-center">
+            <img src={saisEmblem} alt="SAIS" className="h-24 w-auto" crossOrigin="anonymous" />
+          </div>
+          <div className="text-left text-xs space-y-1">
+            <div><span className="text-muted-foreground">الرقم: </span><span className="font-mono">RPT-{new Date().getFullYear()}-{String(Math.floor(Math.random()*9000)+1000)}</span></div>
+            <div><span className="text-muted-foreground">التاريخ: </span><span dir="ltr">{new Date().toLocaleDateString("ar-SA")}</span></div>
+            <div><span className="text-muted-foreground">الفترة: </span>{range === "30d" ? "آخر 30 يوم" : range === "3m" ? "آخر 3 أشهر" : range === "1y" ? "سنة كاملة" : "آخر 6 أشهر"}</div>
+          </div>
+        </div>
+
+        {/* Title bar */}
+        <div className="bg-[#0E5A3A] text-white px-4 py-2 rounded text-center">
+          <h2 className="text-lg font-bold">تقرير الأداء التحليلي</h2>
+          <p className="text-[11px] opacity-90">Analytical Performance Report</p>
+        </div>
 
         {/* KPI tiles */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -578,6 +608,11 @@ function ReportsContent() {
             <Line type="monotone" dataKey="v" stroke="var(--primary)" strokeWidth={2} name="مشاريع مكتملة" />
           </LineChart>
         </ChartCard>
+
+        {/* Official footer */}
+        <div className="pt-4 mt-4 border-t-2 border-[#0E5A3A] text-center text-[11px] text-[#0E5A3A]">
+          الرياض — المملكة العربية السعودية | sais.gov.sa
+        </div>
       </div>
     </div>
   );
