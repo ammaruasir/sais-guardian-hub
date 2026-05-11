@@ -237,56 +237,252 @@ function ReportsContent() {
   const avgSla = Math.round(departments.reduce((a, b) => a + b.sla, 0) / departments.length);
 
   const exportPdf = async () => {
-    if (!reportRef.current) return;
     setExporting(true);
     toast.info("جاري إنشاء التقرير...");
+    let host: HTMLDivElement | null = null;
     try {
       const [{ default: jsPDF }, html2canvasMod] = await Promise.all([
         import("jspdf"),
         import("html2canvas-pro"),
       ]);
       const html2canvas = (html2canvasMod as any).default ?? html2canvasMod;
-      const node = reportRef.current;
-      // Wait one frame so any pending chart re-render settles
-      await new Promise((r) => requestAnimationFrame(() => r(null)));
 
-      const canvas = await html2canvas(node, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: node.scrollWidth,
-      });
+      // 1) Snapshot existing on-page chart cards as images (so charts keep colors/RTL)
+      const chartImages: string[] = [];
+      if (reportRef.current) {
+        const chartNodes = reportRef.current.querySelectorAll<HTMLElement>("[data-chart-card]");
+        for (const node of Array.from(chartNodes)) {
+          const c = await html2canvas(node, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+          chartImages.push(c.toDataURL("image/png"));
+        }
+      }
+
+      // 2) Build offscreen multi-page A4 template (RTL)
+      const A4_W = 794; // px @96dpi
+      const A4_H = 1123;
+      const periodLabel = range === "30d" ? "آخر 30 يوم" : range === "3m" ? "آخر 3 أشهر" : range === "1y" ? "سنة كاملة" : "آخر 6 أشهر";
+      const issueDate = new Date().toLocaleDateString("ar-SA");
+      const refNo = `RPT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+
+      const esc = (s: any) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+      const slaCell = (n: number) => {
+        const color = n >= 90 ? "#15803d" : n >= 85 ? "#b45309" : "#be123c";
+        const bg = n >= 90 ? "#dcfce7" : n >= 85 ? "#fef3c7" : "#ffe4e6";
+        return `<span style="display:inline-block;padding:2px 8px;border-radius:6px;background:${bg};color:${color};font-weight:600">${n}%</span>`;
+      };
+
+      const headerHtml = `
+        <div style="display:flex;align-items:center;gap:16px;padding-bottom:12px;border-bottom:2px solid #0E5A3A">
+          <div style="flex:1;text-align:right;color:#0E5A3A">
+            <div style="font-size:13px;font-weight:700">المملكة العربية السعودية</div>
+            <div style="font-size:11px">الهيئة العليا للأمن الصناعي</div>
+          </div>
+          <div style="flex:0 0 auto"><img src="${saisEmblem}" style="height:80px;width:auto" crossorigin="anonymous"/></div>
+          <div style="flex:1;text-align:left;font-size:11px;line-height:1.7">
+            <div><span style="color:#64748b">الرقم: </span><span style="font-family:monospace">${refNo}</span></div>
+            <div><span style="color:#64748b">التاريخ: </span><span dir="ltr">${issueDate}</span></div>
+            <div><span style="color:#64748b">الفترة: </span>${periodLabel}</div>
+          </div>
+        </div>`;
+
+      const titleBar = `
+        <div style="background:#0E5A3A;color:#fff;padding:8px 16px;border-radius:6px;text-align:center;margin-top:14px">
+          <div style="font-size:16px;font-weight:700">تقرير الأداء التحليلي</div>
+          <div style="font-size:10px;opacity:.9">Analytical Performance Report</div>
+        </div>`;
+
+      const footerHtml = (n: number, total: number) => `
+        <div style="position:absolute;bottom:24px;inset-inline:24px;border-top:2px solid #0E5A3A;padding-top:8px;display:flex;justify-content:space-between;font-size:10px;color:#0E5A3A">
+          <span>الرياض — المملكة العربية السعودية | sais.gov.sa</span>
+          <span dir="ltr">${n} / ${total}</span>
+        </div>`;
+
+      const sectionTitle = (ar: string, en: string) => `
+        <div style="margin-top:18px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #d1d5db">
+          <div style="font-size:14px;font-weight:700;color:#0E5A3A">${ar}</div>
+          <div style="font-size:10px;color:#64748b">${en}</div>
+        </div>`;
+
+      const tableStyle = `width:100%;border-collapse:collapse;font-size:11px;direction:rtl`;
+      const thStyle = `background:#0E5A3A;color:#fff;padding:8px;text-align:right;font-weight:600;border:1px solid #0E5A3A`;
+      const tdStyle = `padding:7px 8px;border:1px solid #e5e7eb;text-align:right`;
+
+      const kpiCard = (label: string, value: string | number, hint: string) => `
+        <div style="border:1px solid #e5e7eb;border-radius:10px;padding:14px;background:#f8fafc">
+          <div style="font-size:10px;color:#64748b;margin-bottom:4px">${label}</div>
+          <div style="font-size:22px;font-weight:700;color:#0E5A3A">${value}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:4px">${hint}</div>
+        </div>`;
+
+      const pages: string[] = [];
+
+      // Page 1 — Cover + KPIs
+      pages.push(`
+        ${headerHtml}
+        ${titleBar}
+        <div style="margin-top:24px;text-align:center">
+          <div style="font-size:13px;color:#64748b">الفترة المختارة</div>
+          <div style="font-size:18px;font-weight:700;margin-top:4px">${periodLabel}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:6px">تاريخ الإصدار: <span dir="ltr">${issueDate}</span></div>
+        </div>
+        ${sectionTitle("المؤشرات الرئيسية", "Key Performance Indicators")}
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          ${kpiCard("إجمالي الطلبات", totalRequests, "ضمن الفترة المختارة")}
+          ${kpiCard("مشاريع نشطة", totalActive, `${totalCompleted} مكتمل`)}
+          ${kpiCard("متوسط زمن المراجعة", `${stagesR[2].days} يوم`, "عبر جميع المراحل")}
+          ${kpiCard("نسبة التزام SLA", `${avgSla}%`, "متوسط جميع الإدارات")}
+        </div>
+      `);
+
+      // Page 2 — Requests table
+      pages.push(`
+        ${headerHtml}
+        ${sectionTitle("أحدث الطلبات", "Latest Requests")}
+        <table style="${tableStyle}">
+          <thead><tr>
+            <th style="${thStyle}">الرقم</th>
+            <th style="${thStyle}">المنشأة</th>
+            <th style="${thStyle}">النوع</th>
+            <th style="${thStyle}">المراجع</th>
+            <th style="${thStyle}">الحالة</th>
+            <th style="${thStyle}">التاريخ</th>
+          </tr></thead>
+          <tbody>
+            ${requestsRows.map((r) => `<tr>
+              <td style="${tdStyle};font-family:monospace" dir="ltr">${esc(r.id)}</td>
+              <td style="${tdStyle};font-weight:600">${esc(r.company)}</td>
+              <td style="${tdStyle};color:#64748b">${esc(r.type)}</td>
+              <td style="${tdStyle}">${esc(r.reviewer)}</td>
+              <td style="${tdStyle}">${esc(r.status)}</td>
+              <td style="${tdStyle};color:#64748b" dir="ltr">${esc(r.date)}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      `);
+
+      // Page 3 — Projects table
+      pages.push(`
+        ${headerHtml}
+        ${sectionTitle("المشاريع النشطة", "Active Projects")}
+        <table style="${tableStyle}">
+          <thead><tr>
+            <th style="${thStyle}">الرقم</th>
+            <th style="${thStyle}">المنشأة</th>
+            <th style="${thStyle}">القطاع</th>
+            <th style="${thStyle}">المرحلة</th>
+            <th style="${thStyle}">الحالة</th>
+            <th style="${thStyle}">عدد الأيام</th>
+          </tr></thead>
+          <tbody>
+            ${projectsRows.map((p) => `<tr>
+              <td style="${tdStyle};font-family:monospace" dir="ltr">${esc(p.id)}</td>
+              <td style="${tdStyle};font-weight:600">${esc(p.company)}</td>
+              <td style="${tdStyle};color:#64748b">${esc(p.sector)}</td>
+              <td style="${tdStyle}">${esc(p.stage)}</td>
+              <td style="${tdStyle}">${esc(p.status)}</td>
+              <td style="${tdStyle};text-align:center">${p.days}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      `);
+
+      // Page 4 — Departments
+      pages.push(`
+        ${headerHtml}
+        ${sectionTitle("أداء الإدارات", "Department Performance")}
+        <table style="${tableStyle}">
+          <thead><tr>
+            <th style="${thStyle}">الإدارة</th>
+            <th style="${thStyle}">نشطة</th>
+            <th style="${thStyle}">مكتملة</th>
+            <th style="${thStyle}">متوسط الأيام</th>
+            <th style="${thStyle}">التزام SLA</th>
+          </tr></thead>
+          <tbody>
+            ${departments.map((d) => `<tr>
+              <td style="${tdStyle};font-weight:600">${esc(d.name)}</td>
+              <td style="${tdStyle};text-align:center">${d.active}</td>
+              <td style="${tdStyle};text-align:center">${d.completed}</td>
+              <td style="${tdStyle};text-align:center">${d.avgDays}</td>
+              <td style="${tdStyle};text-align:center">${slaCell(d.sla)}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      `);
+
+      // Page 5 — Employees
+      pages.push(`
+        ${headerHtml}
+        ${sectionTitle("أداء الموظفين", "Employee Performance")}
+        <table style="${tableStyle}">
+          <thead><tr>
+            <th style="${thStyle}">الموظف</th>
+            <th style="${thStyle}">الإدارة</th>
+            <th style="${thStyle}">نشطة</th>
+            <th style="${thStyle}">مكتملة</th>
+            <th style="${thStyle}">متوسط الأيام</th>
+            <th style="${thStyle}">SLA</th>
+          </tr></thead>
+          <tbody>
+            ${employees.map((e) => `<tr>
+              <td style="${tdStyle};font-weight:600">${esc(e.name)}</td>
+              <td style="${tdStyle};color:#64748b">${esc(e.dept)}</td>
+              <td style="${tdStyle};text-align:center">${e.active}</td>
+              <td style="${tdStyle};text-align:center">${e.completed}</td>
+              <td style="${tdStyle};text-align:center">${e.avgDays}</td>
+              <td style="${tdStyle};text-align:center">${slaCell(e.sla)}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      `);
+
+      // Pages for charts (2 charts per page)
+      for (let i = 0; i < chartImages.length; i += 2) {
+        const pair = chartImages.slice(i, i + 2);
+        pages.push(`
+          ${headerHtml}
+          ${sectionTitle("الرسوم البيانية", "Visual Analytics")}
+          <div style="display:flex;flex-direction:column;gap:14px">
+            ${pair.map((src) => `<div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;background:#fff"><img src="${src}" style="width:100%;height:auto;display:block"/></div>`).join("")}
+          </div>
+        `);
+      }
+
+      const totalPages = pages.length;
+      host = document.createElement("div");
+      host.style.cssText = `position:fixed;left:-99999px;top:0;width:${A4_W}px;background:#fff;font-family:"IBM Plex Sans Arabic","Tajawal",system-ui,sans-serif`;
+      host.dir = "rtl";
+      host.innerHTML = pages.map((body, idx) => `
+        <div data-pdf-page style="position:relative;width:${A4_W}px;height:${A4_H}px;padding:24px;box-sizing:border-box;background:#fff;border:2px solid #0E5A3A;overflow:hidden">
+          ${body}
+          ${footerHtml(idx + 1, totalPages)}
+        </div>
+      `).join("");
+      document.body.appendChild(host);
+
+      // Wait for images (logo + chart snapshots) to load
+      await Promise.all(
+        Array.from(host.querySelectorAll("img")).map(
+          (img) => (img as HTMLImageElement).complete
+            ? Promise.resolve()
+            : new Promise((res) => { img.addEventListener("load", () => res(null)); img.addEventListener("error", () => res(null)); })
+        )
+      );
 
       const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Pixel height of one PDF page from the source canvas
-      const pxPerMm = canvas.width / pageWidth;
-      const pageHeightPx = Math.floor(pageHeight * pxPerMm);
-
-      let renderedHeight = 0;
-      let pageIndex = 0;
-      while (renderedHeight < canvas.height) {
-        const sliceHeight = Math.min(pageHeightPx, canvas.height - renderedHeight);
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = sliceHeight;
-        const ctx = pageCanvas.getContext("2d");
-        if (!ctx) throw new Error("Canvas context unavailable");
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-        ctx.drawImage(
-          canvas,
-          0, renderedHeight, canvas.width, sliceHeight,
-          0, 0, canvas.width, sliceHeight
-        );
-        const imgData = pageCanvas.toDataURL("image/jpeg", 0.92);
-        const imgH = (sliceHeight / canvas.width) * pageWidth;
-        if (pageIndex > 0) pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgH);
-        renderedHeight += sliceHeight;
-        pageIndex += 1;
+      const pageWidthMm = pdf.internal.pageSize.getWidth();
+      const pageHeightMm = pdf.internal.pageSize.getHeight();
+      const pageEls = host.querySelectorAll<HTMLElement>("[data-pdf-page]");
+      for (let i = 0; i < pageEls.length; i++) {
+        const c = await html2canvas(pageEls[i], {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          windowWidth: A4_W,
+        });
+        const data = c.toDataURL("image/jpeg", 0.94);
+        if (i > 0) pdf.addPage();
+        pdf.addImage(data, "JPEG", 0, 0, pageWidthMm, pageHeightMm);
       }
 
       const stamp = new Date().toISOString().slice(0, 10);
@@ -296,6 +492,7 @@ function ReportsContent() {
       console.error("PDF export failed:", e);
       toast.error(`تعذّر إنشاء التقرير: ${e?.message ?? "خطأ غير معروف"}`);
     } finally {
+      if (host && host.parentNode) host.parentNode.removeChild(host);
       setExporting(false);
     }
   };
