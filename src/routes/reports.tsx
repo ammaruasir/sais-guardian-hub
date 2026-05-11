@@ -601,11 +601,6 @@ function ReportsContent() {
             <Line type="monotone" dataKey="v" stroke="var(--primary)" strokeWidth={2} name="مشاريع مكتملة" />
           </LineChart>
         </ChartCard>
-
-        {/* Official footer */}
-        <div className="pt-4 mt-4 border-t-2 border-[#0E5A3A] text-center text-[11px] text-[#0E5A3A]">
-          الرياض — المملكة العربية السعودية | sais.gov.sa
-        </div>
       </div>
     </div>
   );
