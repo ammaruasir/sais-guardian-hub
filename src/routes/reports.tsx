@@ -25,6 +25,7 @@ import { usePageTitle } from "@/hooks/usePageTitle";
 import { useT } from "@/hooks/useT";
 import { Download, FileText, ClipboardList, Building2, Users, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import saisEmblem from "@/assets/sais-emblem.png";
 import {
   BarChart,
   Bar,
