@@ -327,30 +327,23 @@ function ReportsContent() {
         </div>
       </div>
 
-      {/* Report area to capture */}
-      <div ref={reportRef} dir="rtl" className="space-y-6 bg-white p-6 border-2 border-[#0E5A3A] rounded-md">
-        {/* Official SAIS header */}
-        <div className="grid grid-cols-3 items-center gap-4 pb-4 border-b-2 border-[#0E5A3A]">
-          <div className="text-right text-[#0E5A3A]">
-            <div className="text-sm font-bold">المملكة العربية السعودية</div>
-            <div className="text-xs">الهيئة العليا للأمن الصناعي</div>
-            <div className="text-[10px] text-muted-foreground mt-1">Supreme Authority For Industrial Security</div>
+      {/* Report area (kept for on-screen viewing only) */}
+      <div ref={reportRef} className="space-y-6">
+        {/* Cover (on-screen) */}
+        <Card className="overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-l from-primary/5 to-secondary/5 p-6">
+            <div>
+              <div className="text-xs text-muted-foreground">الهيئة العليا للأمن الصناعي</div>
+              <h2 className="mt-1 text-xl font-bold">تقرير الأداء التحليلي</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                الفترة: {range === "30d" ? "آخر 30 يوم" : range === "3m" ? "آخر 3 أشهر" : range === "1y" ? "سنة كاملة" : "آخر 6 أشهر"}
+                {" — "}
+                تاريخ الإصدار: {new Date().toLocaleDateString("ar-SA")}
+              </p>
+            </div>
+            <FileText className="h-10 w-10 text-primary/60" />
           </div>
-          <div className="flex justify-center">
-            <img src={saisEmblem} alt="SAIS" className="h-24 w-auto" crossOrigin="anonymous" />
-          </div>
-          <div className="text-left text-xs space-y-1">
-            <div><span className="text-muted-foreground">الرقم: </span><span className="font-mono">RPT-{new Date().getFullYear()}-{String(Math.floor(Math.random()*9000)+1000)}</span></div>
-            <div><span className="text-muted-foreground">التاريخ: </span><span dir="ltr">{new Date().toLocaleDateString("ar-SA")}</span></div>
-            <div><span className="text-muted-foreground">الفترة: </span>{range === "30d" ? "آخر 30 يوم" : range === "3m" ? "آخر 3 أشهر" : range === "1y" ? "سنة كاملة" : "آخر 6 أشهر"}</div>
-          </div>
-        </div>
-
-        {/* Title bar */}
-        <div className="bg-[#0E5A3A] text-white px-4 py-2 rounded text-center">
-          <h2 className="text-lg font-bold">تقرير الأداء التحليلي</h2>
-          <p className="text-[11px] opacity-90">Analytical Performance Report</p>
-        </div>
+        </Card>
 
         {/* KPI tiles */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
