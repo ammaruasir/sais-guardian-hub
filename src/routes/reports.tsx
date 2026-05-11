@@ -162,7 +162,7 @@ function ChartCard({
   height?: number;
 }) {
   return (
-    <Card>
+    <Card data-chart-card>
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
         <p className="text-xs text-muted-foreground">{en}</p>
